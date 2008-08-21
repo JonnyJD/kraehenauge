@@ -48,8 +48,6 @@ var seiten = {
 	rbally1:	{name: "Allianzen",	pic: "allianz"}
 }
 
-window.addEventListener('load', function() {
-
 //Kernvariablen
 var wholePage = document.getElementsByTagName('HTML')[0].innerHTML;
 var session = document.getElementsByName('name')[0].value;
@@ -85,7 +83,7 @@ function createFormlink(leiste, seite, target) {
 	if (seite == "|") { createTrenner(leiste); }
 	else {
 		var linkForm = document.createElement('form');
-		linkForm.innerHTML = '<form>' +
+		linkForm.innerHTML = '<form method="post">' +
 '<input type="hidden" name="name" value="' + session + '">' +
 '<input type="hidden" name="passw" value="' + spieler + '">' +
 '<input type="hidden" name="seite" value="' + seite + '">' +
@@ -133,7 +131,7 @@ createTrenner(4); createTrenner(4);
 // Armeelinks
 if (spiel[spieler] && spiel[spieler].armeen) {
 for (var leiste = 3; leiste <= 4; leiste++) { 
-	var temptext = '<form>' +
+	var temptext = '<form method="post">' +
 '<input type="hidden" name="name" value="' + session + '">' +
 '<input type="hidden" name="passw" value="' + spieler + '">' +
 '<input type="hidden" name="seite" value="rbarmee">' +
@@ -154,10 +152,7 @@ for (var leiste = 3; leiste <= 4; leiste++) {
 	} else {
 		linkForm.style.border = "1px solid black";
 	}
-
-	var newTD = document.createElement('td');
-	document.getElementById('Leiste' + leiste).appendChild(newTD);
-	newTD.appendChild(linkForm);
+	document.getElementById('Leiste' + leiste).appendChild(linkForm);
 	createTrenner(leiste);
 }
 }
@@ -165,7 +160,7 @@ for (var leiste = 3; leiste <= 4; leiste++) {
 // Dorflinks
 if (spiel[spieler] && spiel[spieler].dorf) {
 for (var leiste = 3; leiste <= 4; leiste++) { 
-	temptext = '<form>' +
+	temptext = '<form method="post">' +
 '<input type="hidden" name="name" value="' + session + '">' +
 '<input type="hidden" name="passw" value="' + spieler + '">' +
 '<input type="hidden" name="seite" value="rbkarte">' +
@@ -185,10 +180,7 @@ for (var leiste = 3; leiste <= 4; leiste++) {
 	} else {
 		linkForm.style.border = "1px solid black";
 	}
-
-	var newTD = document.createElement('td');
-	document.getElementById('Leiste' + leiste).appendChild(newTD);
-	newTD.appendChild(linkForm);
+	document.getElementById('Leiste' + leiste).appendChild(linkForm);
 	createTrenner(leiste);
 }
 }
@@ -198,7 +190,7 @@ if (spiel[spieler] && spiel[spieler].hb) {
 // Ring
 for (var leiste = 3; leiste <= 4; leiste++) { 
 	var linkForm = document.createElement('form');
-	linkForm.innerHTML = '<form>' +
+	linkForm.innerHTML = '<form method="post">' +
 '<input type="hidden" name="name" value="' + session + '">' +
 '<input type="hidden" name="passw" value="' + spieler + '">' +
 '<input type="hidden" name="seite" value="3">' +
@@ -214,10 +206,7 @@ for (var leiste = 3; leiste <= 4; leiste++) {
 	} else {
 		linkForm.style.border = "1px solid black";
 	}
-
-	var newTD = document.createElement('td');
-	document.getElementById('Leiste' + leiste).appendChild(newTD);
-	newTD.appendChild(linkForm);
+	document.getElementById('Leiste' + leiste).appendChild(linkForm);
 	createTrenner(leiste);
 }
 
@@ -227,7 +216,7 @@ for (var i = 0; i < spiel["standard"].hb.length; i++) {
 	if (spieler == spiel["ab"]) { j = i; }
 	for (var leiste = 3; leiste <= 4; leiste++) { 
 		var linkForm = document.createElement('form');
-		linkForm.innerHTML = '<form>' +
+		linkForm.innerHTML = '<form method="post">' +
 '<input type="hidden" name="name" value="' + session + '">' +
 '<input type="hidden" name="passw" value="' + spieler + '">' +
 '<input type="hidden" name="seite" value="31">' +
@@ -244,10 +233,7 @@ for (var i = 0; i < spiel["standard"].hb.length; i++) {
 		} else {
 			linkForm.style.border = "1px solid black";
 		}
-
-		var newTD = document.createElement('td');
-		document.getElementById('Leiste' + leiste).appendChild(newTD);
-		newTD.appendChild(linkForm);
+		document.getElementById('Leiste' + leiste).appendChild(linkForm);
 	}
 }
 }
@@ -263,25 +249,3 @@ newlink.href = "http://ksk.JonnyJD.net/alirion/preise";
 newlink.target = "_blank";
 newlink.appendChild(ksktag);
 document.getElementById('Leiste4').appendChild(newlink);
-
-
-	//'<br/><textarea style="width:400px; height:500px;" id="KSKAntwort">' +
-	//'</textarea>' +
-	//'</div></td>' +
-//GM_xmlhttpRequest({
-//	method: 'POST',
-//	url: 'http://ksk.JonnyJD.net/sendRB.php',
-//	headers: { "Content-type" : "application/x-www-form-urlencoded" },
-//	data: "RBpage=" + encodeURIComponent(wholePage),
-//	onload: function(responseDetails) {
-//document.getElementById("KSKAntwort").value = responseDetails.responseText;
-//}
-
-//	onerror: function(responseDetails) {
-//alert("Nich  "+responseDetails.status);
-//document.getElementsByName("RBtestframes")[0].value = responseDetails.status;
-//document.getElementsByName("RBtestframes")[0].value = "eee";
-//}
-//})
-
-},  true); // end of event "load"
