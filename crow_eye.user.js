@@ -20,6 +20,7 @@ var spiel = {
 		hb: new Array({ mfeld: "294270", feld: "55" },
 			{ mfeld: "292269", feld: "44" })
 	},
+	// Der Spieler, der die AB und EB kontrolliert
 	ab: "rbspiel1728",
 	rbspiel1728: {
 		armeen: new Array("7666", "h7666h", "7511", "h7511h",
