@@ -20,13 +20,20 @@ var spiel = {
 		hb: new Array({ mfeld: "294270", feld: "55" },
 			{ mfeld: "292269", feld: "44" })
 	},
-	ab: "rbspiel1728",
-	rbspiel1728: {
-		armeen: new Array("7666", "h7666h", "7511", "h7511h",
-				"6669", "521", "6695", "522"),
-		dorf: new Array("297273", "294270", "292269", "293273", "292270"),
-		hb: new Array({ mfeld: "294270", feld: "55" },
-			{ mfeld: "292269", feld: "44" })
+	//ab: "rbspiel1728",
+	//rbspiel1728: {
+	//	armeen: new Array("7666", "h7666h", "7511", "h7511h",
+	//			"6669", "521", "6695", "522"),
+	//	dorf: new Array("297273", "294270", "292269", "293273", "292270"),
+	//	hb: new Array({ mfeld: "294270", feld: "55" },
+	//		{ mfeld: "292269", feld: "44" })
+	//}
+	ab: "rbspiel1802",
+	rbspiel1802: {
+		armeen: new Array("7692", "h7692h", "7687", "h7687h",
+				"51", "hsol6", "135", "h135h"),
+		dorf: new Array("293267", "292267", "291267", "290267", "295268"),
+		hb: new Array({ mfeld: "293267", feld: "44" })
 	}
 }
 
