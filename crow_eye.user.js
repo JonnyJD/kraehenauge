@@ -256,3 +256,33 @@ newlink.href = "http://ksk.JonnyJD.net/alirion/preise";
 newlink.target = "_blank";
 newlink.appendChild(ksktag);
 document.getElementById('Leiste4').appendChild(newlink);
+
+
+//Antwort des Scanners vom Server
+var antwort = document.createElement('textarea');
+antwort.id = "ServerAntwort";
+antwort.value = "blub";
+antwort.style.width = "600px";
+antwort.style.height = "300px";
+antwort.value = wholePage;
+var newdiv = document.createElement('div');
+newdiv.align = "center";
+document.getElementsByTagName('BODY')[0].appendChild(newdiv);
+newdiv.appendChild(antwort);
+
+GM_xmlhttpRequest({
+	method: 'POST',
+	url: 'http://ksk.JonnyJD.net/cgi-bin/kskscanner.cgi',
+	//headers: { "Content-type" : "text/plain" },
+	data: wholePage,
+	onload: function(responseDetails) {
+		document.getElementById("ServerAntwort").value
+			= responseDetails.responseText;
+	},
+
+	onerror: function(responseDetails) {
+		document.getElementById("ServerAntwort").value
+			= 'status: ' + responseDetails.status
+			+ '\n' + responseDetails.responseText;
+	}
+})
