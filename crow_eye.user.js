@@ -259,12 +259,14 @@ document.getElementById('Leiste4').appendChild(newlink);
 
 
 //Antwort des Scanners vom Server
-var antwort = document.createElement('textarea');
+var antwort = document.createElement('div');
 antwort.id = "ServerAntwort";
-antwort.value = "blub";
-antwort.style.width = "600px";
-antwort.style.height = "300px";
-antwort.value = wholePage;
+antwort.style.fontFamily = "monospace";
+antwort.style.whiteSpace = "pre";
+antwort.style.backgroundColor = "black";
+antwort.style.color = "green";
+antwort.style.width = "auto";
+antwort.style.maxWidth = "600px";
 var newdiv = document.createElement('div');
 newdiv.align = "center";
 document.getElementsByTagName('BODY')[0].appendChild(newdiv);
@@ -276,12 +278,12 @@ GM_xmlhttpRequest({
 	//headers: { "Content-type" : "text/plain" },
 	data: wholePage,
 	onload: function(responseDetails) {
-		document.getElementById("ServerAntwort").value
+		document.getElementById("ServerAntwort").innerHTML
 			= responseDetails.responseText;
 	},
 
 	onerror: function(responseDetails) {
-		document.getElementById("ServerAntwort").value
+		document.getElementById("ServerAntwort").innerHTML
 			= 'status: ' + responseDetails.status
 			+ '\n' + responseDetails.responseText;
 	}
