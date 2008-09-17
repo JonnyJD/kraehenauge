@@ -1,11 +1,12 @@
 // ==UserScript==
-// @name	Krähenauge
-// @description	Dies ist bzw. wird das clientseitige KSK-Programm. Es unterstützt die Krähen auf ihren Wegen in Alirion und gibt ihnen Überblick und schnelle Reaktionsmöglichkeiten.
+// @name	Kraehenauge
+// @description	Dies ist bzw. wird das clientseitige KSK-Programm. Es unterstuetzt die Kraehen auf ihren Wegen in Alirion und gibt ihnen ueberblick und schnelle Reaktionsmoeglichkeiten.
 // @include	http://www.ritterburgwelt.de/rb/rbstart.php
 // @author	JonnyJD
 // @version	1.0.1
 // ==/UserScript==
 
+var version = 'Kr\xE4henauge 1.0.1';
 var spiel = {
 	standard: {
 		links: new Array("rbstart",
@@ -43,12 +44,12 @@ var seiten = {
 	rbereignis:	{name: "Ereignisse",	pic: "ereignisse"},
 	rbnachr1:	{name: "nachricht",	pic: "name"},
 	rbquest:	{name: "Quests",	pic: "quest"},
-	rbfturma:	{name: "Allianztürme",	pic: "allianz"},
+	rbfturma:	{name: "Allianzt\xFCrme",pic: "allianz"},
 	rbmonster:	{name: "Monster",	pic: "monster"},
 	rbminfo0:	{name: "Untertanen",	pic: "untertanen"},
 	rbrinfo0:	{name: "Ressourcen",	pic: "ress0"},
 	rbrezept:	{name: "Rezepte",	pic: "rezept"},
-	rbsanzeige2:	{name: "Gegenstände",	pic: "sache"},
+	rbsanzeige2:	{name: "Gegenst\xE4nde",pic: "sache"},
 	rbtop10:	{name: "Top10",		pic: "top10"},
 	rbreiche:	{name: "Reiche",	pic: "reiche"},
 	rbdiplo:	{name: "Diplomatie",	pic: "diplomatie"},
@@ -60,7 +61,7 @@ var wholePage = document.getElementsByTagName('HTML')[0].innerHTML;
 var session = document.getElementsByName('name')[0].value;
 var spieler = document.getElementsByName('passw')[0].value;
 
-//Bereiche für die Linkleisten einfuegen
+//Bereiche fuer die Linkleisten einfuegen
 //Aufpassen, dass interne forms noch funktionieren
 //Test Case: Waren zwischen Einheiten
 var altesZentrum = document.getElementsByTagName('CENTER')[0];
@@ -82,6 +83,10 @@ document.getElementById("zentrum").appendChild(altesZentrum);
 var spielertext = document.createElement('div');
 spielertext.innerHTML = '<div><br/>' + spieler + '</div>';
 document.getElementsByTagName('CENTER')[2].appendChild(spielertext);
+//Versionsnummer unten ausgeben
+var versiontext = document.createElement('div');
+versiontext.innerHTML = '<br/>' + version;
+document.getElementsByTagName('CENTER')[2].appendChild(versiontext);
 
 if (document.getElementsByName('Einstellungen').length > 0) {
 }
@@ -259,6 +264,9 @@ document.getElementById('Leiste4').appendChild(newlink);
 
 
 //Antwort des Scanners vom Server
+var newdiv = document.createElement('div');
+newdiv.align = "center";
+document.getElementsByTagName('BODY')[0].appendChild(newdiv);
 var antwort = document.createElement('div');
 antwort.id = "ServerAntwort";
 antwort.style.fontFamily = "monospace";
@@ -267,9 +275,6 @@ antwort.style.backgroundColor = "black";
 antwort.style.color = "green";
 antwort.style.width = "auto";
 antwort.style.maxWidth = "600px";
-var newdiv = document.createElement('div');
-newdiv.align = "center";
-document.getElementsByTagName('BODY')[0].appendChild(newdiv);
 newdiv.appendChild(antwort);
 
 GM_xmlhttpRequest({
