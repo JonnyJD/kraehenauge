@@ -35,6 +35,12 @@ var game = {
                         "51", "hsol6", "135", "h135h"),
         dorf: new Array("293267", "292267", "291267", "290267", "295268"),
         hb: new Array({ mfeld: "293267", feld: "44" })
+    },
+    rbspiel1850: {
+        armeen: new Array("7924", "h7924h", "2913857", "transport1",
+                        "6723", "505", "4105", "516"),
+        dorf: new Array("282270", "289268", "290268", "282269", "292268"),
+        hb: new Array({ mfeld: "292268", feld: "62" })
     }
 }
 
