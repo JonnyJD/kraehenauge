@@ -23,23 +23,26 @@ var game = {
     },
     // Der Spieler, der die AB und EB kontrolliert
     ab: "rbspiel1728",
-    rbspiel1728: { // jonny
+    // Jonerian
+    rbspiel1728: {
         armeen: new Array("7666", "h7666h", "7511", "h7511h",
                         "6669", "521", "6695", "522"),
         dorf: new Array("297273", "294270", "292269", "293273", "292270"),
         hb: new Array({ mfeld: "294270", feld: "55" },
                 { mfeld: "292269", feld: "44" })
     },
-    rbspiel1802: { // rich
+    // Rich
+    rbspiel1802: {
         armeen: new Array("7692", "h7692h", "7687", "h7687h",
                         "90", "h2s7", "135", "h135h"),
         dorf: new Array("293267", "292267", "291267", "290267", "295268"),
         hb: new Array({ mfeld: "293267", feld: "44" })
     },
-    rbspiel1850: { // boerni
-        armeen: new Array("7924", "h7924h", "2913857", "transport1",
+    // Boerni
+    rbspiel1850: {
+        armeen: new Array("7924", "h7924h", "7920", "h7920h",
                         "6723", "505", "4105", "516"),
-        dorf: new Array("282270", "289268", "290268", "282269", "292268"),
+        dorf: new Array("282270", "269265", "290268", "282269", "292268"),
         hb: new Array({ mfeld: "292268", feld: "62" })
     }
 }
