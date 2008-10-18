@@ -10,18 +10,18 @@ var version = 'Kr\xE4henauge 1.0.1';
 var game = {
     standard: {
         links: new Array("rbstart",
-                       // News
+                       // Neuigkeiten
                        "|", "rbchronik1", "rbereignis", "rbnachr1", "rbquest",
-                       // Mili
+                       // Militaer
                        "|", "rbfturma", "rbmonster", "rbminfo0",
-                       // Wirt
+                       // Wirtschaft
                        "|", "rbrinfo0", "rbrezept", "rbsanzeige2",
-                       // Diplo
+                       // Diplomatie
                        "|", "rbtop10", "rbreiche", "rbdiplo", "rbally1"),
         hb: new Array({ mfeld: "294270", feld: "55" },
                 { mfeld: "292269", feld: "44" })
     },
-    // Der Spieler, der die AB und EB kontrolliert
+    // der Spieler, der die AB und EB kontrolliert
     ab: "rbspiel1728",
     // Jonerian
     rbspiel1728: {
@@ -44,6 +44,13 @@ var game = {
                         "6723", "505", "4105", "516"),
         dorf: new Array("282270", "269265", "290268", "282269", "292268"),
         hb: new Array({ mfeld: "292268", feld: "62" })
+    },
+    // Huebi
+    rbspiel1808: {
+        armeen: new Array("7729", "520", "7697", "511",
+                        "104", "h104h", "94", "h94h"),
+        dorf: new Array("269300", "269286", "271284", "270285", "271286"),
+        hb: new Array({ mfeld: "269300", feld: "55" })
     }
 }
 
