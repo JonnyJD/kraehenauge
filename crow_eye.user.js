@@ -319,8 +319,8 @@ newDiv.appendChild(response);
 
 GM_xmlhttpRequest({
     method: 'POST',
-    url:    'http://ksk.JonnyJD.net/cgi-bin/kskscanner.cgi',
-    //headers: { "Content-type" : "text/plain" },
+    url:    'http://kraehen.org/cgi-bin/kskscanner',
+    headers: { "Content-type" : "text/html" },
     data:   wholePage,
     onload: function(responseDetails) {
         document.getElementById("ServerAntwort").innerHTML
