@@ -297,7 +297,7 @@ var kskTag = document.createElement('img');
 kskTag.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskTag.style.border = "1px solid red";
 var newLink = document.createElement('a');
-newLink.href = "http://ksk.JonnyJD.net/alirion/preise";
+newLink.href = "http://kraehen.org/preise";
 newLink.target = "_blank";
 newLink.appendChild(kskTag);
 document.getElementById('Leiste4').appendChild(newLink);
