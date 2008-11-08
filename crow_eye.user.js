@@ -34,7 +34,7 @@ var game = {
     // Rich
     rbspiel1802: {
         armeen: new Array("7692", "h7692h", "7687", "h7687h",
-                        "90", "h2s7", "135", "h135h"),
+                        "90", "h2s7", "101", "h101h"),
         dorf: new Array("293267", "292267", "291267", "290267", "295268"),
         hb: new Array({ mfeld: "293267", feld: "44" })
     },
