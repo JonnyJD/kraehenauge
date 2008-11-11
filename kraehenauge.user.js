@@ -51,6 +51,10 @@ var game = {
                         "104", "h104h", "39", "hs6"),
         dorf: new Array("300269", "286269", "284271", "285270", "286271"),
         hb: new Array({ mfeld: "300269", feld: "55" })
+    },
+    // Ubigaz
+    rbspiel3068: {
+        dorf: new Array("306250")
     }
 }
 
