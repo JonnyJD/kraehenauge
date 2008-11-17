@@ -81,6 +81,31 @@ var wholePage = document.getElementsByTagName('HTML')[0].innerHTML;
 var session = document.getElementsByName('name')[0].value;
 var gameId = document.getElementsByName('passw')[0].value;
 
+// Seitenerkennung
+var gamePage = '';
+// allgemeine Seiten
+if (wholePage.search(/<font size="6" face="Diploma">Thronsaal(.*)<\/font>/) >= 0) gamePage = 'rbstart';
+else if (wholePage.indexOf('<font size="6" face="Diploma">\xD6ffentliche Chronik</font>') >= 0) gamePage = 'rbchronik1';
+else if (wholePage.indexOf('<font size="5" face="Diploma">die letzten Ereignisse</font>') >= 0) gamePage = 'rbereignis';
+else if (wholePage.indexOf('<font size="6" face="Diploma">Nachrichten</font>') >= 0) gamePage = 'rbnachr1';
+else if (wholePage.indexOf('<font size="6" face="Diploma">laufende Quests</font>') >= 0) gamePage = 'rbquest';
+else if (wholePage.search(/<font size="5" face="Diploma">T\xFCrme der Allianz<br>(.*)<\/font>/) >= 0) gamePage = 'rbfturma';
+else if (wholePage.indexOf('<font size="6" face="Diploma">vernichtete Monster und R\xE4uber</font>') >= 0) gamePage = 'rbmonster';
+else if (wholePage.indexOf('<font size="5" face="Diploma">Aufteilung der verschiedenen Einheiten im Reich:</font>') >= 0) gamePage = 'rbminfo0';
+else if (wholePage.search(/<font size="6" face="Diploma">Ressourcen im Reich (.*)<\/font>/) >= 0) gamePage = 'rbrinfo0';
+else if (wholePage.indexOf('<font size="6" face="Diploma">bekannte Rezepte</font>') >= 0) gamePage = 'rbrezept';
+else if (wholePage.indexOf('<font size="6" face="Diploma">bekannte Gegenst\xE4nde</font>') >= 0) gamePage = 'rbanzeige2';
+else if (wholePage.indexOf('<font size="6" face="Diploma">TOP 10</font>') >= 0) gamePage = 'rbftop10';
+else if (wholePage.indexOf('<font size="6" face="Diploma">\xDCbersicht der Reiche</font>') >= 0) gamePage = 'rbreiche';
+else if (wholePage.indexOf('<font size="6" face="Diploma">Diplomatie</font>') >= 0) gamePage = 'rbdiplo';
+else if (wholePage.indexOf('<font size="6" face="Diploma">Allianzen</font>') >= 0) gamePage = 'rbally1';
+// Individualseiten
+else if (wholePage.indexOf('<font size="6" face="Diploma">Armee</font>') >= 0) gamePage = 'rbarmee';
+else if (wholePage.search(/<font size="6" face="Diploma">Dorf (.*), Handelsbude<\/font>/) >= 0) gamePage = 'rbfhandel1';
+else if (wholePage.search(/<font size="6" face="Diploma">Dorf (.*), Turmsicht<\/font>/) >= 0) gamePage = 'rbfturm1';
+else if (wholePage.search(/<font size="6" face="Diploma">Dorf (.*), Turmsicht\(2\)<\/font>/) >= 0) gamePage = 'rbfturm2';
+else if (wholePage.search(/<font size="6" face="Diploma">Ressourcen im Dorf (.*)<\/font>/) >= 0) gamePage = 'rbrinfo';
+
 // Bereiche fuer die Linkleisten einfuegen
 // Aufpassen, dass interne forms noch funktionieren
 // test case: Waren zwischen Einheiten
@@ -101,7 +126,7 @@ document.getElementById("zentrum").appendChild(oldCenter);
 
 // Spiel-ID zu Debugzwecken unten ausgeben
 var gameInfo = document.createElement('div');
-gameInfo.innerHTML = '<div><br/>' + gameId + '</div>';
+gameInfo.innerHTML = '<div><br/>' + gameId + ' - ' + gamePage + '</div>';
 document.getElementsByTagName('CENTER')[2].appendChild(gameInfo);
 // Versionsnummer unten ausgeben
 var versionInfo = document.createElement('div');
@@ -307,7 +332,7 @@ newLink.appendChild(kskTag);
 document.getElementById('Leiste4').appendChild(newLink);
 
 
-//Antwort des Scanners vom Server
+// Antwort des Scanners vom Server
 var newDiv = document.createElement('div');
 newDiv.align = "center";
 document.getElementsByTagName('BODY')[0].appendChild(newDiv);
@@ -321,20 +346,82 @@ response.style.width = "auto";
 response.style.maxWidth = "600px";
 newDiv.appendChild(response);
 
-GM_xmlhttpRequest({
-    method: 'POST',
-    url:    'http://kraehen.org/cgi-bin/kskscanner',
-    headers: { "Content-type" : "text/html" },
-    data:   wholePage,
-    onload: function(responseDetails) {
-        document.getElementById("ServerAntwort").innerHTML
-            = responseDetails.responseText;
-    },
-    onerror: function(responseDetails) {
-        document.getElementById("ServerAntwort").innerHTML
-            = 'status: ' + responseDetails.status
-            + '\n' + responseDetails.responseText;
-    }
-})
+function sendToScanner() {
+    GM_xmlhttpRequest({
+        method: 'POST',
+        url:    'http://kraehen.org/cgi-bin/kskscanner',
+        headers: { "Content-type" : "text/html" },
+        data:   wholePage,
+        onload: function(responseDetails) {
+            document.getElementById("ServerAntwort").innerHTML
+                = responseDetails.responseText;
+        },
+        onerror: function(responseDetails) {
+            document.getElementById("ServerAntwort").innerHTML
+                = 'status: ' + responseDetails.status
+                + '\n' + responseDetails.responseText;
+        }
+    })
+}
+
+if (gamePage == "rbftop10"
+        || gamePage == "rbfhandel1"
+        || gamePage == "rbrinfo"
+        || gamePage == "rbrinfo0") {
+    sendToScanner();
+}
+
+
+// Antwort der Datenbank
+var newDiv = document.createElement('div');
+newDiv.align = "center";
+document.getElementsByTagName('BODY')[0].appendChild(newDiv);
+var response = document.createElement('div');
+response.id = "DBAntwort";
+response.style.backgroundColor = "#AF874E";
+response.style.width = "auto";
+response.style.maxWidth = "600px";
+newDiv.appendChild(response);
+var copyText = wholePage;
+// "herauskopieren" des sichtbaren Texts
+copyText = copyText.replace(/<head>(.|\n)*<\/head>/gi, "");
+copyText = copyText.replace(/<script[^>]*>[^<]*<\/script>/gi, "");
+copyText = copyText.replace(/<br ?\/?>/gi, "\n");
+copyText = copyText.replace(/<\/tr>/gi, "\n");
+copyText = copyText.replace(/<\/td>/gi, "\t");
+copyText = copyText.replace(/<[^>]*>/g, "");
+copyText = copyText.replace(/&nbsp;/gi, " ");
+copyText = copyText.replace(/&Auml;/g, '\xC4');
+copyText = copyText.replace(/&Ouml;/g, '\xD6');
+copyText = copyText.replace(/&Uuml;/g, '\xDC');
+copyText = copyText.replace(/&szlig;/g,'\xDF');
+copyText = copyText.replace(/&auml;/g, '\xE4');
+copyText = copyText.replace(/&ouml;/g, '\xF6');
+copyText = copyText.replace(/&uuml;/g, '\xFC');
+//document.getElementById("DBAntwort").innerHTML = "<pre>"+copyText+"</pre>";
+
+
+function sendToHandler(handler, fieldName) {
+    GM_xmlhttpRequest({
+        method: 'POST',
+        url:    "http://test.kraehen.org/karte/"+handler,
+        headers: { "Content-type" : "application/x-www-form-urlencoded" },
+        data:   fieldName+'='+encodeURIComponent(copyText),
+        onload: function(responseDetails) {
+            document.getElementById("DBAntwort").innerHTML
+                = responseDetails.responseText;
+        },
+        onerror: function(responseDetails) {
+            document.getElementById("DBAntwort").innerHTML
+                = 'status: ' + responseDetails.status
+                + '\n' + responseDetails.responseText;
+        }
+    })
+}
+
+if (gamePage == "rbarmee") sendToHandler("k-armee.php", "dorftext");
+if (gamePage == "rbfturm1" || gamePage == "rbfturm2") sendToHandler("k-turm.php", "text");
+
+
 
 /* vim:set shiftwidth=4 expandtab smarttab: */
