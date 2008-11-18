@@ -3,10 +3,10 @@
 // @description    Dies ist bzw. wird das clientseitige KSK-Programm. Es unterstuetzt die Kraehen auf ihren Wegen in Alirion und gibt ihnen Ueberblick und schnelle Reaktionsmoeglichkeiten.
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
 // @author         JonnyJD
-// @version        1.0.1
+// @version        1.2
 // ==/UserScript==
 
-var version = 'Kr\xE4henauge 1.0.1';
+var version = 'Kr\xE4henauge 1.2';
 var game = {
     standard: {
         links: new Array("rbstart",
@@ -105,6 +105,13 @@ else if (wholePage.search(/<font size="6" face="Diploma">Dorf (.*), Handelsbude<
 else if (wholePage.search(/<font size="6" face="Diploma">Dorf (.*), Turmsicht<\/font>/) >= 0) gamePage = 'rbfturm1';
 else if (wholePage.search(/<font size="6" face="Diploma">Dorf (.*), Turmsicht\(2\)<\/font>/) >= 0) gamePage = 'rbfturm2';
 else if (wholePage.search(/<font size="6" face="Diploma">Ressourcen im Dorf (.*)<\/font>/) >= 0) gamePage = 'rbrinfo';
+
+// einige nochmal mit anderer Attributreihenfolge (bug in einer Firefoxversion?)
+// Das nur um sicherzugehen, dass diese klappen und um user zu fragen ob es an der Stelle klappt
+else if (wholePage.search(/<font face="Diploma" size="6">Thronsaal(.*)<\/font>/) >= 0) gamePage = 'rbstart';
+else if (wholePage.indexOf('<font face="Diploma" size="6">Armee</font>') >= 0) gamePage = 'rbarmee';
+else if (wholePage.search(/<font face="Diploma" size="6">Dorf (.*), Turmsicht<\/font>/) >= 0) gamePage = 'rbfturm1';
+else if (wholePage.search(/<font face="Diploma" size="6">Dorf (.*), Turmsicht\(2\)<\/font>/) >= 0) gamePage = 'rbfturm2';
 
 // Bereiche fuer die Linkleisten einfuegen
 // Aufpassen, dass interne forms noch funktionieren
@@ -223,6 +230,17 @@ if (game[gameId] && game[gameId].armeen) {
         createSeparation(listNumber);
     }
 }
+
+// Kraehenkarte
+var kskKarte = document.createElement('img');
+kskKarte.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
+kskKarte.style.border = "1px solid red";
+var newLink = document.createElement('a');
+newLink.href = "http://kraehen.org/karte/";
+newLink.target = "_blank";
+newLink.appendChild(kskKarte);
+document.getElementById('Leiste4').appendChild(newLink);
+createSeparation(4); createSeparation(4);
 
 // Dorflinks
 if (game[gameId] && game[gameId].dorf) {
@@ -404,7 +422,7 @@ copyText = copyText.replace(/&uuml;/g, '\xFC');
 function sendToHandler(handler, fieldName) {
     GM_xmlhttpRequest({
         method: 'POST',
-        url:    "http://test.kraehen.org/karte/"+handler,
+        url:    "http://kraehen.org/karte/"+handler,
         headers: { "Content-type" : "application/x-www-form-urlencoded" },
         data:   fieldName+'='+encodeURIComponent(copyText),
         onload: function(responseDetails) {
