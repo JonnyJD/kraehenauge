@@ -96,6 +96,8 @@ else if (wholePage.search(/<font size="6" face="Diploma">Ressourcen im Reich (.*
 else if (wholePage.indexOf('<font size="6" face="Diploma">bekannte Rezepte</font>') >= 0) gamePage = 'rbrezept';
 else if (wholePage.indexOf('<font size="6" face="Diploma">bekannte Gegenst\xE4nde</font>') >= 0) gamePage = 'rbanzeige2';
 else if (wholePage.indexOf('<font size="6" face="Diploma">TOP 10</font>') >= 0) gamePage = 'rbftop10';
+else if (wholePage.indexOf('<font size="6" face="Diploma">Die besten Arbeiter</font>') >= 0) gamePage = 'rbtop10b';
+else if (wholePage.indexOf('<font size="6" face="Diploma">TOP 10 der Bekanntheit</font>') >= 0) gamePage = 'rbtop10q';
 else if (wholePage.indexOf('<font size="6" face="Diploma">\xDCbersicht der Reiche</font>') >= 0) gamePage = 'rbreiche';
 else if (wholePage.indexOf('<font size="6" face="Diploma">Diplomatie</font>') >= 0) gamePage = 'rbdiplo';
 else if (wholePage.indexOf('<font size="6" face="Diploma">Allianzen</font>') >= 0) gamePage = 'rbally1';
@@ -383,6 +385,7 @@ function sendToScanner() {
 }
 
 if (gamePage == "rbftop10"
+        || gamePage == "rbtop10q"
         || gamePage == "rbfhandel1"
         || gamePage == "rbrinfo"
         || gamePage == "rbrinfo0") {
