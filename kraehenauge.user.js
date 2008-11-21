@@ -38,12 +38,12 @@ var game = {
         dorf: new Array("293267", "292267", "291267", "290267", "295268"),
         hb: new Array({ mfeld: "293267", feld: "44" })
     },
-    // Boerni
-    rbspiel1850: {
-        armeen: new Array("7924", "h7924h", "7920", "h7920h",
-                        "6723", "505", "4105", "516"),
-        dorf: new Array("282270", "269265", "290268", "282269", "292268"),
-        hb: new Array({ mfeld: "292268", feld: "62" })
+    // Stolze
+    rbspiel1803: {
+        armeen: new Array("7719", "520", "7708", "507",
+                        "147", "h147h", "214", "h214h"),
+        dorf: new Array("289270", "291271", "290271", "290272"),
+        hb: new Array({ mfeld: "290270", feld: "23" })
     },
     // Huebi
     rbspiel1808: {
@@ -51,6 +51,13 @@ var game = {
                         "104", "h104h", "39", "hs6"),
         dorf: new Array("300269", "286269", "284271", "285270", "286271"),
         hb: new Array({ mfeld: "300269", feld: "55" })
+    },
+    // Boerni
+    rbspiel1850: {
+        armeen: new Array("7924", "h7924h", "7920", "h7920h",
+                        "6723", "505", "4105", "516"),
+        dorf: new Array("282270", "269265", "290268", "282269", "292268"),
+        hb: new Array({ mfeld: "292268", feld: "62" })
     },
     // Ubigaz
     rbspiel3068: {
