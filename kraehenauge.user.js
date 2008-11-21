@@ -420,13 +420,6 @@ copyText = copyText.replace(/<\/tr>/gi, "\n");
 copyText = copyText.replace(/<\/td>/gi, "\t");
 copyText = copyText.replace(/<[^>]*>/g, "");
 copyText = copyText.replace(/&nbsp;/gi, " ");
-copyText = copyText.replace(/&Auml;/g, '\xC4');
-copyText = copyText.replace(/&Ouml;/g, '\xD6');
-copyText = copyText.replace(/&Uuml;/g, '\xDC');
-copyText = copyText.replace(/&szlig;/g,'\xDF');
-copyText = copyText.replace(/&auml;/g, '\xE4');
-copyText = copyText.replace(/&ouml;/g, '\xF6');
-copyText = copyText.replace(/&uuml;/g, '\xFC');
 //document.getElementById("DBAntwort").innerHTML = "<pre>"+copyText+"</pre>";
 
 
