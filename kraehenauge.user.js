@@ -61,6 +61,7 @@ var game = {
     },
     // Ubigaz
     rbspiel3068: {
+        armeen: new Array("2948578", "517", "2948579", "508"),
         dorf: new Array("306250")
     }
 }
