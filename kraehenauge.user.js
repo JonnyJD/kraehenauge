@@ -59,6 +59,14 @@ var game = {
         dorf: new Array("282270", "269265", "290268", "282269", "292268"),
         hb: new Array({ mfeld: "292268", feld: "62" })
     },
+    // Windson
+    rbspiel3037: {
+        armeen: new Array("2914905", "521", "2915115", "515",
+                        "8281", "512", "4142", "509"),
+        dorf: new Array("291265", "295263", "295266", "296267", "300271"),
+        hb: new Array({ mfeld: "295266", feld: "8" },
+                { mfeld: "300271", feld: "20"})
+    },
     // Ubigaz
     rbspiel3068: {
         armeen: new Array("2948578", "517", "2948579", "508"),
