@@ -451,6 +451,7 @@ function sendToHandler(handler, fieldName) {
 
 if (gamePage == "rbarmee") sendToHandler("k-armee.php", "dorftext");
 if (gamePage == "rbfturm1" || gamePage == "rbfturm2") sendToHandler("k-turm.php", "text");
+if (gamePage == "rbfturma") sendToHandler("k-turm.php", "text"); // Allianztuerme sichten
 
 
 
