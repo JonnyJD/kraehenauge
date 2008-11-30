@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name           Kraehenauge
+// @namespace      http://kraehen.org
 // @description    Dies ist bzw. wird das clientseitige KSK-Programm. Es unterstuetzt die Kraehen auf ihren Wegen in Alirion und gibt ihnen Ueberblick und schnelle Reaktionsmoeglichkeiten.
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
 // @author         JonnyJD
-// @version        1.2.0.2
+// @version        1.2.0.3
 // ==/UserScript==
 
-var version = 'Kr\xE4henauge 1.2.0.2';
+var version = 'Kr\xE4henauge 1.2.0.3';
 var game = {
     standard: {
         links: new Array("rbstart",
