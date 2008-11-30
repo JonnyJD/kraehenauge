@@ -74,6 +74,11 @@ var game = {
     }
 }
 
+// 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
+// 59 = TW, 60 = KSK, 61 = UfR, 63 = BdS, 67 = RK
+var friendlyAllies = "(43|60|61|67)";
+var hostileAllies  = "(31)";
+
 var pages = {
     rbstart:     {name: "Thronsaal",       pic: "start"},
     rbchronik1:  {name: "Chronik",         pic: "chronik"},
@@ -450,9 +455,81 @@ function sendToHandler(handler, fieldName) {
 }
 
 if (gamePage == "rbarmee") sendToHandler("k-armee.php", "dorftext");
-if (gamePage == "rbfturm1" || gamePage == "rbfturm2") sendToHandler("k-turm.php", "text");
-if (gamePage == "rbfturma") sendToHandler("k-turm.php", "text"); // Allianztuerme sichten
+if (gamePage == "rbfturm1"
+        || gamePage == "rbfturm2") sendToHandler("k-turm.php", "text");
+// Allianztuerme sichten
+if (gamePage == "rbfturma") sendToHandler("k-turm.php", "text");
 
 
+// Armeesortierung
+
+function allyArmee(imgEntry, allies) {
+	var box = imgEntry.parentNode.parentNode;
+	var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
+                allies+".gif","");
+	return pattern.exec(imgEntry.src)
+                // eigene Armee
+		&& box.innerHTML.indexOf("Menschentransfer")	== -1
+                // eigentlich ein Dorf
+		&& box.innerHTML.indexOf("Dorf")		== -1
+                // eigentlich ein Aussenposten
+		&& box.innerHTML.indexOf("Aussenposten")	== -1
+		;
+}
+
+if( gamePage == "rbarmee" 
+	|| gamePage == "rbfturm1"
+	|| gamePage == "rbfturm2"
+) {
+        var imgEntries = document.getElementsByTagName("img");
+	var bundListe = new Array();
+        var feindListe = new Array();
+
+        for( var i = 0; i < imgEntries.length; i++ ) {
+		if (allyArmee(imgEntries[i], friendlyAllies)) {
+			// Verbuendete Armee
+			bundListe.push(imgEntries[i].parentNode.parentNode);
+		} else {
+			if(allyArmee(imgEntries[i], hostileAllies)) {
+				// Feindliche Armee
+				feindListe.push(
+                                        imgEntries[i].parentNode.parentNode);
+				feind = true;
+			}
+		}
+	}
+
+        // feindliche Armeen an den Anfang
+        for( var i = feindListe.length -1; i > -1; i-- ) {
+		var parentNode = feindListe[i].parentNode;
+		parentNode.removeChild(feindListe[i]);
+                parentNode.insertBefore(feindListe[i], parentNode.firstChild);
+	}
+        // verbuendete Armeen ganz ans Ende
+        for( var i = 0; i < bundListe.length; i++ ) {
+		var parentNode = bundListe[i].parentNode;
+                parentNode.removeChild(bundListe[i]);
+                parentNode.appendChild(bundListe[i]);
+	}
+
+        for( var i = 0; i < imgEntries.length; i++ ) {
+		if (imgEntries[i].src ==
+                        "http://www.ritterburgwelt.de/rb/bild/gui/boxtrenn0.gif"
+		    && (feindListe.length + bundListe.length) > 0) {
+                	temp = document.createTextNode("Hier stehen " +
+                                feindListe.length + " Feinde und " +
+                                bundListe.length + " Verb\xFCndete.");
+                        imgEntries[i].parentNode.parentNode.parentNode.appendChild(temp);
+
+                        break;
+		}
+	}
+
+        if (feindListe.length > 0) {
+        	document.body.background ="";
+                document.bgColor = "#FF0000";
+	}
+
+}
 
 /* vim:set shiftwidth=4 expandtab smarttab: */
