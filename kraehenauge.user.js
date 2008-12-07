@@ -55,8 +55,7 @@ var game = {
     },
     // Boerni
     rbspiel1850: {
-        armeen: new Array("7924", "h7924h", "7920", "h7920h",
-                        "6723", "505", "4105", "516"),
+        armeen: new Array("7924", "h7924h", "7920", "h7920h"),
         dorf: new Array("282270", "269265", "290268", "282269", "292268"),
         hb: new Array({ mfeld: "292268", feld: "62" })
     },
