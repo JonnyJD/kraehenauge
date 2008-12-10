@@ -104,37 +104,64 @@ var gameId = document.getElementsByName('passw')[0].value;
 
 // Seitenerkennung
 var gamePage = '';
+var fontTags = document.getElementsByTagName('font');
+var pageTitle = '';
+for (var i=0; i < fontTags.length; i++) {
+    if (fontTags[i].face == "Diploma"
+        && fontTags[i].firstChild.data.indexOf('\xA9') == -1
+        && (fontTags[i].size = 5 || fontTags[i].size == 6)
+    ) {
+    pageTitle = fontTags[i].firstChild.data;
+    break;
+    }
+}
 // allgemeine Seiten
-if (wholePage.search(/<font size="6" face="Diploma">Thronsaal(.*)<\/font>/) >= 0) gamePage = 'rbstart';
-else if (wholePage.indexOf('<font size="6" face="Diploma">\xD6ffentliche Chronik</font>') >= 0) gamePage = 'rbchronik1';
-else if (wholePage.indexOf('<font size="5" face="Diploma">die letzten Ereignisse</font>') >= 0) gamePage = 'rbereignis';
-else if (wholePage.indexOf('<font size="6" face="Diploma">Nachrichten</font>') >= 0) gamePage = 'rbnachr1';
-else if (wholePage.indexOf('<font size="6" face="Diploma">laufende Quests</font>') >= 0) gamePage = 'rbquest';
-else if (wholePage.search(/<font size="5" face="Diploma">T\xFCrme der Allianz<br>(.*)<\/font>/) >= 0) gamePage = 'rbfturma';
-else if (wholePage.indexOf('<font size="6" face="Diploma">vernichtete Monster und R\xE4uber</font>') >= 0) gamePage = 'rbmonster';
-else if (wholePage.indexOf('<font size="5" face="Diploma">Aufteilung der verschiedenen Einheiten im Reich:</font>') >= 0) gamePage = 'rbminfo0';
-else if (wholePage.search(/<font size="6" face="Diploma">Ressourcen im Reich (.*)<\/font>/) >= 0) gamePage = 'rbrinfo0';
-else if (wholePage.indexOf('<font size="6" face="Diploma">bekannte Rezepte</font>') >= 0) gamePage = 'rbrezept';
-else if (wholePage.indexOf('<font size="6" face="Diploma">bekannte Gegenst\xE4nde</font>') >= 0) gamePage = 'rbanzeige2';
-else if (wholePage.indexOf('<font size="6" face="Diploma">TOP 10</font>') >= 0) gamePage = 'rbftop10';
-else if (wholePage.indexOf('<font size="6" face="Diploma">Die besten Arbeiter</font>') >= 0) gamePage = 'rbtop10b';
-else if (wholePage.indexOf('<font size="6" face="Diploma">TOP 10 der Bekanntheit</font>') >= 0) gamePage = 'rbtop10q';
-else if (wholePage.indexOf('<font size="6" face="Diploma">\xDCbersicht der Reiche</font>') >= 0) gamePage = 'rbreiche';
-else if (wholePage.indexOf('<font size="6" face="Diploma">Diplomatie</font>') >= 0) gamePage = 'rbdiplo';
-else if (wholePage.indexOf('<font size="6" face="Diploma">Allianzen</font>') >= 0) gamePage = 'rbally1';
+if (pageTitle.search(/Thronsaal(.*)/) >= 0)
+    gamePage = 'rbstart';
+else if (pageTitle.indexOf('\xD6ffentliche Chronik') >= 0)
+    gamePage = 'rbchronik1';
+else if (pageTitle.indexOf('die letzten Ereignisse') >= 0)
+    gamePage = 'rbereignis';
+else if (pageTitle.indexOf('Nachrichten') >= 0)
+    gamePage = 'rbnachr1';
+else if (pageTitle.indexOf('laufende Quests') >= 0)
+    gamePage = 'rbquest';
+else if (pageTitle.search(/T\xFCrme der Allianz(.*)/) >= 0)
+    gamePage = 'rbfturma';
+else if (pageTitle.indexOf('vernichtete Monster und R\xE4uber') >= 0)
+    gamePage = 'rbmonster';
+else if (pageTitle.indexOf('Aufteilung der verschiedenen Einheiten im Reich:') >= 0)
+    gamePage = 'rbminfo0';
+else if (pageTitle.search(/Ressourcen im Reich (.*)/) >= 0)
+    gamePage = 'rbrinfo0';
+else if (pageTitle.indexOf('bekannte Rezepte') >= 0)
+    gamePage = 'rbrezept';
+else if (pageTitle.indexOf('bekannte Gegenst\xE4nde') >= 0)
+    gamePage = 'rbanzeige2';
+else if (pageTitle.indexOf('eigene Punktzahl') >= 0)
+    gamePage = 'rbftop10';
+else if (pageTitle.indexOf('Die besten Arbeiter') >= 0)
+    gamePage = 'rbtop10b';
+else if (pageTitle.indexOf('TOP 10 der Bekanntheit') >= 0)
+    gamePage = 'rbtop10q';
+else if (pageTitle.indexOf('\xDCbersicht der Reiche') >= 0)
+    gamePage = 'rbreiche';
+else if (pageTitle.indexOf('Diplomatie') >= 0)
+    gamePage = 'rbdiplo';
+else if (pageTitle.indexOf('Allianzen') >= 0)
+    gamePage = 'rbally1';
 // Individualseiten
-else if (wholePage.indexOf('<font size="6" face="Diploma">Armee</font>') >= 0) gamePage = 'rbarmee';
-else if (wholePage.search(/<font size="6" face="Diploma">Dorf (.*), Handelsbude<\/font>/) >= 0) gamePage = 'rbfhandel1';
-else if (wholePage.search(/<font size="6" face="Diploma">Dorf (.*), Turmsicht<\/font>/) >= 0) gamePage = 'rbfturm1';
-else if (wholePage.search(/<font size="6" face="Diploma">Dorf (.*), Turmsicht\(2\)<\/font>/) >= 0) gamePage = 'rbfturm2';
-else if (wholePage.search(/<font size="6" face="Diploma">Ressourcen im Dorf (.*)<\/font>/) >= 0) gamePage = 'rbrinfo';
+else if (pageTitle.indexOf('Armee') >= 0)
+    gamePage = 'rbarmee';
+else if (pageTitle.search(/Dorf (.*), Handelsbude/) >= 0)
+    gamePage = 'rbfhandel1';
+else if (pageTitle.search(/Dorf (.*), Turmsicht\(2\)/) >= 0)
+    gamePage = 'rbfturm2';
+else if (pageTitle.search(/Dorf (.*), Turmsicht/) >= 0)
+    gamePage = 'rbfturm1';
+else if (pageTitle.search(/Ressourcen im Dorf (.*)/) >= 0)
+    gamePage = 'rbrinfo';
 
-// einige nochmal mit anderer Attributreihenfolge (bug in einer Firefoxversion?)
-// Das nur um sicherzugehen, dass diese klappen und um user zu fragen ob es an der Stelle klappt
-else if (wholePage.search(/<font face="Diploma" size="6">Thronsaal(.*)<\/font>/) >= 0) gamePage = 'rbstart';
-else if (wholePage.indexOf('<font face="Diploma" size="6">Armee</font>') >= 0) gamePage = 'rbarmee';
-else if (wholePage.search(/<font face="Diploma" size="6">Dorf (.*), Turmsicht<\/font>/) >= 0) gamePage = 'rbfturm1';
-else if (wholePage.search(/<font face="Diploma" size="6">Dorf (.*), Turmsicht\(2\)<\/font>/) >= 0) gamePage = 'rbfturm2';
 
 // Bereiche fuer die Linkleisten einfuegen
 // Aufpassen, dass interne forms noch funktionieren
