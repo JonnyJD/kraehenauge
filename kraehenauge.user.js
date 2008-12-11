@@ -108,11 +108,12 @@ var fontTags = document.getElementsByTagName('font');
 var pageTitle = '';
 for (var i=0; i < fontTags.length; i++) {
     if (fontTags[i].face == "Diploma"
+        && fontTags[i].firstChild.data
         && fontTags[i].firstChild.data.indexOf('\xA9') == -1
-        && (fontTags[i].size = 5 || fontTags[i].size == 6)
+        && (fontTags[i].size == 5 || fontTags[i].size == 6)
     ) {
-    pageTitle = fontTags[i].firstChild.data;
-    break;
+        pageTitle = fontTags[i].firstChild.data;
+        break;
     }
 }
 // allgemeine Seiten
