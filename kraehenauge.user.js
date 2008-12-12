@@ -77,8 +77,9 @@ var game = {
 // Einstellungen Armeesortierung
 // 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
 // 59 = TW, 60 = KSK, 61 = UfR, 63 = BdS, 67 = RK
-var friendlyAllies = "(43|60|61|67)";
-var hostileAllies  = "(31)";
+// Trenner ist | (regExp ODER)
+var friendlyAllies = "(60)";
+var hostileAllies  = "()";
 
 // Einstellungen Ressourcenauswertung
 // Bei welcher anzahl verbleibender Tage welche Farbe benutzt wird:
@@ -571,7 +572,8 @@ if( gamePage == "rbrinfo0" ) {
     var gueterTabelle = "";
     var tabellen = document.getElementsByTagName("table");
     for (var i=0; i < tabellen.length; i++) {
-        if (tabellen[i].getElementsByTagName("tr")[0].firstChild.firstChild.data == "Gut") {
+        if (tabellen[i].getElementsByTagName("tr")[0]
+                .firstChild.firstChild.data == "Gut") {
             gueterTabelle = tabellen[i];
             break;
         }
@@ -589,7 +591,8 @@ if( gamePage == "rbrinfo0" ) {
     var restTageZeile = document.createElement("tr");
     gueterTabelle.getElementsByTagName("tr")[0].parentNode.insertBefore(
             restTageZeile, gueterTabelle.getElementsByTagName("tr")[1]);
-    for (var i=0; i < gueterTabelle.getElementsByTagName("tr")[0].childNodes.length; i++) {
+    for (var i=0; i < gueterTabelle.getElementsByTagName("tr")[0]
+            .childNodes.length; i++) {
         restTageZeile.appendChild(document.createElement("td"));
     }
     var textNode = document.createTextNode("Tage verbleibend");
@@ -615,10 +618,12 @@ if( gamePage == "rbrinfo0" ) {
     // jedes Dorf Betrachten
     for (var d = 1; d <= doerfer; d++) {
         restTageDorf = 99999;
-        zuegeImDorf = gueterTabelle.getElementsByTagName("tr")[0].childNodes[d].childNodes[8].nodeValue;
+        zuegeImDorf = gueterTabelle.getElementsByTagName("tr")[0]
+            .childNodes[d].childNodes[8].nodeValue;
         // jedes Gut betrachten
         for (var i = 2; i < 25; i++) {
-            var zelle = gueterTabelle.getElementsByTagName("tr")[i].childNodes[d];
+            var zelle = gueterTabelle.getElementsByTagName("tr")[i]
+                .childNodes[d];
             var zellenText = zelle.firstChild;
             if (zellenText.firstChild) {
                 var werte = zellenText.firstChild.nodeValue.split("(");
@@ -642,7 +647,8 @@ if( gamePage == "rbrinfo0" ) {
     // fuer jedes Gut die Summenspalte betrachten
     var restTageReich = 99999
     for (var i = 2; i < 25; i++) {
-        var zelle = gueterTabelle.getElementsByTagName("tr")[i].childNodes[gesamt];
+        var zelle = gueterTabelle.getElementsByTagName("tr")[i]
+            .childNodes[gesamt];
         var zellenText = zelle.firstChild;
         if (zellenText) {
             var anzahl = zellenText.childNodes[0].firstChild.nodeValue;
