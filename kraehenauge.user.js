@@ -74,10 +74,17 @@ var game = {
     }
 }
 
+// Einstellungen Armeesortierung
 // 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
 // 59 = TW, 60 = KSK, 61 = UfR, 63 = BdS, 67 = RK
 var friendlyAllies = "(43|60|61|67)";
 var hostileAllies  = "(31)";
+
+// Einstellungen Ressourcenauswertung
+// Bei welcher anzahl verbleibender Tage welche Farbe benutzt wird:
+tageRot = 5
+tageGelb = 15
+
 
 var pages = {
     rbstart:     {name: "Thronsaal",       pic: "start"},
@@ -556,5 +563,104 @@ if( gamePage == "rbarmee"
         document.bgColor = "#FF0000";
     }
 } // ende Armeesortierung
+
+
+// Ressourcenauswertung
+if( gamePage == "rbrinfo0" ) {
+    // Finde die Warentabelle
+    var gueterTabelle = "";
+    var tabellen = document.getElementsByTagName("table");
+    for (var i=0; i < tabellen.length; i++) {
+        if (tabellen[i].getElementsByTagName("tr")[0].firstChild.firstChild.data == "Gut") {
+            gueterTabelle = tabellen[i];
+            break;
+        }
+    }
+
+    // Zaehle die Doerfer
+    var doerfer = 0;
+    while (gueterTabelle.getElementsByTagName("tr")[0].childNodes[doerfer+1]
+                    .innerHTML.indexOf("Dorf") >= 0) {
+        doerfer++;
+    }
+    var gesamt = doerfer + 1;
+
+    // Zeile mit verbleibenden Tagen pro Dorf vorbereiten
+    var restTageZeile = document.createElement("tr");
+    gueterTabelle.getElementsByTagName("tr")[0].parentNode.insertBefore(
+            restTageZeile, gueterTabelle.getElementsByTagName("tr")[1]);
+    for (var i=0; i < gueterTabelle.getElementsByTagName("tr")[0].childNodes.length; i++) {
+        restTageZeile.appendChild(document.createElement("td"));
+    }
+    var textNode = document.createTextNode("Tage verbleibend");
+    restTageZeile.childNodes[0].appendChild(textNode);
+
+    // Funktion fuer die Ausgabe und Formatierung
+    function zellenInfo(info, tage, zelle) {
+        if (zelle.childNodes >= 0) {
+            zelle.appendChild(document.createElement("br"));
+        }
+        centerTag = document.createElement("center");
+        centerTag.appendChild(document.createElement("b"));
+        infoText = document.createTextNode(info);
+        centerTag.childNodes[0].appendChild(infoText)
+        zelle.appendChild(centerTag);
+        if (tage <= tageRot) {
+            zelle.style.backgroundColor = "red";
+        } else if (tage <= tageGelb) {
+            zelle.style.backgroundColor = "yellow";
+        }
+    }
+
+    // jedes Dorf Betrachten
+    for (var d = 1; d <= doerfer; d++) {
+        restTageDorf = 99999;
+        zuegeImDorf = gueterTabelle.getElementsByTagName("tr")[0].childNodes[d].childNodes[8].nodeValue;
+        // jedes Gut betrachten
+        for (var i = 2; i < 25; i++) {
+            var zelle = gueterTabelle.getElementsByTagName("tr")[i].childNodes[d];
+            var zellenText = zelle.firstChild;
+            if (zellenText.firstChild) {
+                var werte = zellenText.firstChild.nodeValue.split("(");
+                var anzahl = werte[0];
+                var veraenderung = werte[1].replace(")","");
+                if (veraenderung < 0) {
+                    var restZuege = Math.floor(anzahl / Math.abs(veraenderung));
+                    var restTage = Math.floor(restZuege / zuegeImDorf);
+                    if (restTage < restTageDorf) { restTageDorf = restTage; }
+                    var info = restZuege + " | " + restTage;
+                    zellenInfo(info, restTage, zelle);
+                }	
+                zelle.style.verticalAlign = "top";
+            }
+        }
+        // verbleibende Tage fuer das Dorf
+        zelle = gueterTabelle.getElementsByTagName("tr")[1].childNodes[d];
+        zellenInfo(restTageDorf, restTageDorf, zelle);
+    }
+
+    // fuer jedes Gut die Summenspalte betrachten
+    var restTageReich = 99999
+    for (var i = 2; i < 25; i++) {
+        var zelle = gueterTabelle.getElementsByTagName("tr")[i].childNodes[gesamt];
+        var zellenText = zelle.firstChild;
+        if (zellenText) {
+            var anzahl = zellenText.childNodes[0].firstChild.nodeValue;
+            var veraenderung = zellenText.childNodes[1].nodeValue;
+            veraenderung = veraenderung.replace(/\((.*)\)/,"$1");			
+            if (veraenderung < 0) {
+                var restTage = Math.floor(anzahl / Math.abs(veraenderung));
+                if (restTage < restTageReich) { restTageReich = restTage; }
+                zellenInfo(restTage, restTage, zelle);
+            }
+            zelle.style.verticalAlign = "top";
+        }
+    }
+    // verbleibende Tage fuer das gesamte Reich
+    zelle = restTageZeile.childNodes[gesamt];
+    zellenInfo(restTageReich, restTageReich, zelle);
+
+
+} // ende Ressourcenauswertung
 
 /* vim:set shiftwidth=4 expandtab smarttab: */
