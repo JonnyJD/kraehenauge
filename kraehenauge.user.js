@@ -603,11 +603,11 @@ if( gamePage == "rbrinfo0" ) {
         if (zelle.childNodes >= 0) {
             zelle.appendChild(document.createElement("br"));
         }
-        centerTag = document.createElement("center");
-        centerTag.appendChild(document.createElement("b"));
-        infoText = document.createTextNode(info);
-        centerTag.childNodes[0].appendChild(infoText)
-        zelle.appendChild(centerTag);
+        divTag = document.createElement("div");
+        divTag.style.textAlign = "right";
+        divTag.style.fontStyle = "italic";
+        divTag.appendChild(document.createTextNode(info));
+        zelle.appendChild(divTag);
         if (tage <= tageRot) {
             zelle.style.backgroundColor = "red";
         } else if (tage <= tageGelb) {
