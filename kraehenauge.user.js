@@ -640,17 +640,18 @@ if( gamePage == "rbrinfo0" ) {
             }
         }
         // verbleibende Tage fuer das Dorf
+        if (restTageDorf == 99999) { restTageDorf = String.fromCharCode(8734); }
         zelle = gueterTabelle.getElementsByTagName("tr")[1].childNodes[d];
         zellenInfo(restTageDorf, restTageDorf, zelle);
     }
 
     // fuer jedes Gut die Summenspalte betrachten
-    var restTageReich = 99999
+    var restTageReich = 99999;
     for (var i = 2; i < 25; i++) {
         var zelle = gueterTabelle.getElementsByTagName("tr")[i]
             .childNodes[gesamt];
         var zellenText = zelle.firstChild;
-        if (zellenText) {
+        if (zellenText.firstChild) {
             var anzahl = zellenText.childNodes[0].firstChild.nodeValue;
             var veraenderung = zellenText.childNodes[1].nodeValue;
             veraenderung = veraenderung.replace(/\((.*)\)/,"$1");			
@@ -663,10 +664,16 @@ if( gamePage == "rbrinfo0" ) {
         }
     }
     // verbleibende Tage fuer das gesamte Reich
+    if (restTageReich == 99999) { restTageReich = String.fromCharCode(8734); }
     zelle = restTageZeile.childNodes[gesamt];
     zellenInfo(restTageReich, restTageReich, zelle);
 
 
 } // ende Ressourcenauswertung
+
+// debugausgabe
+if (debugOut) {
+    gameInfo.appendChild(document.createTextNode(debugOut));
+}
 
 /* vim:set shiftwidth=4 expandtab smarttab: */
