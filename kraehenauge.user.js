@@ -76,7 +76,7 @@ var game = {
 
 // Einstellungen Armeesortierung
 // 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
-// 59 = TW, 60 = KSK, 61 = UfR, 63 = BdS, 67 = RK
+// 59 = TW, 60 = KSK, 61 = UfR, 63 = BdS, 67 = RK, 70 = NW
 // Trenner ist | (regExp ODER)
 var friendlyAllies = "(60)";
 var hostileAllies  = "()";
@@ -109,6 +109,7 @@ var pages = {
 var wholePage = document.getElementsByTagName('HTML')[0].innerHTML;
 var session = document.getElementsByName('name')[0].value;
 var gameId = document.getElementsByName('passw')[0].value;
+var debugOut = "";
 
 // Seitenerkennung
 var gamePage = '';
@@ -672,7 +673,7 @@ if( gamePage == "rbrinfo0" ) {
 } // ende Ressourcenauswertung
 
 // debugausgabe
-if (debugOut) {
+if (debugOut != "") {
     gameInfo.appendChild(document.createTextNode(debugOut));
 }
 
