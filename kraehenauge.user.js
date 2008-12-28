@@ -53,6 +53,13 @@ var game = {
         dorf: new Array("300269", "286269", "284271", "285270", "286271"),
         hb: new Array({ mfeld: "300269", feld: "55" })
     },
+    // Skaar
+    rbspiel1809: {
+        armeen: new Array("7862", "h7862h", "7881", "h7881h",
+                        "6083", "512", "7230", "505"),
+        dorf: new Array("287267", "287271", "287270", "288270", "287269"),
+        hb: new Array({ mfeld: "287270", feld: "40"})
+    },
     // Boerni
     rbspiel1850: {
         armeen: new Array("7924", "h7924h", "7920", "h7920h"),
