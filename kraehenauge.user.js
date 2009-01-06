@@ -27,7 +27,7 @@ var game = {
     // Jonerian
     rbspiel1728: {
         armeen: new Array("7666", "h7666h", "7511", "h7511h",
-                        "201", "h201h", "6695", "522"),
+                        "201", "h201h", "80", "h1s7"),
         dorf: new Array("297273", "294270", "292269", "293273", "292270"),
         hb: new Array({ mfeld: "294270", feld: "55" },
                       { mfeld: "292269", feld: "44" })
