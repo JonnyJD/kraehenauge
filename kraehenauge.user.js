@@ -500,9 +500,13 @@ function sendToHandler(handler, fieldName) {
 
 if (gamePage == "rbarmee") sendToHandler("k-armee.php", "dorftext");
 if (gamePage == "rbfturm1"
-    || gamePage == "rbfturm2") sendToHandler("k-turm.php", "text");
-// Allianztuerme sichten
-if (gamePage == "rbfturma") sendToHandler("k-turm.php", "text");
+    || gamePage == "rbfturm2"
+    || gamePage == "rbfturma") sendToHandler("k-turm.php", "text");
+// datenpflegeseite kann momentan nicht von allen benutzt werden
+if (gameId == 'rbspiel1728') {
+    if (gamePage == 'rbftop10') sendToHandler("datenpflege.php",
+            "wahl=top10&textbereich");
+}
 
 
 // Armeesortierung
