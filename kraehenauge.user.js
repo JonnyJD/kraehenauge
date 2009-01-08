@@ -133,51 +133,53 @@ for (var i=0; i < fontTags.length; i++) {
     }
 }
 // allgemeine Seiten
-if (pageTitle.search(/Thronsaal(.*)/) >= 0)
+if (pageTitle.indexOf('Thronsaal') == 0)
     gamePage = 'rbstart';
-else if (pageTitle.indexOf('\xD6ffentliche Chronik') >= 0)
+else if (pageTitle.indexOf('\xD6ffentliche Chronik') == 0)
     gamePage = 'rbchronik1';
-else if (pageTitle.indexOf('die letzten Ereignisse') >= 0)
+else if (pageTitle.indexOf('die letzten Ereignisse') == 0)
     gamePage = 'rbereignis';
-else if (pageTitle.indexOf('Nachrichten') >= 0)
+else if (pageTitle.indexOf('Nachrichten') == 0)
     gamePage = 'rbnachr1';
-else if (pageTitle.indexOf('laufende Quests') >= 0)
+else if (pageTitle.indexOf('laufende Quests') == 0)
     gamePage = 'rbquest';
-else if (pageTitle.search(/T\xFCrme der Allianz(.*)/) >= 0)
+else if (pageTitle.indexOf('T\xFCrme der Allianz') == 0)
     gamePage = 'rbfturma';
-else if (pageTitle.indexOf('vernichtete Monster und R\xE4uber') >= 0)
+else if (pageTitle.indexOf('vernichtete Monster und R\xE4uber') == 0)
     gamePage = 'rbmonster';
-else if (pageTitle.indexOf('Aufteilung der verschiedenen Einheiten im Reich:') >= 0)
+else if (pageTitle.indexOf('Aufteilung der verschiedenen Einheiten im Reich:') == 0)
     gamePage = 'rbminfo0';
-else if (pageTitle.search(/Ressourcen im Reich (.*)/) >= 0)
+else if (pageTitle.indexOf('Ressourcen im Reich ') == 0)
     gamePage = 'rbrinfo0';
-else if (pageTitle.indexOf('bekannte Rezepte') >= 0)
+else if (pageTitle.indexOf('bekannte Rezepte') == 0)
     gamePage = 'rbrezept';
-else if (pageTitle.indexOf('bekannte Gegenst\xE4nde') >= 0)
+else if (pageTitle.indexOf('bekannte Gegenst\xE4nde') == 0)
     gamePage = 'rbanzeige2';
-else if (pageTitle.indexOf('eigene Punktzahl') >= 0)
+else if (pageTitle.indexOf('eigene Punktzahl') == 0)
     gamePage = 'rbftop10';
-else if (pageTitle.indexOf('Die besten Arbeiter') >= 0)
+else if (pageTitle.indexOf('Die besten Arbeiter') == 0)
     gamePage = 'rbtop10b';
-else if (pageTitle.indexOf('TOP 10 der Bekanntheit') >= 0)
+else if (pageTitle.indexOf('TOP 10 der Bekanntheit') == 0)
     gamePage = 'rbtop10q';
-else if (pageTitle.indexOf('\xDCbersicht der Reiche') >= 0)
+else if (pageTitle.indexOf('\xDCbersicht der Reiche') == 0)
     gamePage = 'rbreiche';
-else if (pageTitle.indexOf('Diplomatie') >= 0)
+else if (pageTitle.indexOf('Diplomatie') == 0)
     gamePage = 'rbdiplo';
-else if (pageTitle.indexOf('Allianzen') >= 0)
+else if (pageTitle.indexOf('Allianzen') == 0)
     gamePage = 'rbally1';
 // Individualseiten
-else if (pageTitle.indexOf('Armee') >= 0)
+else if (pageTitle.indexOf('Armee') == 0)
     gamePage = 'rbarmee';
-else if (pageTitle.search(/Dorf (.*), Handelsbude/) >= 0)
+else if (pageTitle.search(/Dorf (.*), Handelsbude/) == 0)
     gamePage = 'rbfhandel1';
-else if (pageTitle.search(/Dorf (.*), Turmsicht\(2\)/) >= 0)
+else if (pageTitle.search(/Dorf (.*), Turmsicht\(2\)/) == 0)
     gamePage = 'rbfturm2';
-else if (pageTitle.search(/Dorf (.*), Turmsicht/) >= 0)
+else if (pageTitle.search(/Dorf (.*), Turmsicht/) == 0)
     gamePage = 'rbfturm1';
-else if (pageTitle.search(/Ressourcen im Dorf (.*)/) >= 0)
+else if (pageTitle.indexOf('Ressourcen im Dorf ') == 0)
     gamePage = 'rbrinfo';
+else if (pageTitle.indexOf('Allianz ') == 0)
+    gamePage = 'rbally2';
 
 
 // Bereiche fuer die Linkleisten einfuegen
@@ -475,6 +477,8 @@ copyText = copyText.replace(/<script[^>]*>[^<]*<\/script>/gi, "");
 copyText = copyText.replace(/<br ?\/?>/gi, "\n");
 copyText = copyText.replace(/<\/tr>/gi, "\n");
 copyText = copyText.replace(/<\/td>/gi, "\t");
+copyText = copyText.replace(/<li>/gi, "\n    * ");
+copyText = copyText.replace(/<\/ul>/gi, "\n");
 copyText = copyText.replace(/<[^>]*>/g, "");
 copyText = copyText.replace(/&nbsp;/gi, " ");
 //document.getElementById("DBAntwort").innerHTML = "<pre>"+copyText+"</pre>";
@@ -506,6 +510,8 @@ if (gamePage == "rbfturm1"
 if (gameId == 'rbspiel1728') {
     if (gamePage == 'rbftop10') sendToHandler("datenpflege.php",
             "wahl=top10&textbereich");
+    if (gamePage == 'rbally2') sendToHandler("datenpflege.php",
+            "wahl=alli&textbereich");
 }
 
 
