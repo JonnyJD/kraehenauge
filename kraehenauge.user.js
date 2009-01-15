@@ -599,11 +599,16 @@ if( gamePage == "rbrinfo0" ) {
 
     // Zaehle die Doerfer
     var doerfer = 0;
-    while (gueterTabelle.getElementsByTagName("tr")[0].childNodes[doerfer+1]
-                    .innerHTML.indexOf("Dorf") >= 0) {
+    while (gueterTabelle.getElementsByTagName("tr")[0]
+            .childNodes[doerfer+1].innerHTML.indexOf("Dorf") >= 0) {
         doerfer++;
     }
-    var gesamt = doerfer + 1;
+    var posten = 0;
+    while (gueterTabelle.getElementsByTagName("tr")[0]
+            .childNodes[doerfer+posten+1].innerHTML.indexOf("Aussenp.") >= 0) {
+        posten++;
+    }
+    var gesamt = doerfer + posten + 1;
 
     // Zeile mit verbleibenden Tagen pro Dorf vorbereiten
     var restTageZeile = document.createElement("tr");
