@@ -290,6 +290,7 @@ if( gamePage == "rbstart" ) {
     }
 
     // Anmerkung: im DOM hat die Tabelle immer ein tbody tag
+    var tote = 0;
     var armeeZeilen = armeeTabelle.firstChild.childNodes;
     for (var i = 0; i < armeeZeilen.length; i++) {
         var armeeFeld = armeeZeilen[i].firstChild;
@@ -305,12 +306,17 @@ if( gamePage == "rbstart" ) {
 
         // Armeedaten einlesen
         var armeeForm = armeeZeilen[i].childNodes[1].firstChild;
-        var armeeImg = armeeForm.getElementsByTagName("input")[4];
-        GM_setValue(gameId+".armee"+(i+1),
-                armeeImg.name.match(/\[(.*)\]/)[1]);
-        GM_setValue(gameId+".armee"+(i+1)+".src",
-                armeeImg.src.match(/([^\/]*)\.gif/)[1]);
-        GM_setValue(gameId+".armeen", i+1);
+        if (armeeForm) {
+            var armeeImg = armeeForm.getElementsByTagName("input")[4];
+            GM_setValue(gameId+".armee"+(i+1-tote),
+                    armeeImg.name.match(/\[(.*)\]/)[1]);
+            GM_setValue(gameId+".armee"+(i+1-tote)+".src",
+                    armeeImg.src.match(/([^\/]*)\.gif/)[1]);
+            GM_setValue(gameId+".armeen", i+1-tote);
+        } else {
+            // tote Armeen haben eine Zeile ohne Linkformular
+            tote++;
+        }
     }
 } // Ende Armeedaten einlesen
 
