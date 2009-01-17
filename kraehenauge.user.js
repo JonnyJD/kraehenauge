@@ -26,57 +26,43 @@ var game = {
     ab: "rbspiel1728",
     // Jonerian
     rbspiel1728: {
-        armeen: new Array("7666", "h7666h", "7511", "h7511h",
-                        "201", "h201h", "80", "h1s7"),
         dorf: new Array("297273", "294270", "292269", "293273", "292270"),
         hb: new Array({ mfeld: "294270", feld: "55" },
                       { mfeld: "292269", feld: "44" })
     },
     // Rich
     rbspiel1802: {
-        armeen: new Array("7692", "h7692h", "7687", "h7687h",
-                        "138", "h138h", "193", "h193h"),
         dorf: new Array("293267", "292267", "291267", "290267", "295268"),
         hb: new Array({ mfeld: "293267", feld: "44" })
     },
     // Stolze
     rbspiel1803: {
-        armeen: new Array("7719", "520", "7708", "507",
-                        "147", "h147h", "214", "h214h"),
         dorf: new Array("289270", "291271", "290271", "290272"),
         hb: new Array({ mfeld: "290270", feld: "23" })
     },
     // Huebi
     rbspiel1808: {
-        armeen: new Array("7729", "520", "7697", "511",
-                        "104", "h104h", "39", "hs6"),
         dorf: new Array("300269", "286269", "284271", "285270", "286271"),
         hb: new Array({ mfeld: "300269", feld: "55" })
     },
     // Skaar
     rbspiel1809: {
-        armeen: new Array("7862", "h7862h", "7881", "h7881h",
-                        "6083", "512", "7230", "505"),
         dorf: new Array("287267", "287271", "287270", "288270", "287269"),
         hb: new Array({ mfeld: "287270", feld: "40"})
     },
     // Boerni
     rbspiel1850: {
-        armeen: new Array("7924", "h7924h", "7920", "h7920h"),
         dorf: new Array("282270", "269265", "290268", "282269", "292268"),
         hb: new Array({ mfeld: "292268", feld: "62" })
     },
     // Windson
     rbspiel3037: {
-        armeen: new Array("2914905", "521", "2915115", "515",
-                          "8281", "512", "4142", "509"),
         dorf: new Array("291265", "295263", "295266", "296267", "300271"),
         hb: new Array({ mfeld: "295266", feld: "8" },
                       { mfeld: "300271", feld: "20"})
     },
     // Ubigaz
     rbspiel3068: {
-        armeen: new Array("2948578", "517", "2948579", "508"),
         dorf: new Array("306250")
     }
 }
@@ -271,19 +257,19 @@ document.getElementById('Leiste4').appendChild(newLink);
 createSeparation(4); createSeparation(4);
 
 // Armeelinks
-if (game[gameId] && game[gameId].armeen) {
+if (GM_getValue(gameId+".armeen", 0)) {
     for (var listNumber = 3; listNumber <= 4; listNumber++) { 
         var tempText = '<form method="post">' +
             '<input type="hidden" name="name" value="' + session + '">' +
             '<input type="hidden" name="passw" value="' + gameId + '">' +
             '<input type="hidden" name="seite" value="rbarmee">' +
             '<input type="hidden" name="bereich" value="armee">';
-        for (var i = 0; i < game[gameId].armeen.length-1; i += 2) {
+        for (var i = 1; i <= GM_getValue(gameId+".armeen"); i++) {
             tempText += 
                 '<input type="image" name="armee[' +
-                game[gameId].armeen[i] + ']" ' +
+                GM_getValue(gameId+".armee"+i) + ']" ' +
                 'src="http://www.ritterburgwelt.de/rb/held/' +
-                game[gameId].armeen[i+1] + '.gif" border=0><br/>';
+                GM_getValue(gameId+".armee"+i+".src") + '.gif" border=0><br/>';
         }
         tempText += '</form>';
         var linkForm = document.createElement('form');
@@ -695,7 +681,7 @@ if( gamePage == "rbrinfo0" ) {
 } // ende Ressourcenauswertung
 
 
-// Soeldnererinnerung
+// Armeedaten lesen und markieren (Erinnerung)
 if( gamePage == "rbstart" ) {
     var fontTags = document.getElementsByTagName('font');
     for (var i=0; i < fontTags.length; i++) {
@@ -739,6 +725,15 @@ if( gamePage == "rbstart" ) {
                 farbTage(bTag, "1", "yellow");
             }
         }
+
+        // Armeedaten einlesen
+        var armeeForm = armeeZeilen[i].childNodes[1].firstChild;
+        var armeeImg = armeeForm.getElementsByTagName("input")[4];
+        GM_setValue(gameId+".armee"+(i+1),
+                armeeImg.name.match(/\[(.*)\]/)[1]);
+        GM_setValue(gameId+".armee"+(i+1)+".src",
+                armeeImg.src.match(/([^\/]*)\.gif/)[1]);
+        GM_setValue(gameId+".armeen", i+1);
     }
 } // Ende Soeldnererinnerung
 
