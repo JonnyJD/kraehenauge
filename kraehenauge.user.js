@@ -26,44 +26,36 @@ var game = {
     ab: "rbspiel1728",
     // Jonerian
     rbspiel1728: {
-        dorf: new Array("297273", "294270", "292269", "293273", "292270"),
         hb: new Array({ mfeld: "294270", feld: "55" },
                       { mfeld: "292269", feld: "44" })
     },
     // Rich
     rbspiel1802: {
-        dorf: new Array("293267", "292267", "291267", "290267", "295268"),
         hb: new Array({ mfeld: "293267", feld: "44" })
     },
     // Stolze
     rbspiel1803: {
-        dorf: new Array("289270", "291271", "290271", "290272"),
         hb: new Array({ mfeld: "290270", feld: "23" })
     },
     // Huebi
     rbspiel1808: {
-        dorf: new Array("300269", "286269", "284271", "285270", "286271"),
         hb: new Array({ mfeld: "300269", feld: "55" })
     },
     // Skaar
     rbspiel1809: {
-        dorf: new Array("287267", "287271", "287270", "288270", "287269"),
         hb: new Array({ mfeld: "287270", feld: "40"})
     },
     // Boerni
     rbspiel1850: {
-        dorf: new Array("282270", "269265", "290268", "282269", "292268"),
         hb: new Array({ mfeld: "292268", feld: "62" })
     },
     // Windson
     rbspiel3037: {
-        dorf: new Array("291265", "295263", "295266", "296267", "300271"),
         hb: new Array({ mfeld: "295266", feld: "8" },
                       { mfeld: "300271", feld: "20"})
     },
     // Ubigaz
     rbspiel3068: {
-        dorf: new Array("306250")
     }
 }
 
@@ -297,7 +289,7 @@ if( gamePage == "rbstart" ) {
         var armeeNodes = armeeFeld.childNodes;
         for (var j = 0; j < armeeNodes.length; j++) {
             if (armeeNodes[j].nodeType == 3 // Textknoten
-                    && armeeNodes[j].data.indexOf('Söldner') == 0) {
+                    && armeeNodes[j].data.indexOf('S\xF6ldner') == 0) {
                 var bTag = armeeNodes[j].nextSibling;
                 farbTage(bTag, "0", "red");
                 farbTage(bTag, "1", "yellow");
@@ -319,6 +311,33 @@ if( gamePage == "rbstart" ) {
         }
     }
 } // Ende Armeedaten einlesen
+
+
+// Dorfdaten lesen
+if( gamePage == "rbstart" ) {
+    // Dorftabelle finden
+    var fontTags = document.getElementsByTagName('font');
+    for (var i=0; i < fontTags.length; i++) {
+        if (fontTags[i].face == "Diploma"
+            && fontTags[i].size == 5
+            && fontTags[i].firstChild.data
+            && fontTags[i].firstChild.data.indexOf('D\xF6rfer') == 0
+        ) {
+            var dorfTabelle = fontTags[i].parentNode
+                .getElementsByTagName("table")[0];
+            break;
+        }
+    }
+
+    // Doerfer einlesen
+    // Anmerkung: im DOM hat die Tabelle immer ein tbody tag
+    var dorfZeilen = dorfTabelle.firstChild.childNodes;
+    for (var i = 0; i < dorfZeilen.length; i++) {
+        var dorfImg = dorfZeilen[i].getElementsByTagName("input")[0];
+        GM_setValue(gameId+".dorf"+(i+1), dorfImg.name.match(/\[(.*)\]/)[1]);
+        GM_setValue(gameId+".doerfer", i+1);
+    }
+} // Ende Dorfdaten einlesen
 
 
 // Armeelinks
@@ -363,17 +382,17 @@ document.getElementById('Leiste4').appendChild(newLink);
 createSeparation(4); createSeparation(4);
 
 // Dorflinks
-if (game[gameId] && game[gameId].dorf) {
+if (GM_getValue(gameId+".doerfer", 0)) {
     for (var listNumber = 3; listNumber <= 4; listNumber++) { 
         var tempText = '<form method="post">' +
             '<input type="hidden" name="name" value="' + session + '">' +
             '<input type="hidden" name="passw" value="' + gameId + '">' +
             '<input type="hidden" name="seite" value="rbkarte">' +
             '<input type="hidden" name="bereich" value="dorf">';
-        for (var i = 0; i < game[gameId].dorf.length; i ++) {
+        for (var i = 1; i <= GM_getValue(gameId+".doerfer"); i ++) {
             tempText += 
                 '<input type="image" name="mfeld[' +
-                game[gameId].dorf[i] + ']" ' +
+                GM_getValue(gameId+".dorf"+i) + ']" ' +
                 'src="http://www.ritterburgwelt.de/rb/bild/buttons/b_map.gif"' +
                 ' border=0><br/>';
         }
