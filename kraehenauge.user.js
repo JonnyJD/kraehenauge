@@ -24,39 +24,6 @@ var game = {
     },
     // der Spieler, der die AB und EB kontrolliert
     ab: "rbspiel1728",
-    // Jonerian
-    rbspiel1728: {
-        hb: new Array({ mfeld: "294270", feld: "55" },
-                      { mfeld: "292269", feld: "44" })
-    },
-    // Rich
-    rbspiel1802: {
-        hb: new Array({ mfeld: "293267", feld: "44" })
-    },
-    // Stolze
-    rbspiel1803: {
-        hb: new Array({ mfeld: "290270", feld: "23" })
-    },
-    // Huebi
-    rbspiel1808: {
-        hb: new Array({ mfeld: "300269", feld: "55" })
-    },
-    // Skaar
-    rbspiel1809: {
-        hb: new Array({ mfeld: "287270", feld: "40"})
-    },
-    // Boerni
-    rbspiel1850: {
-        hb: new Array({ mfeld: "292268", feld: "62" })
-    },
-    // Windson
-    rbspiel3037: {
-        hb: new Array({ mfeld: "295266", feld: "8" },
-                      { mfeld: "300271", feld: "20"})
-    },
-    // Ubigaz
-    rbspiel3068: {
-    }
 }
 
 // Einstellungen Armeesortierung
@@ -340,6 +307,22 @@ if( gamePage == "rbstart" ) {
 } // Ende Dorfdaten einlesen
 
 
+// Handelsbude einlesen aus einer Handelsdorfseite
+if( pageTitle.search(/Dorf (.*), Handelsd\xF6rfer/) == 0) {
+    // nur formlinks im unveraenderten mittelteil suchen
+    var zentrum = document.getElementById("zentrum");
+    var formEins = zentrum.getElementsByTagName("form")[0];
+    var inputs = formEins.getElementsByTagName("input");
+    for (i = 0; i < inputs.length; i++) {
+        if (inputs[i].name == "mfeld") {
+            GM_setValue(gameId+".hb.mfeld", inputs[i].value);
+            GM_setValue(gameId+".hb.feld", inputs[i+1].value);
+            break;
+        }
+    }
+}
+
+
 // Armeelinks
 if (GM_getValue(gameId+".armeen", 0)) {
     for (var listNumber = 3; listNumber <= 4; listNumber++) { 
@@ -412,7 +395,7 @@ if (GM_getValue(gameId+".doerfer", 0)) {
 }
 
 // HBlinks
-if (game[gameId] && game[gameId].hb) {
+if (GM_getValue(gameId+".hb.mfeld")) {
     // Ring
     for (var listNumber = 3; listNumber <= 4; listNumber++) { 
         var linkForm = document.createElement('form');
@@ -423,9 +406,9 @@ if (game[gameId] && game[gameId].hb) {
             '<input type="hidden" name="bereich" value="dorf">' +
             '<input type="hidden" name="modul" value="handel">' +
             '<input type="hidden" name="mfeld" value="' +
-            game[gameId].hb[0].mfeld + '">' +
+            GM_getValue(gameId+".hb.mfeld") + '">' +
             '<input type="hidden" name="feld" value="' +
-            game[gameId].hb[0].feld + '">' +
+            GM_getValue(gameId+".hb.feld") + '">' +
             '<input type="image" name="Handelsring" ' +
             'src="http://www.ritterburgwelt.de/rb/bild/buttons/b_chronik.gif"' +
             ' border=0></form>';
@@ -441,11 +424,16 @@ if (game[gameId] && game[gameId].hb) {
     }
 
     // Allianz
+    var mfeld;
+    var feld;
     for (var i = 0; i < game["standard"].hb.length; i++) {
         var j = 0; // Die erste hb des Spielers greift auf die AB zu
         if (gameId == game["ab"]) {
-            // Der Besitzer der Handelsbuden greift mit versch. Buden zu
-            j = i;
+            mfeld = game["standard"].hb[i].mfeld;
+            feld = game["standard"].hb[i].feld;
+        } else {
+            mfeld = GM_getValue(gameId+".hb.mfeld");
+            feld = GM_getValue(gameId+".hb.feld");
         }
         for (var listNumber = 3; listNumber <= 4; listNumber++) { 
             var linkForm = document.createElement('form');
@@ -457,10 +445,8 @@ if (game[gameId] && game[gameId].hb) {
                 '<input type="hidden" name="modul" value="handel">' +
                 '<input type="hidden" name="mfeld2" value="' +
                 game["standard"].hb[i].mfeld + '">' +
-                '<input type="hidden" name="mfeld" value="' +
-                game[gameId].hb[j].mfeld+'">' +
-                '<input type="hidden" name="feld" value="' +
-                game[gameId].hb[j].feld + '">' +
+                '<input type="hidden" name="mfeld" value="' + mfeld + '">' +
+                '<input type="hidden" name="feld" value="' + feld + '">' +
                 '<input type="image" name="Angebot" ' +
                 'src="http://www.ritterburgwelt.de/rb/bild/buttons/b_map.gif"' +
                 ' border=0></form>';
