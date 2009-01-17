@@ -256,6 +256,65 @@ newLink.appendChild(kskTag);
 document.getElementById('Leiste4').appendChild(newLink);
 createSeparation(4); createSeparation(4);
 
+
+// Armeedaten lesen und markieren (Erinnerung)
+if( gamePage == "rbstart" ) {
+    // Armeetabelle finden
+    var fontTags = document.getElementsByTagName('font');
+    for (var i=0; i < fontTags.length; i++) {
+        if (fontTags[i].face == "Diploma"
+            && fontTags[i].firstChild.data
+            && fontTags[i].firstChild.data.indexOf('Armeen') == 0
+            && fontTags[i].size == 5
+        ) {
+            var armeeTabelle = fontTags[i].nextSibling;
+            break;
+        }
+    }
+
+    // fuer die spaetere Faerbung
+    function farbTage(parentTag, tage, farbe) {
+        var dauerNode = parentTag.firstChild;
+        if (dauerNode.nodeType != 3) return; // schon farbig
+        var dauerArray = dauerNode.data.split("/");
+        if (dauerArray[0] == tage) {
+            var newDauer = document.createElement("span");
+            newDauer.style.color = farbe;
+            newDauer.style.fontSize = "1.5em";
+            newDauer.appendChild(document.createTextNode(tage));
+            parentTag.replaceChild(newDauer, dauerNode);
+            var newText = document.createTextNode("/"+dauerArray[1]);
+            parentTag.appendChild(newText);
+        }
+        
+    }
+
+    // Anmerkung: im DOM hat die Tabelle immer ein tbody tag
+    var armeeZeilen = armeeTabelle.firstChild.childNodes;
+    for (var i = 0; i < armeeZeilen.length; i++) {
+        var armeeFeld = armeeZeilen[i].firstChild;
+        var armeeNodes = armeeFeld.childNodes;
+        for (var j = 0; j < armeeNodes.length; j++) {
+            if (armeeNodes[j].nodeType == 3 // Textknoten
+                    && armeeNodes[j].data.indexOf('Söldner') == 0) {
+                var bTag = armeeNodes[j].nextSibling;
+                farbTage(bTag, "0", "red");
+                farbTage(bTag, "1", "yellow");
+            }
+        }
+
+        // Armeedaten einlesen
+        var armeeForm = armeeZeilen[i].childNodes[1].firstChild;
+        var armeeImg = armeeForm.getElementsByTagName("input")[4];
+        GM_setValue(gameId+".armee"+(i+1),
+                armeeImg.name.match(/\[(.*)\]/)[1]);
+        GM_setValue(gameId+".armee"+(i+1)+".src",
+                armeeImg.src.match(/([^\/]*)\.gif/)[1]);
+        GM_setValue(gameId+".armeen", i+1);
+    }
+} // Ende Armeedaten einlesen
+
+
 // Armeelinks
 if (GM_getValue(gameId+".armeen", 0)) {
     for (var listNumber = 3; listNumber <= 4; listNumber++) { 
@@ -679,63 +738,6 @@ if( gamePage == "rbrinfo0" ) {
 
 
 } // ende Ressourcenauswertung
-
-
-// Armeedaten lesen und markieren (Erinnerung)
-if( gamePage == "rbstart" ) {
-    var fontTags = document.getElementsByTagName('font');
-    for (var i=0; i < fontTags.length; i++) {
-        if (fontTags[i].face == "Diploma"
-            && fontTags[i].firstChild.data
-            && fontTags[i].firstChild.data.indexOf('Armeen') == 0
-            && fontTags[i].size == 5
-        ) {
-            var armeeTabelle = fontTags[i].nextSibling;
-            break;
-        }
-    }
-
-    // fuer die spaetere Faerbung
-    function farbTage(parentTag, tage, farbe) {
-        var dauerNode = parentTag.firstChild;
-        if (dauerNode.nodeType != 3) return; // schon farbig
-        var dauerArray = dauerNode.data.split("/");
-        if (dauerArray[0] == tage) {
-            var newDauer = document.createElement("span");
-            newDauer.style.color = farbe;
-            newDauer.style.fontSize = "1.5em";
-            newDauer.appendChild(document.createTextNode(tage));
-            parentTag.replaceChild(newDauer, dauerNode);
-            var newText = document.createTextNode("/"+dauerArray[1]);
-            parentTag.appendChild(newText);
-        }
-        
-    }
-
-    // Anmerkung: im DOM hat die Tabelle immer ein tbody tag
-    var armeeZeilen = armeeTabelle.firstChild.childNodes;
-    for (var i = 0; i < armeeZeilen.length; i++) {
-        var armeeFeld = armeeZeilen[i].firstChild;
-        var armeeNodes = armeeFeld.childNodes;
-        for (var j = 0; j < armeeNodes.length; j++) {
-            if (armeeNodes[j].nodeType == 3 // Textknoten
-                    && armeeNodes[j].data.indexOf('Söldner') == 0) {
-                var bTag = armeeNodes[j].nextSibling;
-                farbTage(bTag, "0", "red");
-                farbTage(bTag, "1", "yellow");
-            }
-        }
-
-        // Armeedaten einlesen
-        var armeeForm = armeeZeilen[i].childNodes[1].firstChild;
-        var armeeImg = armeeForm.getElementsByTagName("input")[4];
-        GM_setValue(gameId+".armee"+(i+1),
-                armeeImg.name.match(/\[(.*)\]/)[1]);
-        GM_setValue(gameId+".armee"+(i+1)+".src",
-                armeeImg.src.match(/([^\/]*)\.gif/)[1]);
-        GM_setValue(gameId+".armeen", i+1);
-    }
-} // Ende Soeldnererinnerung
 
 
 // debugausgabe
