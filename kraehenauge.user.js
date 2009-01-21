@@ -3,11 +3,12 @@
 // @namespace      http://kraehen.org
 // @description    Dies ist bzw. wird das clientseitige KSK-Programm. Es unterstuetzt die Kraehen auf ihren Wegen in Alirion und gibt ihnen Ueberblick und schnelle Reaktionsmoeglichkeiten.
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
+// @include        file:///home/jonnyjd/rbstart.php.html
 // @author         JonnyJD
-// @version        1.2.2
+// @version        1.2.2.1
 // ==/UserScript==
 
-var version = 'Kr\xE4henauge 1.2.2';
+var version = 'Kr\xE4henauge 1.2.2.1';
 var game = {
     standard: {
         links: new Array("rbstart",
@@ -33,10 +34,13 @@ var game = {
 var friendlyAllies = "(60)";
 var hostileAllies  = "()";
 
-// Einstellungen Ressourcenauswertung
+// Einstellungen Ressourcenauswertung und Zugauswertung
 // Bei welcher anzahl verbleibender Tage welche Farbe benutzt wird:
 tageRot = 5
 tageGelb = 15
+// 2 Zuege macht man taeglich mindestens
+zuegeRot = 10
+zuegeGelb = 30
 
 
 var pages = {
@@ -74,6 +78,13 @@ for (var i=0; i < fontTags.length; i++) {
         && (fontTags[i].size == 5 || fontTags[i].size == 6)
     ) {
         pageTitle = fontTags[i].firstChild.data;
+        break;
+    } else if (fontTags[i].face == "Diploma"
+        && fontTags[i].firstChild.nodeName == "CENTER"
+        && (fontTags[i].size == 5 || fontTags[i].size == 6)
+    ) {
+        // rbzug macht nen extra center tag
+        pageTitle = fontTags[i].firstChild.firstChild.data;
         break;
     }
 }
@@ -117,6 +128,8 @@ else if (pageTitle.indexOf('Armee') == 0)
     gamePage = 'rbarmee';
 else if (pageTitle.search(/Dorf (.*), Handelsbude/) == 0)
     gamePage = 'rbfhandel1';
+else if (pageTitle.search(/Dorf (.*), Zugergebnisse/) == 0 )
+    gamePage = 'rbzug';
 else if (pageTitle.search(/Dorf (.*), Turmsicht\(2\)/) == 0)
     gamePage = 'rbfturm2';
 else if (pageTitle.search(/Dorf (.*), Turmsicht/) == 0)
@@ -749,6 +762,52 @@ if( gamePage == "rbrinfo0" ) {
 
 
 } // ende Ressourcenauswertung
+
+
+// Zugauswertung
+if (gamePage == "rbzug") {
+    // finde die Gueterbilanz
+    var gueterTabelle = '';
+    var fontTags = document.getElementsByTagName('font');
+    for (var i=0; i < fontTags.length; i++) {
+        if (fontTags[i].face == "Diploma"
+            && fontTags[i].size == 5
+            && fontTags[i].firstChild.data
+            && fontTags[i].firstChild.data.indexOf('G\xFCterbilanz') == 0
+        ) {
+            // Diesmal ist der font noch in <i> tag und danach nen \n text
+            var gueterTabelle = fontTags[i].parentNode.nextSibling.nextSibling;
+            break;
+        }
+    }
+    gueterZeilen = gueterTabelle.firstChild.childNodes; // beachte tbody
+
+    // Titelzeile
+    newTD = document.createElement("TD");
+    newText = document.createTextNode("Z\xFCge");
+    newTD.appendChild(newText);
+    gueterZeilen[0].appendChild(newTD);
+
+    // betrachte alle Gueter
+    // Man beachte die Leerzeile nach der Titelzeile
+    for (var gut = 2; gut < gueterZeilen.length; gut++) {
+        var diff = gueterZeilen[gut].childNodes[2].firstChild.data;
+        var danach = gueterZeilen[gut].childNodes[3].firstChild.data;
+        if (diff < 0) {
+            var restZuege = Math.floor(danach / Math.abs(diff))
+            var newTD = document.createElement("TD");
+            newTD.appendChild(document.createTextNode(restZuege));
+            if (restZuege <= zuegeGelb) newTD.style.backgroundColor = "yellow";
+            if (restZuege <= zuegeRot) newTD.style.backgroundColor = "red";
+            gueterZeilen[gut].appendChild(newTD);
+        } else {
+            var infinite = document.createTextNode(String.fromCharCode(8734));
+            var newTD = document.createElement("TD");
+            newTD.appendChild(infinite);
+            gueterZeilen[gut].appendChild(newTD);
+        }
+    }
+} // Ende Zugauswertung
 
 
 // debugausgabe
