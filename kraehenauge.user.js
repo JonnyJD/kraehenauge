@@ -775,8 +775,8 @@ if (gamePage == "rbzug") {
             && fontTags[i].firstChild.data
             && fontTags[i].firstChild.data.indexOf('G\xFCterbilanz') == 0
         ) {
-            // Diesmal ist der font noch in <i> tag und danach nen \n text
-            var gueterTabelle = fontTags[i].parentNode.nextSibling.nextSibling;
+            // Diesmal ist der font noch in <i> tag
+            var gueterTabelle = fontTags[i].parentNode.nextSibling;
             break;
         }
     }
