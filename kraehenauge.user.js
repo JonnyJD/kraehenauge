@@ -776,7 +776,12 @@ if (gamePage == "rbzug") {
             && fontTags[i].firstChild.data.indexOf('G\xFCterbilanz') == 0
         ) {
             // Diesmal ist der font noch in <i> tag
-            var gueterTabelle = fontTags[i].parentNode.nextSibling;
+            gueterTabelle = fontTags[i].parentNode.nextSibling;
+            if (!gueterTabelle) {
+                GM_log("extra div vor Guetertabelle");
+                // extra span wenn Runenforschung betrieben wird? 
+                gueterTabelle = fontTags[i].parentNode.parentNode.nextSibling;
+            }
             break;
         }
     }
