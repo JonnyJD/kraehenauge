@@ -180,6 +180,7 @@ function createFormLink(listNumber, page, target)
             '<input type="hidden" name="seite" value="' + page + '">' +
             '<input type="hidden" name="bereich" value="thronsaal">' +
             '<input type="image" name="' + pages[page].name + '" ' +
+            'title="' + pages[page].name + '" ' +
             'src="http://www.ritterburgwelt.de/rb/bild/buttons/b_' +
             pages[page].pic + '.gif" border=0></form>';
         linkForm.method = "post";
@@ -219,6 +220,7 @@ for (var i = 0; i < links.length; i++) {
 
 // kskforum
 var kskTag = document.createElement('img');
+kskTag.title = "KSK-Forum";
 kskTag.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskTag.style.border = "1px solid red";
 var newLink = document.createElement('a');
@@ -348,6 +350,7 @@ if (GM_getValue(gameId+".armeen", 0)) {
             tempText += 
                 '<input type="image" name="armee[' +
                 GM_getValue(gameId+".armee"+i) + ']" ' +
+                'title="' + GM_getValue(gameId+".armee"+i) + '" ' +
                 'src="http://www.ritterburgwelt.de/rb/held/' +
                 GM_getValue(gameId+".armee"+i+".src") + '.gif" border=0><br/>';
         }
@@ -368,6 +371,7 @@ if (GM_getValue(gameId+".armeen", 0)) {
 
 // Kraehenkarte
 var kskKarte = document.createElement('img');
+kskKarte.title = "Kr\xE4henkarte"
 kskKarte.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskKarte.style.border = "1px solid red";
 var newLink = document.createElement('a');
@@ -389,6 +393,7 @@ if (GM_getValue(gameId+".doerfer", 0)) {
             tempText += 
                 '<input type="image" name="mfeld[' +
                 GM_getValue(gameId+".dorf"+i) + ']" ' +
+                'title="' + GM_getValue(gameId+".dorf"+i) + '" ' +
                 'src="http://www.ritterburgwelt.de/rb/bild/buttons/b_map.gif"' +
                 ' border=0><br/>';
         }
@@ -423,6 +428,7 @@ if (GM_getValue(gameId+".hb.mfeld")) {
             '<input type="hidden" name="feld" value="' +
             GM_getValue(gameId+".hb.feld") + '">' +
             '<input type="image" name="Handelsring" ' +
+            'title="Handelsring" ' +
             'src="http://www.ritterburgwelt.de/rb/bild/buttons/b_chronik.gif"' +
             ' border=0></form>';
         linkForm.method = "post";
@@ -450,7 +456,7 @@ if (GM_getValue(gameId+".hb.mfeld")) {
         }
         for (var listNumber = 3; listNumber <= 4; listNumber++) { 
             var linkForm = document.createElement('form');
-            linkForm.innerHTML = '<form method="post">' +
+            var tempText = '<form method="post">' +
                 '<input type="hidden" name="name" value="' + session + '">' +
                 '<input type="hidden" name="passw" value="' + gameId + '">' +
                 '<input type="hidden" name="seite" value="31">' +
@@ -460,9 +466,13 @@ if (GM_getValue(gameId+".hb.mfeld")) {
                 game["standard"].hb[i].mfeld + '">' +
                 '<input type="hidden" name="mfeld" value="' + mfeld + '">' +
                 '<input type="hidden" name="feld" value="' + feld + '">' +
-                '<input type="image" name="Angebot" ' +
+                '<input type="image" name="Angebot" ';
+            if (i == 0) tempText += 'title="EB" ';
+            if (i == 1) tempText += 'title="AB" ';
+            tempText +=
                 'src="http://www.ritterburgwelt.de/rb/bild/buttons/b_map.gif"' +
                 ' border=0></form>';
+            linkForm.innerHTML = tempText;
             linkForm.method = "post";
             if (listNumber == 4) {
                 linkForm.target = "_blank";
@@ -479,6 +489,7 @@ createSeparation(4);
 
 // kskpreise
 var kskTag = document.createElement('img');
+kskTag.title = "Preise";
 kskTag.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskTag.style.border = "1px solid red";
 var newLink = document.createElement('a');
