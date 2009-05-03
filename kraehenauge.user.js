@@ -1,14 +1,16 @@
-// ==UserScript==
+// ==UserScript==       {{{1
 // @name           Kraehenauge
 // @namespace      http://kraehen.org
 // @description    Dies ist bzw. wird das clientseitige KSK-Programm. Es unterstuetzt die Kraehen auf ihren Wegen in Alirion und gibt ihnen Ueberblick und schnelle Reaktionsmoeglichkeiten.
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
 // @include        file:///home/jonnyjd/rbstart.php.html
 // @author         JonnyJD
-// @version        1.2.2.1
-// ==/UserScript==
+// @version        1.2.2.2
+// ==/UserScript==      }}}1
 
-var version = 'Kr\xE4henauge 1.2.2.1';
+var version = 'Kr\xE4henauge 1.2.2.2';
+
+// Einstellungen        {{{1
 var game = {
     standard: {
         links: new Array("rbstart",
@@ -42,8 +44,8 @@ tageGelb = 15
 zuegeRot = 10
 zuegeGelb = 30
 
-
-var pages = {
+//                       }}}1
+var pages = {        // {{{1
     rbstart:     {name: "Thronsaal",       pic: "start"},
     rbchronik1:  {name: "Chronik",         pic: "chronik"},
     rbereignis:  {name: "Ereignisse",      pic: "ereignisse"},
@@ -60,14 +62,15 @@ var pages = {
     rbdiplo:     {name: "Diplomatie",      pic: "diplomatie"},
     rbally1:     {name: "Allianzen",       pic: "allianz"}
 }
-
-// Kernvariablen
+                     // }}}1
+// Kernvariablen        {{{1
 var wholePage = document.getElementsByTagName('HTML')[0].innerHTML;
 var session = document.getElementsByName('name')[0].value;
 var gameId = document.getElementsByName('passw')[0].value;
 var debugOut = "";
+//                      }}}1
 
-// Seitenerkennung
+// Seitenerkennung      {{{1
 var gamePage = '';
 var fontTags = document.getElementsByTagName('font');
 var pageTitle = '';
@@ -88,7 +91,7 @@ for (var i=0; i < fontTags.length; i++) {
         break;
     }
 }
-// allgemeine Seiten
+// allgemeine Seiten    {{{2
 if (pageTitle.indexOf('Thronsaal') == 0)
     gamePage = 'rbstart';
 else if (pageTitle.indexOf('\xD6ffentliche Chronik') == 0)
@@ -123,7 +126,8 @@ else if (pageTitle.indexOf('Diplomatie') == 0)
     gamePage = 'rbdiplo';
 else if (pageTitle.indexOf('Allianzen') == 0)
     gamePage = 'rbally1';
-// Individualseiten
+//                      }}}2
+// Individualseiten     {{{2
 else if (pageTitle.indexOf('Armee') == 0)
     gamePage = 'rbarmee';
 else if (pageTitle.search(/Dorf (.*), Handelsbude/) == 0)
@@ -138,9 +142,10 @@ else if (pageTitle.indexOf('Ressourcen im Dorf ') == 0)
     gamePage = 'rbrinfo';
 else if (pageTitle.indexOf('Allianz ') == 0)
     gamePage = 'rbally2';
+//                      }}}2
+//                      }}}1
 
-
-// Bereiche fuer die Linkleisten einfuegen
+// Bereiche fuer die Linkleisten einfuegen      {{{1
 // Aufpassen, dass interne forms noch funktionieren
 // test case: Waren zwischen Einheiten
 var oldCenter = document.getElementsByTagName('CENTER')[0];
@@ -156,9 +161,8 @@ var newCenter = document.createElement('center');
 newCenter.appendChild(newTable);
 oldCenter.parentNode.replaceChild(newCenter, oldCenter);
 document.getElementById("zentrum").appendChild(oldCenter);
-
-
-// Spiel-ID zu Debugzwecken unten ausgeben
+//                                              }}}1
+// Spiel-ID zu Debugzwecken unten ausgeben      {{{1
 var gameInfo = document.createElement('div');
 gameInfo.innerHTML = '<div><br/>' + gameId + ' - ' + gamePage + '</div>';
 document.getElementsByTagName('CENTER')[2].appendChild(gameInfo);
@@ -166,9 +170,8 @@ document.getElementsByTagName('CENTER')[2].appendChild(gameInfo);
 var versionInfo = document.createElement('div');
 versionInfo.innerHTML = '<br/>' + version;
 document.getElementsByTagName('CENTER')[2].appendChild(versionInfo);
-
-
-function createFormLink(listNumber, page, target)
+//                                              }}}1
+function createFormLink(listNumber, page, target)       // {{{1
 {
     if (page == "|") {
         createSeparation(listNumber);
@@ -194,20 +197,19 @@ function createFormLink(listNumber, page, target)
         document.getElementById('Leiste' + listNumber).appendChild(linkForm);
     }
 }
-
-function createSeparation(listNumber)
+                                                        // }}}1                                                     
+function createSeparation(listNumber)                   // {{{1
 {
     var newBreak = document.createElement('br');
     document.getElementById('Leiste' + listNumber).appendChild(newBreak);
 }
-
-function createTwoLinks(page)
+                                                        // }}}1
+function createTwoLinks(page)                           // {{{1
 {
     createFormLink(1, page, "");
     createFormLink(2, page, "_blank");
-}
-
-// Hauptlinkleisten
+}                                                       // }}}1
+// Hauptlinkleisten     {{{1
 if (game[gameId] && game[gameId].links) {
     var links = game[gameId].links;
 } else {
@@ -216,9 +218,8 @@ if (game[gameId] && game[gameId].links) {
 for (var i = 0; i < links.length; i++) {
     createTwoLinks(links[i]);
 }
-
-
-// kskforum
+//                      }}}1
+// kskforum             {{{1
 var kskTag = document.createElement('img');
 kskTag.title = "KSK-Forum";
 kskTag.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
@@ -229,11 +230,11 @@ newLink.target = "_blank";
 newLink.appendChild(kskTag);
 document.getElementById('Leiste4').appendChild(newLink);
 createSeparation(4); createSeparation(4);
+//                      }}}1
 
-
-// Armeedaten lesen und markieren (Erinnerung)
+// Armeedaten lesen und markieren (Erinnerung)          {{{1
 if( gamePage == "rbstart" ) {
-    // Armeetabelle finden
+    // Armeetabelle finden              {{{2
     var fontTags = document.getElementsByTagName('font');
     for (var i=0; i < fontTags.length; i++) {
         if (fontTags[i].face == "Diploma"
@@ -245,9 +246,9 @@ if( gamePage == "rbstart" ) {
             break;
         }
     }
-
+    //                                  }}}2
+    function farbTage(parentTag, tage, farbe) { // {{{2
     // fuer die spaetere Faerbung
-    function farbTage(parentTag, tage, farbe) {
         var dauerNode = parentTag.firstChild;
         if (dauerNode.nodeType != 3) return; // schon farbig
         var dauerArray = dauerNode.data.split("/");
@@ -262,7 +263,7 @@ if( gamePage == "rbstart" ) {
         }
         
     }
-
+    // faerben und einlesen             {{{2
     // Anmerkung: im DOM hat die Tabelle immer ein tbody tag
     var tote = 0;
     var armeeZeilen = armeeTabelle.firstChild.childNodes;
@@ -292,10 +293,11 @@ if( gamePage == "rbstart" ) {
             tote++;
         }
     }
+    //                                  }}}2
 } // Ende Armeedaten einlesen
+//                                                      }}}1
 
-
-// Dorfdaten lesen
+// Dorfdaten lesen                                      {{{1
 if( gamePage == "rbstart" ) {
     // Dorftabelle finden
     var fontTags = document.getElementsByTagName('font');
@@ -320,9 +322,9 @@ if( gamePage == "rbstart" ) {
         GM_setValue(gameId+".doerfer", i+1);
     }
 } // Ende Dorfdaten einlesen
+//                                                      }}}1
 
-
-// Handelsbude einlesen aus einer Handelsdorfseite
+// Handelsbude einlesen aus einer Handelsdorfseite      {{{1
 if( pageTitle.search(/Dorf (.*), Handelsd\xF6rfer/) == 0) {
     // nur formlinks im unveraenderten mittelteil suchen
     var zentrum = document.getElementById("zentrum");
@@ -336,9 +338,9 @@ if( pageTitle.search(/Dorf (.*), Handelsd\xF6rfer/) == 0) {
         }
     }
 }
+//                                                      }}}1
 
-
-// Armeelinks
+// Armeelinks                   {{{1
 if (GM_getValue(gameId+".armeen", 0)) {
     for (var listNumber = 3; listNumber <= 4; listNumber++) { 
         var tempText = '<form method="post">' +
@@ -368,8 +370,8 @@ if (GM_getValue(gameId+".armeen", 0)) {
         createSeparation(listNumber);
     }
 }
-
-// Kraehenkarte
+//                              }}}1
+// Kraehenkarte                 {{{1
 var kskKarte = document.createElement('img');
 kskKarte.title = "Kr\xE4henkarte"
 kskKarte.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
@@ -380,8 +382,8 @@ newLink.target = "_blank";
 newLink.appendChild(kskKarte);
 document.getElementById('Leiste4').appendChild(newLink);
 createSeparation(4); createSeparation(4);
-
-// Dorflinks
+//                              }}}1
+// Dorflinks                    {{{1
 if (GM_getValue(gameId+".doerfer", 0)) {
     for (var listNumber = 3; listNumber <= 4; listNumber++) { 
         var tempText = '<form method="post">' +
@@ -411,10 +413,10 @@ if (GM_getValue(gameId+".doerfer", 0)) {
         createSeparation(listNumber);
     }
 }
-
-// HBlinks
+//                              }}}1
+// HBlinks                      {{{1
 if (GM_getValue(gameId+".hb.mfeld")) {
-    // Ring
+    // Ring             {{{2
     for (var listNumber = 3; listNumber <= 4; listNumber++) { 
         var linkForm = document.createElement('form');
         linkForm.innerHTML = '<form method="post">' +
@@ -441,8 +443,8 @@ if (GM_getValue(gameId+".hb.mfeld")) {
         document.getElementById('Leiste' + listNumber).appendChild(linkForm);
         createSeparation(listNumber);
     }
-
-    // Allianz
+    //                  }}}2
+    // Allianz          {{{2
     var mfeld;
     var feld;
     for (var i = 0; i < game["standard"].hb.length; i++) {
@@ -482,12 +484,12 @@ if (GM_getValue(gameId+".hb.mfeld")) {
             }
             document.getElementById('Leiste' + listNumber).appendChild(linkForm);
         }
-    }
+    }   //              }}}2
 }
 createSeparation(3);
 createSeparation(4);
-
-// kskpreise
+//                              }}}1
+// kskpreise                    {{{1
 var kskTag = document.createElement('img');
 kskTag.title = "Preise";
 kskTag.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
@@ -497,9 +499,9 @@ newLink.href = "http://kraehen.org/preise";
 newLink.target = "_blank";
 newLink.appendChild(kskTag);
 document.getElementById('Leiste4').appendChild(newLink);
+//                              }}}1
 
-
-// Antwort des Scanners vom Server
+// Antwort des Scanners vom Server      {{{1
 var newDiv = document.createElement('div');
 newDiv.align = "center";
 document.getElementsByTagName('BODY')[0].appendChild(newDiv);
@@ -513,7 +515,7 @@ response.style.width = "auto";
 response.style.maxWidth = "600px";
 newDiv.appendChild(response);
 
-function sendToScanner() {
+function sendToScanner() {      // {{{2
     GM_xmlhttpRequest({
         method: 'POST',
         url:    'http://kraehen.org/cgi-bin/kskscanner',
@@ -529,7 +531,7 @@ function sendToScanner() {
                 + '\n' + responseDetails.responseText;
         }
     })
-}
+}                               // }}}2
 
 if (gamePage == "rbftop10"
         || gamePage == "rbtop10q"
@@ -538,9 +540,9 @@ if (gamePage == "rbftop10"
         || gamePage == "rbrinfo0") {
     sendToScanner();
 }
+//                                      }}}1
 
-
-// Antwort der Datenbank
+// Antwort der Datenbank                {{{1
 var newDiv = document.createElement('div');
 newDiv.align = "center";
 document.getElementsByTagName('BODY')[0].appendChild(newDiv);
@@ -563,8 +565,7 @@ copyText = copyText.replace(/<[^>]*>/g, "");
 copyText = copyText.replace(/&nbsp;/gi, " ");
 //document.getElementById("DBAntwort").innerHTML = "<pre>"+copyText+"</pre>";
 
-
-function sendToHandler(handler, fieldName) {
+function sendToHandler(handler, fieldName) {    // {{{2
     GM_xmlhttpRequest({
         method: 'POST',
         url:    "http://kraehen.org/karte/"+handler,
@@ -580,7 +581,7 @@ function sendToHandler(handler, fieldName) {
                 + '\n' + responseDetails.responseText;
         }
     })
-}
+}                                               // }}}2
 
 if (gamePage == "rbarmee") sendToHandler("k-armee.php", "dorftext");
 if (gamePage == "rbfturm1"
@@ -593,10 +594,10 @@ if (gameId == 'rbspiel1728') {
     if (gamePage == 'rbally2') sendToHandler("datenpflege.php",
             "wahl=alli&textbereich");
 }
+//                                      }}}1
 
-
-// Armeesortierung
-function allyArmee(imgEntry, allies) {
+// Armeesortierung              {{{1
+function allyArmee(imgEntry, allies) {  // {{{2
     var box = imgEntry.parentNode.parentNode;
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
         allies+".gif","");
@@ -608,7 +609,7 @@ function allyArmee(imgEntry, allies) {
     } else {
         return pattern.exec(imgEntry.src);
     }
-}
+}                                       // }}}2
 
 if( gamePage == "rbarmee" 
     || gamePage == "rbfturm1"
@@ -618,6 +619,7 @@ if( gamePage == "rbarmee"
     var bundListe = new Array();
     var feindListe = new Array();
 
+    // Armmen identifizieren    {{{2
     for( var i = 0; i < imgEntries.length; i++ ) {
         if (allyArmee(imgEntries[i], friendlyAllies)) {
             // Verbuendete Armee
@@ -631,20 +633,22 @@ if( gamePage == "rbarmee"
             }
         }
     }
-
-    // feindliche Armeen an den Anfang
+    //                          }}}2
+    // feindliche Armeen an den Anfang  {{{2
     for( var i = feindListe.length -1; i > -1; i-- ) {
         var parentNode = feindListe[i].parentNode;
         parentNode.removeChild(feindListe[i]);
         parentNode.insertBefore(feindListe[i], parentNode.firstChild);
     }
-    // verbuendete Armeen ganz ans Ende
+    //                                  }}}2
+    // verbuendete Armeen ganz ans Ende {{{2
     for( var i = 0; i < bundListe.length; i++ ) {
         var parentNode = bundListe[i].parentNode;
         parentNode.removeChild(bundListe[i]);
         parentNode.appendChild(bundListe[i]);
     }
-
+    //                                  }}}2
+    // Zusammenfassung          {{{2
     for( var i = 0; i < imgEntries.length; i++ ) {
         if (imgEntries[i].src
                 == "http://www.ritterburgwelt.de/rb/bild/gui/boxtrenn0.gif"
@@ -661,12 +665,13 @@ if( gamePage == "rbarmee"
         document.body.background ="";
         document.bgColor = "#FF0000";
     }
+    //                          }}}2
 } // ende Armeesortierung
+//                              }}}1
 
-
-// Ressourcenauswertung
+// Ressourcenauswertung         {{{1
 if( gamePage == "rbrinfo0" ) {
-    // Finde die Warentabelle
+    // Finde die Warentabelle           {{{2
     var gueterTabelle = "";
     var tabellen = document.getElementsByTagName("table");
     for (var i=0; i < tabellen.length; i++) {
@@ -676,8 +681,8 @@ if( gamePage == "rbrinfo0" ) {
             break;
         }
     }
-
-    // Zaehle die Doerfer
+    //                                  }}}2
+    // Zaehle die Doerfer               {{{2
     var doerfer = 0;
     while (gueterTabelle.getElementsByTagName("tr")[0]
             .childNodes[doerfer+1].innerHTML.indexOf("Dorf") >= 0) {
@@ -689,8 +694,8 @@ if( gamePage == "rbrinfo0" ) {
         posten++;
     }
     var gesamt = doerfer + posten + 1;
-
-    // Zeile mit verbleibenden Tagen pro Dorf vorbereiten
+    //                                  }}}2
+    // Zeile mit verbleibenden Tagen pro Dorf vorbereiten       {{{2
     var restTageZeile = document.createElement("tr");
     gueterTabelle.getElementsByTagName("tr")[0].parentNode.insertBefore(
             restTageZeile, gueterTabelle.getElementsByTagName("tr")[1]);
@@ -700,8 +705,8 @@ if( gamePage == "rbrinfo0" ) {
     }
     var textNode = document.createTextNode("Tage verbleibend");
     restTageZeile.childNodes[0].appendChild(textNode);
-
-    // Funktion fuer die Ausgabe und Formatierung
+    //                                                          }}}2
+    // Funktion fuer die Ausgabe und Formatierung       {{{2
     function zellenInfo(info, tage, zelle) {
         if (zelle.childNodes >= 0) {
             zelle.appendChild(document.createElement("br"));
@@ -717,8 +722,8 @@ if( gamePage == "rbrinfo0" ) {
             zelle.style.backgroundColor = "yellow";
         }
     }
-
-    // jedes Dorf Betrachten
+    //                                                  }}}2
+    // jedes Dorf Betrachten                            {{{2
     for (var d = 1; d <= doerfer; d++) {
         restTageDorf = 99999;
         zuegeImDorf = gueterTabelle.getElementsByTagName("tr")[0]
@@ -747,8 +752,8 @@ if( gamePage == "rbrinfo0" ) {
         zelle = gueterTabelle.getElementsByTagName("tr")[1].childNodes[d];
         zellenInfo(restTageDorf, restTageDorf, zelle);
     }
-
-    // fuer jedes Gut die Summenspalte betrachten
+    //                                                  }}}2
+    // fuer jedes Gut die Summenspalte betrachten       {{{2
     var restTageReich = 99999;
     for (var i = 2; i < 25; i++) {
         var zelle = gueterTabelle.getElementsByTagName("tr")[i]
@@ -770,14 +775,14 @@ if( gamePage == "rbrinfo0" ) {
     if (restTageReich == 99999) { restTageReich = String.fromCharCode(8734); }
     zelle = restTageZeile.childNodes[gesamt];
     zellenInfo(restTageReich, restTageReich, zelle);
-
+    //                                                  }}}2
 
 } // ende Ressourcenauswertung
+//                              }}}1
 
-
-// Zugauswertung
+// Zugauswertung                {{{1
 if (gamePage == "rbzug") {
-    // finde die Gueterbilanz
+    // finde die Gueterbilanz   {{{2
     var gueterTabelle = '';
     var fontTags = document.getElementsByTagName('font');
     for (var i=0; i < fontTags.length; i++) {
@@ -797,14 +802,14 @@ if (gamePage == "rbzug") {
         }
     }
     gueterZeilen = gueterTabelle.firstChild.childNodes; // beachte tbody
-
-    // Titelzeile
+    //                          }}}2
+    // Titelzeile               {{{2
     newTD = document.createElement("TD");
     newText = document.createTextNode("Z\xFCge");
     newTD.appendChild(newText);
     gueterZeilen[0].appendChild(newTD);
-
-    // betrachte alle Gueter
+    //                          }}}2
+    // betrachte alle Gueter    {{{2
     // Man beachte die Leerzeile nach der Titelzeile
     for (var gut = 2; gut < gueterZeilen.length; gut++) {
         var diff = gueterZeilen[gut].childNodes[2].firstChild.data;
@@ -823,12 +828,13 @@ if (gamePage == "rbzug") {
             gueterZeilen[gut].appendChild(newTD);
         }
     }
+    //                          }}}2
 } // Ende Zugauswertung
+//                              }}}1
 
-
-// debugausgabe
+// debugausgabe {{{1
 if (debugOut != "") {
     gameInfo.appendChild(document.createTextNode(debugOut));
-}
+}       //      }}}1
 
-/* vim:set shiftwidth=4 expandtab smarttab: */
+/* vim:set shiftwidth=4 expandtab smarttab foldmethod=marker: */
