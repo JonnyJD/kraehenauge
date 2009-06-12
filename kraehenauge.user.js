@@ -8,7 +8,7 @@
 // @version        1.2.2.2
 // ==/UserScript==      }}}1
 
-var version = 'Kr\xE4henauge 1.2.2.2';
+var version = 'Kr\xE4henauge 1.2.2.3';
 
 // Einstellungen        {{{1
 var game = {
