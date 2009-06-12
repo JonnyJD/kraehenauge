@@ -534,10 +534,10 @@ function sendToScanner() {      // {{{2
 }                               // }}}2
 
 
-function sendToEcho() {      // {{{2
+function saveToServer() {      // {{{2
     GM_xmlhttpRequest({
         method: 'POST',
-        url:    'http://kraehen.org/cgi-bin/echo?' + gamePage,
+        url:    'http://kraehen.org/cgi-bin/save?' + gamePage,
         headers: { "Content-type" : "text/html" },
         data:   wholePage,
         onload: function(responseDetails) {
@@ -558,7 +558,7 @@ if (gamePage == "rbftop10"
         || gamePage == "rbrinfo"
         || gamePage == "rbrinfo0") {
     sendToScanner();
-    //sendToEcho();
+    //saveToServer();
 }
 //                                      }}}1
 
