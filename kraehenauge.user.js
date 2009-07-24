@@ -562,16 +562,23 @@ if (gamePage == "rbftop10"
 }
 //                                      }}}1
 
+function createOutputArea(id) { //      {{{1
+    var newDiv = document.createElement('div');
+    newDiv.align = "center";
+    document.getElementsByTagName('BODY')[0].appendChild(newDiv);
+    var response = document.createElement('div');
+    response.id = id;
+    response.style.backgroundColor = "#AF874E";
+    response.style.width = "auto";
+    response.style.maxWidth = "600px";
+    newDiv.appendChild(response);
+    newDiv.appendChild(document.createElement("br"));
+    return response;
+}
+// }}}1
+
 // Antwort der Datenbank                {{{1
-var newDiv = document.createElement('div');
-newDiv.align = "center";
-document.getElementsByTagName('BODY')[0].appendChild(newDiv);
-var response = document.createElement('div');
-response.id = "DBAntwort";
-response.style.backgroundColor = "#AF874E";
-response.style.width = "auto";
-response.style.maxWidth = "600px";
-newDiv.appendChild(response);
+createOutputArea("DBAntwort");
 var copyText = wholePage;
 // "herauskopieren" des sichtbaren Texts
 copyText = copyText.replace(/<head>(.|\n)*<\/head>/gi, "");
@@ -615,6 +622,68 @@ if (gameId == 'rbspiel1728') {
             "wahl=alli&textbereich");
 }
 //                                      }}}1
+
+// Landschaftserfassung         {{{1
+if (gamePage == "rbarmee") {
+    var output = createOutputArea("Landschaft");
+
+    // Kartenmittelpunkt suchen
+    // = erstes Auftreten eines Kartenbildes im Code
+    var imgEntries = document.getElementsByTagName("img");
+    i = 0;
+    while (i < imgEntries.length
+            && imgEntries[i].src.indexOf('/bild/karte/') == -1) { i++; }
+    if (i == imgEntries.length) {
+        GM_log("Kartenmitte konnte nicht ermittelt werden.");
+    } else {
+        // Koordinaten des Mittelpunkts
+        var tdNode = imgEntries[i].parentNode.nextSibling;
+        text = tdNode.childNodes[1].firstChild.nodeValue;
+        var xval = parseInt(text.replace(/([0-9]*),([0-9]*)/, '$1'));
+        var yval = parseInt(text.replace(/([0-9]*),([0-9]*)/, '$2'));
+        output.appendChild(document.createTextNode(xval + " " + yval + " "));
+
+        var text = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
+        output.appendChild(document.createTextNode(text));
+        var text = tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1');
+        output.appendChild(document.createTextNode(text));
+    }
+
+    // Kartenausschnitt finden
+    // gekennzeichnet durch "<td width=20>&nbpsp;></td><td valign=top>"
+    // valign=top ist leider Standard, Suche nach width=20
+    var tdEntries = document.getElementsByTagName("td");
+    var i=0;
+    while (i < tdEntries.length && tdEntries[i].width != 20) { i++; }
+    if (i == tdEntries.length) {
+        GM_log("Kartenausschnitt nicht gefunden.");
+    } else {
+        i++; // Wir suchen die darauffolgende Zelle
+        var imgEntries = tdEntries[i].getElementsByTagName("img");
+        var width = Math.sqrt(imgEntries.length);
+        output.appendChild(document.createElement("br"));
+        for (var i=0; i < imgEntries.length; i++) {
+            output.appendChild(document.createElement("br"));
+            x = xval + (i % width ) - Math.floor(width / 2);
+            if (width == 3) {
+                if (i < 3)             { y = yval - 1; }
+                else if (i < 6)        { y = yval;     }
+                else                   { y = yval + 1; };
+            } else {    // width == 5, Entdecker ?
+                if (i < 5)             { y = yval - 2; }
+                else if (i < 10)       { y = yval - 1; }
+                else if (i < 15)       { y = yval;     }
+                else if (i < 20)       { y = yval + 1; }
+                else                   { y = yval + 2; };
+            }
+            var textNode = document.createTextNode(x + " " + y + " ");
+            output.appendChild(textNode);
+            var text = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
+            output.appendChild(document.createTextNode(text));
+        }
+    }
+}
+// }}}1
 
 // Armeesortierung              {{{1
 function allyArmee(imgEntry, allies) {  // {{{2
