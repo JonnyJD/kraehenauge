@@ -639,8 +639,15 @@ if (gamePage == "rbarmee") {
         // Koordinaten des Mittelpunkts
         var tdNode = imgEntries[i].parentNode.nextSibling;
         text = tdNode.childNodes[1].firstChild.nodeValue;
-        var xval = parseInt(text.replace(/([0-9]*),([0-9]*)/, '$1'));
-        var yval = parseInt(text.replace(/([0-9]*),([0-9]*)/, '$2'));
+        var expr = /(Q|U[0-9])? ?([0-9]*),([0-9]*)/;
+        expr.exec(text)
+        var floor = RegExp.$1;
+        if (floor == "") {
+            floor = "N";
+        }
+        var xval = parseInt(RegExp.$2);
+        var yval = parseInt(RegExp.$3);
+        output.appendChild(document.createTextNode(floor + " "));
         output.appendChild(document.createTextNode(xval + " " + yval + " "));
 
         var text = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
@@ -676,8 +683,8 @@ if (gamePage == "rbarmee") {
                 else if (i < 20)       { y = yval + 1; }
                 else                   { y = yval + 2; };
             }
-            var textNode = document.createTextNode(x + " " + y + " ");
-            output.appendChild(textNode);
+            output.appendChild(document.createTextNode(floor + " "));
+            output.appendChild(document.createTextNode(x + " " + y + " "));
             var text = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
             output.appendChild(document.createTextNode(text));
         }
