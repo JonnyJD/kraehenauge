@@ -518,7 +518,7 @@ newDiv.appendChild(response);
 function sendToScanner() {      // {{{2
     GM_xmlhttpRequest({
         method: 'POST',
-        url:    'http://kraehen.org/cgi-bin/kskscanner',
+        url:    'http://kraehen.org/kskscanner',
         headers: { "Content-type" : "text/html" },
         data:   wholePage,
         onload: function(responseDetails) {
@@ -537,7 +537,7 @@ function sendToScanner() {      // {{{2
 function saveToServer() {      // {{{2
     GM_xmlhttpRequest({
         method: 'POST',
-        url:    'http://kraehen.org/cgi-bin/save?' + gamePage,
+        url:    'http://kraehen.org/save?' + gamePage,
         headers: { "Content-type" : "text/html" },
         data:   wholePage,
         onload: function(responseDetails) {
@@ -595,7 +595,7 @@ copyText = copyText.replace(/&nbsp;/gi, " ");
 function sendToHandler(handler, fieldName) {    // {{{2
     GM_xmlhttpRequest({
         method: 'POST',
-        url:    "http://kraehen.org/karte/"+handler,
+        url:    "http://kraehen.org/"+handler,
         headers: { "Content-type" : "application/x-www-form-urlencoded" },
         data:   fieldName+'='+encodeURIComponent(copyText),
         onload: function(responseDetails) {
@@ -610,16 +610,29 @@ function sendToHandler(handler, fieldName) {    // {{{2
     })
 }                                               // }}}2
 
-if (gamePage == "rbarmee") sendToHandler("k-armee.php", "dorftext");
+if (gamePage == "rbarmee") {
+
+    sendToHandler("/send/text/armee", "dorftext");
+}
+
 if (gamePage == "rbfturm1"
     || gamePage == "rbfturm2"
-    || gamePage == "rbfturma") sendToHandler("k-turm.php", "text");
+    || gamePage == "rbfturma") {
+
+    sendToHandler("/send/text/turm", "text");
+}
+
 // datenpflegeseite kann momentan nicht von allen benutzt werden
 if (gameId == 'rbspiel1728') {
-    if (gamePage == 'rbftop10') sendToHandler("datenpflege.php",
-            "wahl=top10&textbereich");
-    if (gamePage == 'rbally2') sendToHandler("datenpflege.php",
-            "wahl=alli&textbereich");
+    if (gamePage == 'rbftop10') {
+
+        sendToHandler("/send/text/top10", "wahl=top10&textbereich");
+    }
+
+    if (gamePage == 'rbally2') {
+
+        sendToHandler("/send/text/allianz", "wahl=alli&textbereich");
+    }
 }
 //                                      }}}1
 
