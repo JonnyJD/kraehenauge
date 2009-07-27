@@ -673,8 +673,9 @@ if (gamePage == "rbarmee") {
             var floor = "N";
         }
         sendData += floor + " " + xval + " " + yval + " ";
-
+        // Terrain
         sendData += imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
+        // Landschaftsname
         sendData += tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1');
     }
 
@@ -693,7 +694,6 @@ if (gamePage == "rbarmee") {
         i++; // Wir suchen die darauffolgende Zelle
         var imgEntries = tdEntries[i].getElementsByTagName("img");
         var width = Math.sqrt(imgEntries.length);
-        sendData += "\n";
         for (var i=0; i < imgEntries.length; i++) {
             sendData += "\n";
             x = xval + (i % width ) - Math.floor(width / 2);
@@ -708,7 +708,8 @@ if (gamePage == "rbarmee") {
                 else if (i < 20)       { y = yval + 1; }
                 else                   { y = yval + 2; };
             }
-            sendData += floor + " " + xval + " " + yval + " ";
+            sendData += floor + " " + x + " " + y + " ";
+            // Terrain
             sendData += imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
 
             sendToHandler("/send/terrain", "data", sendData, "Landschaft");
