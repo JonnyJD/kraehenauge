@@ -578,32 +578,39 @@ function createOutputArea(id) { //      {{{1
 // }}}1
 
 // Antwort der Datenbank                {{{1
+
+function visibleText(htmlPage) {                                // {{{2
+    var copyText = htmlPage;
+    // "herauskopieren" des sichtbaren Texts
+    copyText = copyText.replace(/<head>(.|\n)*<\/head>/gi, "");
+    copyText = copyText.replace(/<script[^>]*>[^<]*<\/script>/gi, "");
+    copyText = copyText.replace(/<br ?\/?>/gi, "\n");
+    copyText = copyText.replace(/<\/tr>/gi, "\n");
+    copyText = copyText.replace(/<\/td>/gi, "\t");
+    copyText = copyText.replace(/<li>/gi, "\n    * ");
+    copyText = copyText.replace(/<\/ul>/gi, "\n");
+    copyText = copyText.replace(/<[^>]*>/g, "");
+    copyText = copyText.replace(/&nbsp;/gi, " ");
+    return copyText;
+}                                               // }}}2
+
 createOutputArea("DBAntwort");
-var copyText = wholePage;
-// "herauskopieren" des sichtbaren Texts
-copyText = copyText.replace(/<head>(.|\n)*<\/head>/gi, "");
-copyText = copyText.replace(/<script[^>]*>[^<]*<\/script>/gi, "");
-copyText = copyText.replace(/<br ?\/?>/gi, "\n");
-copyText = copyText.replace(/<\/tr>/gi, "\n");
-copyText = copyText.replace(/<\/td>/gi, "\t");
-copyText = copyText.replace(/<li>/gi, "\n    * ");
-copyText = copyText.replace(/<\/ul>/gi, "\n");
-copyText = copyText.replace(/<[^>]*>/g, "");
-copyText = copyText.replace(/&nbsp;/gi, " ");
+copyText = visibleText(wholePage);
 //document.getElementById("DBAntwort").innerHTML = "<pre>"+copyText+"</pre>";
 
-function sendToHandler(handler, fieldName) {    // {{{2
+function sendToHandler(handler, fieldName, content, answer) {    // {{{2
     GM_xmlhttpRequest({
         method: 'POST',
-        url:    "http://kraehen.org/"+handler,
+        //url:    "http://kraehen.org/"+handler,
+        url:    "http://localhost/"+handler,
         headers: { "Content-type" : "application/x-www-form-urlencoded" },
-        data:   fieldName+'='+encodeURIComponent(copyText),
+        data:   fieldName+'='+encodeURIComponent(content),
         onload: function(responseDetails) {
-            document.getElementById("DBAntwort").innerHTML
+            document.getElementById(answer).innerHTML
                 = responseDetails.responseText;
         },
         onerror: function(responseDetails) {
-            document.getElementById("DBAntwort").innerHTML
+            document.getElementById(answer).innerHTML
                 = 'status: ' + responseDetails.status
                 + '\n' + responseDetails.responseText;
         }
@@ -612,26 +619,28 @@ function sendToHandler(handler, fieldName) {    // {{{2
 
 if (gamePage == "rbarmee") {
 
-    sendToHandler("/send/text/armee", "dorftext");
+    sendToHandler("/send/text/armee", "dorftext", copyText, "DBAntwort");
 }
 
 if (gamePage == "rbfturm1"
     || gamePage == "rbfturm2"
     || gamePage == "rbfturma") {
 
-    sendToHandler("/send/text/turm", "text");
+    sendToHandler("/send/text/turm", "text", copyText, "DBAntwort");
 }
 
 // datenpflegeseite kann momentan nicht von allen benutzt werden
 if (gameId == 'rbspiel1728') {
     if (gamePage == 'rbftop10') {
 
-        sendToHandler("/send/text/top10", "wahl=top10&textbereich");
+        sendToHandler("/send/text/top10", "wahl=top10&textbereich",
+                copyText, "DBAntwort");
     }
 
     if (gamePage == 'rbally2') {
 
-        sendToHandler("/send/text/allianz", "wahl=alli&textbereich");
+        sendToHandler("/send/text/allianz", "wahl=alli&textbereich",
+                copyText, "DBAntwort");
     }
 }
 //                                      }}}1
@@ -639,6 +648,7 @@ if (gameId == 'rbspiel1728') {
 // Landschaftserfassung         {{{1
 if (gamePage == "rbarmee") {
     var output = createOutputArea("Landschaft");
+    var sendData = "";
 
     // Kartenmittelpunkt suchen
     // = erstes Auftreten eines Kartenbildes im Code
@@ -647,26 +657,25 @@ if (gamePage == "rbarmee") {
     while (i < imgEntries.length
             && imgEntries[i].src.indexOf('/bild/karte/') == -1) { i++; }
     if (i == imgEntries.length) {
-        GM_log("Kartenmitte konnte nicht ermittelt werden.");
+        var text = "Kartenmitte konnte nicht ermittelt werden.";
+        output.appendChild(document.createTextNode(text));
+        return;
     } else {
         // Koordinaten des Mittelpunkts
         var tdNode = imgEntries[i].parentNode.nextSibling;
         text = tdNode.childNodes[1].firstChild.nodeValue;
         var expr = /(Q|U[0-9])? ?([0-9]*),([0-9]*)/;
         fields = expr.exec(text);
-            var floor = fields[1];
-            var xval = parseInt(fields[2]);
-            var yval = parseInt(fields[3]);
+        var floor = fields[1];
+        var xval = parseInt(fields[2]);
+        var yval = parseInt(fields[3]);
         if (fields[1] == undefined) {
             var floor = "N";
         }
-        output.appendChild(document.createTextNode(floor + " "));
-        output.appendChild(document.createTextNode(xval + " " + yval + " "));
+        sendData += floor + " " + xval + " " + yval + " ";
 
-        var text = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
-        output.appendChild(document.createTextNode(text));
-        var text = tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1');
-        output.appendChild(document.createTextNode(text));
+        sendData += imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
+        sendData += tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1');
     }
 
     // Kartenausschnitt finden
@@ -676,14 +685,17 @@ if (gamePage == "rbarmee") {
     var i=0;
     while (i < tdEntries.length && tdEntries[i].width != 20) { i++; }
     if (i == tdEntries.length) {
-        GM_log("Kartenausschnitt nicht gefunden.");
+        output.appendChild(document.createElement("br"));
+        var text = "Kartenausschnitt nicht gefunden.";
+        output.appendChild(document.createTextNode(text));
+        return;
     } else {
         i++; // Wir suchen die darauffolgende Zelle
         var imgEntries = tdEntries[i].getElementsByTagName("img");
         var width = Math.sqrt(imgEntries.length);
-        output.appendChild(document.createElement("br"));
+        sendData += "\n";
         for (var i=0; i < imgEntries.length; i++) {
-            output.appendChild(document.createElement("br"));
+            sendData += "\n";
             x = xval + (i % width ) - Math.floor(width / 2);
             if (width == 3) {
                 if (i < 3)             { y = yval - 1; }
@@ -696,10 +708,10 @@ if (gamePage == "rbarmee") {
                 else if (i < 20)       { y = yval + 1; }
                 else                   { y = yval + 2; };
             }
-            output.appendChild(document.createTextNode(floor + " "));
-            output.appendChild(document.createTextNode(x + " " + y + " "));
-            var text = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
-            output.appendChild(document.createTextNode(text));
+            sendData += floor + " " + xval + " " + yval + " ";
+            sendData += imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
+
+            sendToHandler("/send/terrain", "data", sendData, "Landschaft");
         }
     }
 }
