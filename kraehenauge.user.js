@@ -601,8 +601,7 @@ copyText = visibleText(wholePage);
 function sendToHandler(handler, fieldName, content, answer) {    // {{{2
     GM_xmlhttpRequest({
         method: 'POST',
-        //url:    "http://kraehen.org/"+handler,
-        url:    "http://localhost/"+handler,
+        url:    "http://kraehen.org/"+handler,
         headers: { "Content-type" : "application/x-www-form-urlencoded" },
         data:   fieldName+'='+encodeURIComponent(content),
         onload: function(responseDetails) {
@@ -712,8 +711,8 @@ if (gamePage == "rbarmee") {
             // Terrain
             sendData += imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
 
-            sendToHandler("/send/terrain", "data", sendData, "Landschaft");
         }
+        sendToHandler("/send/terrain", "data", sendData, "Landschaft");
     }
 }
 // }}}1
