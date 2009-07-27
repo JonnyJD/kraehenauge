@@ -668,7 +668,7 @@ if (gamePage == "rbarmee") {
         var floor = fields[1];
         var xval = parseInt(fields[2]);
         var yval = parseInt(fields[3]);
-        if (fields[1] == undefined) {
+        if (fields[1] == undefined || fields[1] == "Q") {
             var floor = "N";
         }
         sendData += floor + " " + xval + " " + yval + " ";
