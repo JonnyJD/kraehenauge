@@ -694,7 +694,6 @@ if (gamePage == "rbarmee") {
         var imgEntries = tdEntries[i].getElementsByTagName("img");
         var width = Math.sqrt(imgEntries.length);
         for (var i=0; i < imgEntries.length; i++) {
-            sendData += "\n";
             x = xval + (i % width ) - Math.floor(width / 2);
             if (width == 3) {
                 if (i < 3)             { y = yval - 1; }
@@ -707,9 +706,13 @@ if (gamePage == "rbarmee") {
                 else if (i < 20)       { y = yval + 1; }
                 else                   { y = yval + 2; };
             }
-            sendData += floor + " " + x + " " + y + " ";
-            // Terrain
-            sendData += imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
+            if (x != xval || y != yval) {
+                // Das Zentrum braucht nicht doppelt uebertragen werden
+                sendData += "\n";
+                sendData += floor + " " + x + " " + y + " ";
+                // Terrain
+                sendData += imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/,'$1');
+            }
 
         }
         sendToHandler("/send/terrain", "data", sendData, "Landschaft");
