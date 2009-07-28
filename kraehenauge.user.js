@@ -663,7 +663,7 @@ if (gamePage == "rbarmee") {
         // Koordinaten des Mittelpunkts
         var tdNode = imgEntries[i].parentNode.nextSibling;
         text = tdNode.childNodes[1].firstChild.nodeValue;
-        var expr = /(Q|U[0-9])? ?([0-9]*),([0-9]*)/;
+        var expr = /(Q|U[0-9])?,? ?([0-9]*),([0-9]*)/;
         fields = expr.exec(text);
         var floor = fields[1];
         var xval = parseInt(fields[2]);
