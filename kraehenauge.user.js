@@ -692,8 +692,16 @@ if (gamePage == "rbarmee") {
     } else {
         i++; // Wir suchen die darauffolgende Zelle
         var imgEntries = tdEntries[i].getElementsByTagName("img");
-        var width = Math.sqrt(imgEntries.length);
+        terrain = new Array();
         for (var i=0; i < imgEntries.length; i++) {
+            if (imgEntries[i].src.indexOf("buttons") == -1) {
+                // Alles was kein Button ist, ist hier ein Feld
+                var num = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/,'$1');
+                terrain.push(num);
+            }
+        }
+        var width = Math.sqrt(terrain.length);
+        for (var i=0; i < terrain.length; i++) {
             x = xval + (i % width ) - Math.floor(width / 2);
             if (width == 3) {
                 if (i < 3)             { y = yval - 1; }
@@ -710,8 +718,7 @@ if (gamePage == "rbarmee") {
                 // Das Zentrum braucht nicht doppelt uebertragen werden
                 sendData += "\n";
                 sendData += floor + " " + x + " " + y + " ";
-                // Terrain
-                sendData += imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/,'$1');
+                sendData += terrain[i];
             }
 
         }
