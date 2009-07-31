@@ -721,7 +721,7 @@ if (gamePage == "rbarmee") {
             }
 
         }
-        sendToHandler("/send/terrain", "data", sendData, "Landschaft");
+        sendToHandler("send/terrain", "data", sendData, "Landschaft");
     }
 }
 // }}}1
