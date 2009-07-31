@@ -67,6 +67,7 @@ var pages = {        // {{{1
 var wholePage = document.getElementsByTagName('HTML')[0].innerHTML;
 var session = document.getElementsByName('name')[0].value;
 var gameId = document.getElementsByName('passw')[0].value;
+var a="agent="+encodeURIComponent(version)+"&";
 var debugOut = "";
 //                      }}}1
 
@@ -602,7 +603,7 @@ function sendToHandler(handler, fieldName, content, answer) {    // {{{2
         method: 'POST',
         url:    "http://kraehen.org/"+handler,
         headers: { "Content-type" : "application/x-www-form-urlencoded" },
-        data:   fieldName+'='+encodeURIComponent(content),
+        data:   a+fieldName+'='+encodeURIComponent(content),
         onload: function(responseDetails) {
             document.getElementById(answer).innerHTML
                 = responseDetails.responseText;
