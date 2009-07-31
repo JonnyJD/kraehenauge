@@ -596,7 +596,6 @@ function visibleText(htmlPage) {                                // {{{2
 
 createOutputArea("DBAntwort");
 copyText = visibleText(wholePage);
-//document.getElementById("DBAntwort").innerHTML = "<pre>"+copyText+"</pre>";
 
 function sendToHandler(handler, fieldName, content, answer) {    // {{{2
     GM_xmlhttpRequest({
@@ -618,27 +617,27 @@ function sendToHandler(handler, fieldName, content, answer) {    // {{{2
 
 if (gamePage == "rbarmee") {
 
-    sendToHandler("/send/text/armee", "dorftext", copyText, "DBAntwort");
+    sendToHandler("send/text/armee", "dorftext", copyText, "DBAntwort");
 }
 
 if (gamePage == "rbfturm1"
     || gamePage == "rbfturm2"
     || gamePage == "rbfturma") {
 
-    sendToHandler("/send/text/turm", "text", copyText, "DBAntwort");
+    sendToHandler("send/text/turm", "text", copyText, "DBAntwort");
 }
 
 // datenpflegeseite kann momentan nicht von allen benutzt werden
 if (gameId == 'rbspiel1728') {
     if (gamePage == 'rbftop10') {
 
-        sendToHandler("/send/text/top10", "wahl=top10&textbereich",
+        sendToHandler("send/text/top10", "wahl=top10&textbereich",
                 copyText, "DBAntwort");
     }
 
     if (gamePage == 'rbally2') {
 
-        sendToHandler("/send/text/allianz", "wahl=alli&textbereich",
+        sendToHandler("send/text/allianz", "wahl=alli&textbereich",
                 copyText, "DBAntwort");
     }
 }
