@@ -111,7 +111,7 @@ copyText = visibleText(wholePage);
 function sendToHandler(handler, fieldName, content, answer) {    // {{{2
     GM_xmlhttpRequest({
         method: 'POST',
-        url:    "http://localhost/tw/"+handler,
+        url:    "http://kraehen.org/tw/"+handler,
         headers: { "Content-type" : "application/x-www-form-urlencoded" },
         data:   a+fieldName+'='+encodeURIComponent(content),
         onload: function(responseDetails) {
