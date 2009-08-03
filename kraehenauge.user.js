@@ -646,6 +646,44 @@ if (gameId == 'rbspiel1728') {
 //                                      }}}1
 
 // Landschaftserfassung         {{{1
+
+function listTerrain(terrain, floor, x, y, width, center, list) { //      {{{2
+    if (!center) {
+        // Zentrum aus linker oberer Ecke berechnen
+        xval = x + Math.floor(width/2);
+        yval = y + Math.floor(width/2);
+    } else {
+        // das Zentrum wurde gegeben
+        xval = x;
+        yval = y;
+    }
+    for (var i=0; i < terrain.length; i++) {
+        x = xval + (i % width ) - Math.floor(width / 2);
+        if (width == 3) {
+            if (i < 3)             { y = yval - 1; }
+            else if (i < 6)        { y = yval;     }
+            else                   { y = yval + 1; };
+        } else {    // width == 5, Weitsichtturm, Entdecker ?
+            if (i < 5)             { y = yval - 2; }
+            else if (i < 10)       { y = yval - 1; }
+            else if (i < 15)       { y = yval;     }
+            else if (i < 20)       { y = yval + 1; }
+            else                   { y = yval + 2; };
+        }
+        if (!center || x != xval || y != yval) {
+            // Das Zentrum braucht nicht doppelt uebertragen werden
+            // wenn es schon vorher bekannt war
+            // (Wurde schon zusammen mit dem Namen und Untertyp gesendet)
+            list += floor + " " + x + " " + y + " ";
+            list += terrain[i];
+            list += "\n";
+        }
+
+    }
+    return list;
+}                                                               //      }}}2
+
+// Erfassung in der Armee               {{{2
 if (gamePage == "rbarmee") {
     var output = createOutputArea("Landschaft");
     var sendData = "";
@@ -667,16 +705,17 @@ if (gamePage == "rbarmee") {
         var expr = /(Q|U[0-9])?,? ?([0-9]*),([0-9]*)/;
         fields = expr.exec(text);
         var floor = fields[1];
-        var xval = parseInt(fields[2]);
-        var yval = parseInt(fields[3]);
+        var x = parseInt(fields[2]);
+        var y = parseInt(fields[3]);
         if (fields[1] == undefined || fields[1] == "Q") {
             var floor = "N";
         }
-        sendData += floor + " " + xval + " " + yval + " ";
+        sendData += floor + " " + x + " " + y + " ";
         // Terrain
         sendData += imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
         // Landschaftsname
         sendData += tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1');
+        sendData += "\n";
     }
 
     // Kartenausschnitt finden
@@ -702,30 +741,61 @@ if (gamePage == "rbarmee") {
             }
         }
         var width = Math.sqrt(terrain.length);
-        for (var i=0; i < terrain.length; i++) {
-            x = xval + (i % width ) - Math.floor(width / 2);
-            if (width == 3) {
-                if (i < 3)             { y = yval - 1; }
-                else if (i < 6)        { y = yval;     }
-                else                   { y = yval + 1; };
-            } else {    // width == 5, Entdecker ?
-                if (i < 5)             { y = yval - 2; }
-                else if (i < 10)       { y = yval - 1; }
-                else if (i < 15)       { y = yval;     }
-                else if (i < 20)       { y = yval + 1; }
-                else                   { y = yval + 2; };
-            }
-            if (x != xval || y != yval) {
-                // Das Zentrum braucht nicht doppelt uebertragen werden
-                sendData += "\n";
-                sendData += floor + " " + x + " " + y + " ";
-                sendData += terrain[i];
-            }
+        // x, y sind schon gesendete Zentrumskoordinaten -> true
+        sendData = listTerrain(terrain, floor, x, y, width, true, sendData);
 
-        }
         sendToHandler("send/terrain", "data", sendData, "Landschaft");
     }
-}
+}                                                       //      }}}2
+
+// Erfassung im Turm                    {{{2
+if (gamePage == "rbfturm1"
+        || gamePage == "rbfturm2"
+        || gamePage == "rbfturma") {
+    var output = createOutputArea("Landschaft");
+    var sendData = "";
+
+    // Kartenanfang suchen
+    // = erstes Auftreten eines Kartenbildes im Code
+    var imgEntries = document.getElementsByTagName("img");
+    i = 0;
+    while (i < imgEntries.length
+            && imgEntries[i].src.indexOf('/bild/karte/') == -1) { i++; }
+    if (i == imgEntries.length) {
+        var text = "Karten konnte nicht gefunden werden.";
+        output.appendChild(document.createTextNode(text));
+        return;
+    } else {
+        // zur linken oberen Koordinatenangabe gehen
+        // also die erste Zelle mit Text statt eines Bildes
+        var trNode = imgEntries[i].parentNode.parentNode;
+        var width = 0;
+        // nodeType == 3 -> text node
+        while (trNode.childNodes[width].firstChild.nodeType != "3") { width++; }
+        var text = trNode.childNodes[width].firstChild.nodeValue;
+        var expr = /([0-9]*),([0-9]*)/;
+        coords = expr.exec(text);
+        // Koordinaten der linken oberen Ecke
+        var x = parseInt(coords[1]);
+        var y = parseInt(coords[2]);
+
+        // Terrain auslesen
+        var imgEntries = trNode.parentNode.getElementsByTagName("img");
+        terrain = new Array();
+        for (var i=0; i < imgEntries.length; i++) {
+            if (imgEntries[i].src.indexOf("buttons") == -1) {
+                // Alles was kein Button ist, ist hier ein Feld
+                var num = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/,'$1');
+                terrain.push(num);
+            }
+        }
+        // listTerrain bekommt keinen fertigen Kartenmittelpunkt -> false
+        sendData = listTerrain(terrain, "N", x, y, width, false, sendData);
+
+        sendToHandler("send/terrain", "data", sendData, "Landschaft");
+    }
+}                                                       //      }}}2
+
 // }}}1
 
 // Armeesortierung              {{{1
