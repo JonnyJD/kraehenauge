@@ -23,7 +23,7 @@ var game = {
                        // Diplomatie
                        "|", "rbtop10", "rbreiche", "rbdiplo", "rbally1"),
         hb: new Array({ mfeld: "294270", feld: "55" },
-                { mfeld: "292269", feld: "44" })
+                { mfeld: "292270", feld: "30" })
     },
     // der Spieler, der die AB und EB kontrolliert
     ab: "rbspiel1728",
@@ -33,7 +33,7 @@ var game = {
 // 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
 // 59 = TW, 60 = KSK, 61 = UfR, 63 = BdS, 67 = RK, 70 = NW
 // Trenner ist | (regExp ODER)
-var friendlyAllies = "(60)";
+var friendlyAllies = "(60|59)";
 var hostileAllies  = "()";
 
 // Einstellungen Ressourcenauswertung und Zugauswertung
