@@ -1,14 +1,14 @@
 // ==UserScript==       {{{1
-// @name           Kraehenauge: TW
+// @name           Kraehenauge: Extern
 // @namespace      http://kraehen.org
 // @description    Dies ist das clientseitige KSK-Programm. Es unterstuetzt die Kraehen und ihre Verbuendeten auf ihren Wegen in Alirion und gibt ihnen Ueberblick und schnelle Reaktionsmoeglichkeiten.
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
 // @include        file:///home/jonnyjd/rbstart.php.html
 // @author         JonnyJD
-// @version        0.6
+// @version        0.5
 // ==/UserScript==      }}}1
 
-var version = 'Kr\xE4henauge: TW-Edition 0.6';
+var version = 'Kr\xE4henauge: externe Edition 0.5';
 
 // Einstellungen        {{{1
 // 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
@@ -112,7 +112,7 @@ copyText = visibleText(wholePage);
 function sendToHandler(handler, fieldName, content, answer) {    // {{{2
     GM_xmlhttpRequest({
         method: 'POST',
-        url:    "http://kraehen.org/tw/"+handler,
+        url:    "http://kraehen.org/ext/"+handler,
         headers: { "Content-type" : "application/x-www-form-urlencoded" },
         data:   a+pid+fieldName+'='+encodeURIComponent(content),
         onload: function(responseDetails) {
