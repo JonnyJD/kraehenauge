@@ -282,8 +282,8 @@ if( gamePage == "rbstart" ) {
         }
 
         // Armeedaten einlesen
-        var armeeForm = armeeZeilen[i].childNodes[1].firstChild;
-        if (armeeForm) {
+        if (armeeZeilen[i].childNodes[1]) {
+            var armeeForm = armeeZeilen[i].childNodes[1].firstChild;
             var armeeImg = armeeForm.getElementsByTagName("input")[4];
             GM_setValue(gameId+".armee"+(i+1-tote),
                     armeeImg.name.match(/\[(.*)\]/)[1]);
