@@ -130,6 +130,8 @@ else if (pageTitle.indexOf('Allianzen') == 0)
     gamePage = 'rbally1';
 //                      }}}2
 // Individualseiten     {{{2
+else if (pageTitle.indexOf('Armee - Schiffsturm') == 0)
+    gamePage = 'rbfturms';
 else if (pageTitle.indexOf('Armee') == 0)
     gamePage = 'rbarmee';
 else if (pageTitle.search(/Dorf (.*), Handelsbude/) == 0)
@@ -624,7 +626,8 @@ if (gamePage == "rbarmee") {
 
 if (gamePage == "rbfturm1"
     || gamePage == "rbfturm2"
-    || gamePage == "rbfturma") {
+    || gamePage == "rbfturma"
+    || gamePage == "rbfturms") {
 
     sendToHandler("send/text/turm", "text", copyText, "DBAntwort");
 }
