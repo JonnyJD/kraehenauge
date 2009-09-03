@@ -754,11 +754,12 @@ if (gamePage == "rbarmee") {
 // Erfassung im Turm                    {{{2
 if (gamePage == "rbfturm1"
         || gamePage == "rbfturm2"
-        || gamePage == "rbfturma") {
+        || gamePage == "rbfturma"
+        || gamePage == "rbfturms") {
     var output = createOutputArea("Landschaft");
     var sendData = "";
 
-    // Kartenanfang suchen
+    // Karte suchen
     // = erstes Auftreten eines Kartenbildes im Code
     var imgEntries = document.getElementsByTagName("img");
     i = 0;
@@ -769,21 +770,10 @@ if (gamePage == "rbfturm1"
         output.appendChild(document.createTextNode(text));
         return;
     } else {
-        // zur linken oberen Koordinatenangabe gehen
-        // also die erste Zelle mit Text statt eines Bildes
-        var trNode = imgEntries[i].parentNode.parentNode;
-        var width = 0;
-        // nodeType == 3 -> text node
-        while (trNode.childNodes[width].firstChild.nodeType != "3") { width++; }
-        var text = trNode.childNodes[width].firstChild.nodeValue;
-        var expr = /([0-9]*),([0-9]*)/;
-        coords = expr.exec(text);
-        // Koordinaten der linken oberen Ecke
-        var x = parseInt(coords[1]);
-        var y = parseInt(coords[2]);
+        var tableNode = imgEntries[i].parentNode.parentNode.parentNode;
 
         // Terrain auslesen
-        var imgEntries = trNode.parentNode.getElementsByTagName("img");
+        var imgEntries = tableNode.getElementsByTagName("img");
         terrain = new Array();
         for (var i=0; i < imgEntries.length; i++) {
             if (imgEntries[i].src.indexOf("buttons") == -1) {
@@ -792,8 +782,32 @@ if (gamePage == "rbfturm1"
                 terrain.push(num);
             }
         }
-        // listTerrain bekommt keinen fertigen Kartenmittelpunkt -> false
-        sendData = listTerrain(terrain, "N", x, y, width, false, sendData);
+
+        // sichtbare Koordinaten auslesen
+        coordList = new Array();
+        for (var j=0; j < tableNode.childNodes.length; j++) {
+            var trNode = tableNode.childNodes[j];
+            var currNode = trNode.firstChild;
+            for (var i=0; i < trNode.childNodes.length; i++) {
+                var currNode = trNode.childNodes[i];
+                // nodeType == 3 -> text node
+                if (currNode.firstChild.nodeType == "3"
+                        && currNode.innerHTML != "&nbsp;&nbsp;"
+                        && currNode.innerHTML != "&nbsp;") {
+                    var text = currNode.firstChild.nodeValue;
+                    var expr = /([0-9]*),([0-9]*)/;
+                    coords = expr.exec(text);
+                    coordList.push(coords);
+                }
+            }
+        }
+        for (var i=0; i < coordList.length; i++) {
+            var x = parseInt(coordList[i][1]);
+            var y = parseInt(coordList[i][2]);
+            sendData += "N " + x + " " + y + " ";
+            sendData += terrain[i];
+            sendData += "\n";
+        }
 
         sendToHandler("send/terrain", "data", sendData, "Landschaft");
     }
