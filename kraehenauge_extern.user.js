@@ -5,10 +5,10 @@
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
 // @include        file:///home/jonnyjd/rbstart.php.html
 // @author         JonnyJD
-// @version        0.5
+// @version        0.7
 // ==/UserScript==      }}}1
 
-var version = 'Kr\xE4henauge: externe Edition 0.5';
+var version = 'Kr\xE4henauge: externe Edition 0.7';
 
 // Einstellungen        {{{1
 // 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
