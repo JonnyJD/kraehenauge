@@ -261,7 +261,7 @@ if (gamePage == "rbfturm1"
     while (i < imgEntries.length
             && imgEntries[i].src.indexOf('/bild/karte/') == -1) { i++; }
     if (i == imgEntries.length) {
-        var text = "Karten konnte nicht gefunden werden.";
+        var text = "Karte konnte nicht gefunden werden.";
         output.appendChild(document.createTextNode(text));
         return;
     } else {
