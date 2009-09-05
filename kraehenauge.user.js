@@ -136,6 +136,8 @@ else if (pageTitle.indexOf('Armee') == 0)
     gamePage = 'rbarmee';
 else if (pageTitle.search(/Dorf (.*), Handelsbude/) == 0)
     gamePage = 'rbfhandel1';
+else if (pageTitle.search(/Dorf (.*), Handelsd\xF6rfer/) == 0)
+    gamePage = 'rbfhandelb'; // kein offizieller Name!
 else if (pageTitle.search(/Dorf (.*), Zugergebnisse/) == 0 )
     gamePage = 'rbzug';
 else if (pageTitle.search(/Dorf (.*), Turmsicht\(2\)/) == 0)
@@ -381,7 +383,7 @@ kskKarte.title = "Kr\xE4henkarte"
 kskKarte.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskKarte.style.border = "1px solid red";
 var newLink = document.createElement('a');
-newLink.href = "http://kraehen.org/karte/";
+newLink.href = "http://localhost/karte/";
 newLink.target = "_blank";
 newLink.appendChild(kskKarte);
 document.getElementById('Leiste4').appendChild(newLink);
@@ -500,7 +502,7 @@ kskTag.title = "Preise";
 kskTag.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskTag.style.border = "1px solid red";
 var newLink = document.createElement('a');
-newLink.href = "http://kraehen.org/preise";
+newLink.href = "http://localhost/preise";
 newLink.target = "_blank";
 newLink.appendChild(kskTag);
 document.getElementById('Leiste4').appendChild(newLink);
@@ -523,7 +525,7 @@ newDiv.appendChild(response);
 function sendToScanner() {      // {{{2
     GM_xmlhttpRequest({
         method: 'POST',
-        url:    'http://kraehen.org/kskscanner',
+        url:    'http://localhost/kskscanner',
         headers: { "Content-type" : "text/html" },
         data:   wholePage,
         onload: function(responseDetails) {
@@ -542,7 +544,7 @@ function sendToScanner() {      // {{{2
 function saveToServer() {      // {{{2
     GM_xmlhttpRequest({
         method: 'POST',
-        url:    'http://kraehen.org/save?' + gamePage,
+        url:    'http://localhost/save?' + gamePage,
         headers: { "Content-type" : "text/html" },
         data:   wholePage,
         onload: function(responseDetails) {
@@ -605,7 +607,7 @@ copyText = visibleText(wholePage);
 function sendToHandler(handler, fieldName, content, answer) {    // {{{2
     GM_xmlhttpRequest({
         method: 'POST',
-        url:    "http://kraehen.org/"+handler,
+        url:    "http://localhost/"+handler,
         headers: { "Content-type" : "application/x-www-form-urlencoded" },
         data:   a+pid+fieldName+'='+encodeURIComponent(content),
         onload: function(responseDetails) {
@@ -628,7 +630,8 @@ if (gamePage == "rbarmee") {
 if (gamePage == "rbfturm1"
     || gamePage == "rbfturm2"
     || gamePage == "rbfturma"
-    || gamePage == "rbfturms") {
+    || gamePage == "rbfturms"
+    || gamePage == "rbfhandelb") {
 
     sendToHandler("send/text/turm", "text", copyText, "DBAntwort");
 }
