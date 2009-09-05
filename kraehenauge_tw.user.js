@@ -116,12 +116,12 @@ copyText = visibleText(wholePage);
 
 function sendToHandler(handler, fieldName, content, answer) {    // {{{2
     contentType = "application/x-www-form-urlencoded";
-    url = "http://test.kraehen.org/tw/"+handler;
+    url = "http://kraehen.org/tw/"+handler;
     data = a+pid+fieldName+'='+encodeURIComponent(content);
     function responseFunction(text) {
         document.getElementById(answer).innerHTML = text;
     }
-    if (opera) {
+    if (typeof(opera) !== "undefined") {
         var xmlhttp = new opera.XMLHttpRequest();
         xmlhttp.setRequestHeader("Content-type", contentType);
         xmlhttp.onload = function(){
