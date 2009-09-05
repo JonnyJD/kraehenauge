@@ -195,7 +195,6 @@ if (gamePage == "rbarmee") {
     if (i == imgEntries.length) {
         var text = "Kartenmitte konnte nicht ermittelt werden.";
         output.appendChild(document.createTextNode(text));
-        return;
     } else {
         // Koordinaten des Mittelpunkts
         var tdNode = imgEntries[i].parentNode.nextSibling;
@@ -214,36 +213,37 @@ if (gamePage == "rbarmee") {
         // Landschaftsname
         sendData += tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1');
         sendData += "\n";
-    }
 
-    // Kartenausschnitt finden
-    // gekennzeichnet durch "<td width=20>&nbpsp;></td><td valign=top>"
-    // valign=top ist leider Standard, Suche nach width=20
-    var tdEntries = document.getElementsByTagName("td");
-    var i=0;
-    while (i < tdEntries.length && tdEntries[i].width != 20) { i++; }
-    if (i == tdEntries.length) {
-        output.appendChild(document.createElement("br"));
-        var text = "Kartenausschnitt nicht gefunden.";
-        output.appendChild(document.createTextNode(text));
-        return;
-    } else {
-        i++; // Wir suchen die darauffolgende Zelle
-        var imgEntries = tdEntries[i].getElementsByTagName("img");
-        terrain = new Array();
-        for (var i=0; i < imgEntries.length; i++) {
-            if (imgEntries[i].src.indexOf("buttons") == -1) {
-                // Alles was kein Button ist, ist hier ein Feld
-                var num = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/,'$1');
-                terrain.push(num);
+
+        // Kartenausschnitt finden
+        // gekennzeichnet durch "<td width=20>&nbpsp;></td><td valign=top>"
+        // valign=top ist leider Standard, Suche nach width=20
+        var tdEntries = document.getElementsByTagName("td");
+        var i=0;
+        while (i < tdEntries.length && tdEntries[i].width != 20) { i++; }
+        if (i == tdEntries.length) {
+            output.appendChild(document.createElement("br"));
+            var text = "Kartenausschnitt nicht gefunden.";
+            output.appendChild(document.createTextNode(text));
+        } else {
+            i++; // Wir suchen die darauffolgende Zelle
+            var imgEntries = tdEntries[i].getElementsByTagName("img");
+            terrain = new Array();
+            for (var i=0; i < imgEntries.length; i++) {
+                if (imgEntries[i].src.indexOf("buttons") == -1) {
+                    // Alles was kein Button ist, ist hier ein Feld
+                    var num = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/,'$1');
+                    terrain.push(num);
+                }
             }
-        }
-        var width = Math.sqrt(terrain.length);
-        // x, y sind schon gesendete Zentrumskoordinaten -> true
-        sendData = listTerrain(terrain, floor, x, y, width, true, sendData);
+            var width = Math.sqrt(terrain.length);
+            // x, y sind schon gesendete Zentrumskoordinaten -> true
+            sendData = listTerrain(terrain, floor, x, y, width, true, sendData);
 
-        sendToHandler("send/terrain", "data", sendData, "Landschaft");
+            sendToHandler("send/terrain", "data", sendData, "Landschaft");
+        }
     }
+
 }                                                       //      }}}2
 
 // Erfassung im Turm                    {{{2
@@ -263,7 +263,6 @@ if (gamePage == "rbfturm1"
     if (i == imgEntries.length) {
         var text = "Karte konnte nicht gefunden werden.";
         output.appendChild(document.createTextNode(text));
-        return;
     } else {
         var tableNode = imgEntries[i].parentNode.parentNode.parentNode;
 
