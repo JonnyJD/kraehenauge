@@ -476,7 +476,8 @@ if (GM_getValue(gameId+".hb.mfeld")) {
             if (i == 0) tempText += 'title="EB" ';
             if (i == 1) tempText += 'title="AB" ';
             tempText +=
-                'src="http://www.ritterburgwelt.de/rb/bild/buttons/b_map.gif"' +
+                'src="http://www.ritterburgwelt.de/' +
+                'rb/bild/buttons/b_handel.gif"' +
                 ' border=0></form>';
             linkForm.innerHTML = tempText;
             linkForm.method = "post";
