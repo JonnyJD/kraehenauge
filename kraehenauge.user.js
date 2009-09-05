@@ -383,7 +383,7 @@ kskKarte.title = "Kr\xE4henkarte"
 kskKarte.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskKarte.style.border = "1px solid red";
 var newLink = document.createElement('a');
-newLink.href = "http://localhost/karte/";
+newLink.href = "http://kraehen.org/karte/";
 newLink.target = "_blank";
 newLink.appendChild(kskKarte);
 document.getElementById('Leiste4').appendChild(newLink);
@@ -502,7 +502,7 @@ kskTag.title = "Preise";
 kskTag.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskTag.style.border = "1px solid red";
 var newLink = document.createElement('a');
-newLink.href = "http://localhost/preise";
+newLink.href = "http://kraehen.org/preise";
 newLink.target = "_blank";
 newLink.appendChild(kskTag);
 document.getElementById('Leiste4').appendChild(newLink);
@@ -525,7 +525,7 @@ newDiv.appendChild(response);
 function sendToScanner() {      // {{{2
     GM_xmlhttpRequest({
         method: 'POST',
-        url:    'http://localhost/kskscanner',
+        url:    'http://kraehen.org/kskscanner',
         headers: { "Content-type" : "text/html" },
         data:   wholePage,
         onload: function(responseDetails) {
@@ -544,7 +544,7 @@ function sendToScanner() {      // {{{2
 function saveToServer() {      // {{{2
     GM_xmlhttpRequest({
         method: 'POST',
-        url:    'http://localhost/save?' + gamePage,
+        url:    'http://kraehen.org/save?' + gamePage,
         headers: { "Content-type" : "text/html" },
         data:   wholePage,
         onload: function(responseDetails) {
@@ -607,7 +607,7 @@ copyText = visibleText(wholePage);
 function sendToHandler(handler, fieldName, content, answer) {    // {{{2
     GM_xmlhttpRequest({
         method: 'POST',
-        url:    "http://localhost/"+handler,
+        url:    "http://kraehen.org/"+handler,
         headers: { "Content-type" : "application/x-www-form-urlencoded" },
         data:   a+pid+fieldName+'='+encodeURIComponent(content),
         onload: function(responseDetails) {
