@@ -107,6 +107,8 @@ function visibleText(htmlPage) {                                // {{{2
     copyText = copyText.replace(/<li>/gi, "\n    * ");
     copyText = copyText.replace(/<\/ul>/gi, "\n");
     copyText = copyText.replace(/<[^>]*>/g, "");
+    // \xA0 ist die Entitaet fuer &nbsp; bei Opera
+    copyText = copyText.replace(/\xA0/gi, " ");
     copyText = copyText.replace(/&nbsp;/gi, " ");
     return copyText;
 }                                               // }}}2
