@@ -34,7 +34,7 @@ var game = {
 // 59 = TW, 60 = KSK, 61 = UfR, 63 = BdS, 67 = RK, 70 = NW
 // Trenner ist | (regExp ODER)
 var friendlyAllies = "(60|59)";
-var hostileAllies  = "()";
+var hostileAllies  = "(38)";
 
 // Einstellungen Ressourcenauswertung und Zugauswertung
 // Bei welcher anzahl verbleibender Tage welche Farbe benutzt wird:
@@ -819,13 +819,13 @@ if (gamePage == "rbfturm1"
 // }}}1
 
 // Armeesortierung              {{{1
-function allyArmee(imgEntry, allies) {  // {{{2
+function isAllyArmee(imgEntry, allies) {  // {{{2
     var box = imgEntry.parentNode.parentNode;
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
         allies+".gif","");
-    if (box.innerHTML.indexOf("Menschentransfer")	== -1 // eigene Armee
-        || box.innerHTML.indexOf("Dorf")		== -1
-        || box.innerHTML.indexOf("Aussenposten")	== -1
+    if (box.innerHTML.indexOf("Menschentransfer")	!= -1 // eigene Armee
+        || box.innerHTML.indexOf("Dorf")		!= -1
+        || box.innerHTML.indexOf("Aussenposten")	!= -1
        ) {
         return false;
     } else {
@@ -843,11 +843,11 @@ if( gamePage == "rbarmee"
 
     // Armmen identifizieren    {{{2
     for( var i = 0; i < imgEntries.length; i++ ) {
-        if (allyArmee(imgEntries[i], friendlyAllies)) {
+        if (isAllyArmee(imgEntries[i], friendlyAllies)) {
             // Verbuendete Armee
             bundListe.push(imgEntries[i].parentNode.parentNode);
         } else {
-            if(allyArmee(imgEntries[i], hostileAllies)) {
+            if(isAllyArmee(imgEntries[i], hostileAllies)) {
                 // Feindliche Armee
                 feindListe.push(
                         imgEntries[i].parentNode.parentNode);
