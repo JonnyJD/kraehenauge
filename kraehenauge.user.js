@@ -533,6 +533,29 @@ newLink.appendChild(kskTag);
 document.getElementById('Leiste4').appendChild(newLink);
 //                              }}}1
 
+function sendDataWrapper(handler, type, data, responseFunction) {     {{{1
+    url = "http://kraehen.org/" + handler;
+    if (typeof(opera) !== "undefined") {
+        var xmlhttp = new opera.XMLHttpRequest();
+        xmlhttp.setRequestHeader("Content-type", type);
+        xmlhttp.onload = function(){
+            responseFunction(this.responseText);
+        }
+        xmlhttp.open('POST', url, true);
+        xmlhttp.send(data);
+    } else {
+        GM_xmlhttpRequest({
+            method: 'POST',
+            url:    url,
+            headers: { "Content-type" : type },
+            data:   data,
+            onload: function(responseDetails) {
+                responseFunction(responseDetails.responseText);
+            },
+        })
+    }
+}                                                               }}}1
+
 // Antwort des Scanners vom Server      {{{1
 var newDiv = document.createElement('div');
 newDiv.align = "center";
@@ -548,40 +571,23 @@ response.style.maxWidth = "600px";
 newDiv.appendChild(response);
 
 function sendToScanner() {      // {{{2
-    GM_xmlhttpRequest({
-        method: 'POST',
-        url:    'http://kraehen.org/kskscanner',
-        headers: { "Content-type" : "text/html" },
-        data:   wholePage,
-        onload: function(responseDetails) {
-            document.getElementById("ServerAntwort").innerHTML
-                = responseDetails.responseText;
-        },
-        onerror: function(responseDetails) {
-            document.getElementById("ServerAntwort").innerHTML
-                = 'status: ' + responseDetails.status
-                + '\n' + responseDetails.responseText;
-        }
-    })
+    handler = "kskscanner";
+    type = "text/html";
+    data = wholePage;
+    function responseFunction(text) {
+        document.getElementById("ServerAntwort").innerHTML = text;
+    }
+    sendDataWrapper(handler, type, data, responseFunction);
 }                               // }}}2
 
-
 function saveToServer() {      // {{{2
-    GM_xmlhttpRequest({
-        method: 'POST',
-        url:    'http://kraehen.org/save?' + gamePage,
-        headers: { "Content-type" : "text/html" },
-        data:   wholePage,
-        onload: function(responseDetails) {
-            document.getElementById("ServerAntwort").innerHTML
-                = responseDetails.responseText;
-        },
-        onerror: function(responseDetails) {
-            document.getElementById("ServerAntwort").innerHTML
-                = 'status: ' + responseDetails.status
-                + '\n' + responseDetails.responseText;
-        }
-    })
+    handler = "save?" + gamePage;
+    type = "text/html";
+    data = wholePage;
+    function responseFunction(text) {
+        document.getElementById("ServerAntwort").innerHTML = text;
+    }
+    sendDataWrapper(handler, type, data, responseFunction);
 }                               // }}}2
 
 if (gamePage == "rbftop10"
@@ -632,36 +638,12 @@ createOutputArea("DBAntwort");
 copyText = visibleText(wholePage);
 
 function sendToHandler(handler, fieldName, content, answer) {    // {{{2
-    contentType = "application/x-www-form-urlencoded";
-    url = "http://kraehen.org/"+handler;
     data = a+pid+fieldName+'='+encodeURIComponent(content);
+    type = "application/x-www-form-urlencoded";
     function responseFunction(text) {
         document.getElementById(answer).innerHTML = text;
     }
-    if (typeof(opera) !== "undefined") {
-        var xmlhttp = new opera.XMLHttpRequest();
-        xmlhttp.setRequestHeader("Content-type", contentType);
-        xmlhttp.onload = function(){
-            responseFunction(this.responseText);
-        }
-        xmlhttp.open('POST', url, true);
-        xmlhttp.send(data);
-    } else {
-        GM_xmlhttpRequest({
-            method: 'POST',
-            url:    url,
-            headers: { "Content-type" : contentType },
-            data:   data,
-            onload: function(responseDetails) {
-                responseFunction(responseDetails.responseText);
-            },
-            onerror: function(responseDetails) {
-                document.getElementById(answer).innerHTML
-                    = 'status: ' + responseDetails.status
-                    + '\n' + responseDetails.responseText;
-            }
-        })
-    }
+    sendDataWrapper(handler, type, data, responseFunction);
 }                                               // }}}2
 
 if (gamePage == "rbarmee") {
