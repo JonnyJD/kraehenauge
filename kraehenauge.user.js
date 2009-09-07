@@ -638,8 +638,8 @@ createOutputArea("DBAntwort");
 copyText = visibleText(wholePage);
 
 function sendToHandler(handler, fieldName, content, answer) {    // {{{2
-    data = a+pid+fieldName+'='+encodeURIComponent(content);
     type = "application/x-www-form-urlencoded";
+    data = a+pid+fieldName+'='+encodeURIComponent(content);
     function responseFunction(text) {
         document.getElementById(answer).innerHTML = text;
     }
