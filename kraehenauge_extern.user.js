@@ -5,17 +5,17 @@
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
 // @include        file:///home/jonnyjd/rbstart.php.html
 // @author         JonnyJD
-// @version        0.7
+// @version        0.7.1
 // ==/UserScript==      }}}1
 
-var version = 'Kr\xE4henauge: externe Edition 0.7';
+var version = 'Kr\xE4henauge: externe Edition 0.7.1';
 
 // Einstellungen        {{{1
 // 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
 // 59 = TW, 60 = KSK, 61 = UfR, 63 = BdS, 67 = RK, 70 = NW
 // Trenner ist | (regExp ODER)
 var friendlyAllies = "(60|59)";
-var hostileAllies  = "()";
+var hostileAllies  = "(38)";
 //                       }}}1
 
 // Kernvariablen        {{{1
@@ -310,13 +310,13 @@ if (gamePage == "rbfturm1"
 // }}}1
 
 // Armeesortierung              {{{1
-function allyArmee(imgEntry, allies) {  // {{{2
+function isAllyArmee(imgEntry, allies) {  // {{{2
     var box = imgEntry.parentNode.parentNode;
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
         allies+".gif","");
-    if (box.innerHTML.indexOf("Menschentransfer")	== -1 // eigene Armee
-        || box.innerHTML.indexOf("Dorf")		== -1
-        || box.innerHTML.indexOf("Aussenposten")	== -1
+    if (box.innerHTML.indexOf("Menschentransfer")	!= -1 // eigene Armee
+        || box.innerHTML.indexOf("Dorf")		!= -1
+        || box.innerHTML.indexOf("Aussenposten")	!= -1
        ) {
         return false;
     } else {
@@ -334,11 +334,11 @@ if( gamePage == "rbarmee"
 
     // Armmen identifizieren    {{{2
     for( var i = 0; i < imgEntries.length; i++ ) {
-        if (allyArmee(imgEntries[i], friendlyAllies)) {
+        if (isAllyArmee(imgEntries[i], friendlyAllies)) {
             // Verbuendete Armee
             bundListe.push(imgEntries[i].parentNode.parentNode);
         } else {
-            if(allyArmee(imgEntries[i], hostileAllies)) {
+            if(isAllyArmee(imgEntries[i], hostileAllies)) {
                 // Feindliche Armee
                 feindListe.push(
                         imgEntries[i].parentNode.parentNode);
