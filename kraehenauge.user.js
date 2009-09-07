@@ -5,13 +5,13 @@
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
 // @include        file:///home/jonnyjd/rbstart.php.html
 // @author         JonnyJD
-// @version        1.2.5
+// @version        1.3
 // ==/UserScript==      }}}1
 
 // Da Opera obiges @include nicht versteht
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
-var version = 'Kr\xE4henauge 1.2.5';
+var version = 'Kr\xE4henauge 1.3';
 
 // Einstellungen        {{{1
 var game = {
