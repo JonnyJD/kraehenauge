@@ -5,10 +5,13 @@
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
 // @include        file:///home/jonnyjd/rbstart.php.html
 // @author         JonnyJD
-// @version        0.7.1
+// @version        0.8.1
 // ==/UserScript==      }}}1
 
-var version = 'Kr\xE4henauge: externe Edition 0.7.1';
+// Da Opera obiges @include nicht versteht
+if (document.title.indexOf("RB \xA9 - ") == 0) {
+
+var version = 'Kr\xE4henauge: externe Edition 0.8.1';
 
 // Einstellungen        {{{1
 // 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
@@ -104,6 +107,8 @@ function visibleText(htmlPage) {                                // {{{2
     copyText = copyText.replace(/<li>/gi, "\n    * ");
     copyText = copyText.replace(/<\/ul>/gi, "\n");
     copyText = copyText.replace(/<[^>]*>/g, "");
+    // \xA0 ist die Entitaet fuer &nbsp; bei Opera
+    copyText = copyText.replace(/\xA0/gi, " ");
     copyText = copyText.replace(/&nbsp;/gi, " ");
     return copyText;
 }                                               // }}}2
@@ -112,21 +117,36 @@ createOutputArea("DBAntwort");
 copyText = visibleText(wholePage);
 
 function sendToHandler(handler, fieldName, content, answer) {    // {{{2
-    GM_xmlhttpRequest({
-        method: 'POST',
-        url:    "http://kraehen.org/ext/"+handler,
-        headers: { "Content-type" : "application/x-www-form-urlencoded" },
-        data:   a+pid+fieldName+'='+encodeURIComponent(content),
-        onload: function(responseDetails) {
-            document.getElementById(answer).innerHTML
-                = responseDetails.responseText;
-        },
-        onerror: function(responseDetails) {
-            document.getElementById(answer).innerHTML
-                = 'status: ' + responseDetails.status
-                + '\n' + responseDetails.responseText;
+    contentType = "application/x-www-form-urlencoded";
+    url = "http://kraehen.org/ext/"+handler;
+    data = a+pid+fieldName+'='+encodeURIComponent(content);
+    function responseFunction(text) {
+        document.getElementById(answer).innerHTML = text;
+    }
+    if (typeof(opera) !== "undefined") {
+        var xmlhttp = new opera.XMLHttpRequest();
+        xmlhttp.setRequestHeader("Content-type", contentType);
+        xmlhttp.onload = function(){
+            responseFunction(this.responseText);
         }
-    })
+        xmlhttp.open('POST', url, true);
+        xmlhttp.send(data);
+    } else {
+        GM_xmlhttpRequest({
+            method: 'POST',
+            url:    url,
+            headers: { "Content-type" : contentType },
+            data:   data,
+            onload: function(responseDetails) {
+                responseFunction(responseDetails.responseText);
+            },
+            onerror: function(responseDetails) {
+                document.getElementById(answer).innerHTML
+                    = 'status: ' + responseDetails.status
+                    + '\n' + responseDetails.responseText;
+            }
+        })
+    }
 }                                               // }}}2
 
 if (gamePage == "rbarmee") {
@@ -386,5 +406,7 @@ if( gamePage == "rbarmee"
 if (debugOut != "") {
     gameInfo.appendChild(document.createTextNode(debugOut));
 }       //      }}}1
+
+}
 
 /* vim:set shiftwidth=4 expandtab smarttab foldmethod=marker: */
