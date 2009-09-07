@@ -5,10 +5,10 @@
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
 // @include        file:///home/jonnyjd/rbstart.php.html
 // @author         JonnyJD
-// @version        1.2.4
+// @version        1.2.4.1
 // ==/UserScript==      }}}1
 
-var version = 'Kr\xE4henauge 1.2.4';
+var version = 'Kr\xE4henauge 1.2.4.1';
 
 // Einstellungen        {{{1
 var game = {
