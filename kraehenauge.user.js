@@ -202,43 +202,67 @@ var versionInfo = document.createElement('div');
 versionInfo.innerHTML = '<br/>' + version;
 document.getElementsByTagName('CENTER')[2].appendChild(versionInfo);
 //                                              }}}1
-function createFormLink(listNumber, page, target)       // {{{1
+function createFormLink(bereich, page, linkImages, target)       // {{{1
+{
+    var linkForm = document.createElement('form');
+    if (target) {
+        linkForm.target = target;
+        linkForm.style.border = "1px solid red";
+    } else {
+        linkForm.style.border = "1px solid black";
+    }
+    linkForm.method = "post";
+    var newInput = document.createElement('input');
+    newInput.type = "hidden";
+    newInput.name = "name"; newInput.value = session;
+    linkForm.appendChild(newInput);
+    newInput = document.createElement('input');
+    newInput.type = "hidden";
+    newInput.name = "passw"; newInput.value = gameId;
+    linkForm.appendChild(newInput);
+    newInput = document.createElement('input');
+    newInput.type = "hidden";
+    newInput.name = "seite"; newInput.value = page;
+    linkForm.appendChild(newInput);
+    newInput = document.createElement('input');
+    newInput.type = "hidden";
+    newInput.name = "bereich"; newInput.value = bereich;
+    linkForm.appendChild(newInput);
+    for ( var i = 0; i < linkImages.length; i++ ) {
+        linkForm.appendChild(linkImages[i]);
+        linkForm.appendChild(document.createElement("br"));
+    }
+    
+    return linkForm;
+}
+function appendMainLink(listNumber, page, target)       // {{{1
 {
     if (page == "|") {
         createSeparation(listNumber);
     } else {
-        var linkForm = document.createElement('form');
-        linkForm.innerHTML = '<form method="post">' +
-            '<input type="hidden" name="name" value="' + session + '">' +
-            '<input type="hidden" name="passw" value="' + gameId + '">' +
-            '<input type="hidden" name="seite" value="' + page + '">' +
-            '<input type="hidden" name="bereich" value="thronsaal">' +
-            '<input type="image" name="' + pages[page].name + '" ' +
-            'title="' + pages[page].name + '" ' +
-            'src="http://www.ritterburgwelt.de/rb/bild/buttons/b_' +
-            pages[page].pic + '.gif" border=0></form>';
-        linkForm.method = "post";
-        if (target) {
-            linkForm.target = target;
-            linkForm.style.border = "1px solid red";
-        } else {
-            linkForm.style.border = "1px solid black";
-        }
+        var linkImage = document.createElement('input');
+        linkImage.type = "image";
+        linkImage.name = pages[page].name; linkImage.title = pages[page].name;
+        linkImage.src = "http://www.ritterburgwelt.de/rb/bild/buttons/b_"
+        + pages[page].pic + ".gif";
+        var linkImages = new Array();
+        linkImages.push(linkImage);
+        var linkForm = createFormLink("thronsaal", page, linkImages, target);
 
         document.getElementById('Leiste' + listNumber).appendChild(linkForm);
     }
 }
-                                                        // }}}1                                                     
+                                                        // }}}1 
 function createSeparation(listNumber)                   // {{{1
 {
     var newBreak = document.createElement('br');
     document.getElementById('Leiste' + listNumber).appendChild(newBreak);
 }
                                                         // }}}1
-function createTwoLinks(page)                           // {{{1
+function appendMainLinkBoth(page)                           // {{{1
 {
-    createFormLink(1, page, "");
-    createFormLink(2, page, "_blank");
+    appendMainLink(1, page, "");
+    appendMainLink(2, page, "_blank");
 }                                                       // }}}1
 // Hauptlinkleisten     {{{1
 if (game[gameId] && game[gameId].links) {
@@ -247,7 +271,7 @@ if (game[gameId] && game[gameId].links) {
     var links = game["standard"].links;
 }
 for (var i = 0; i < links.length; i++) {
-    createTwoLinks(links[i]);
+    appendMainLinkBoth(links[i]);
 }
 //                      }}}1
 // kskforum             {{{1
@@ -374,28 +398,20 @@ if( pageTitle.search(/Dorf (.*), Handelsd\xF6rfer/) == 0) {
 // Armeelinks                   {{{1
 if (GM_getValue(gameId+".armeen", 0)) {
     for (var listNumber = 3; listNumber <= 4; listNumber++) { 
-        var tempText = '<form method="post">' +
-            '<input type="hidden" name="name" value="' + session + '">' +
-            '<input type="hidden" name="passw" value="' + gameId + '">' +
-            '<input type="hidden" name="seite" value="rbarmee">' +
-            '<input type="hidden" name="bereich" value="armee">';
+        var linkImages = new Array();
         for (var i = 1; i <= GM_getValue(gameId+".armeen"); i++) {
-            tempText += 
-                '<input type="image" name="armee[' +
-                GM_getValue(gameId+".armee"+i) + ']" ' +
-                'title="' + GM_getValue(gameId+".armee"+i) + '" ' +
-                'src="http://www.ritterburgwelt.de/rb/held/' +
-                GM_getValue(gameId+".armee"+i+".src") + '.gif" border=0><br/>';
+            linkImage = document.createElement('input');
+            linkImage.type = "image";
+            linkImage.name = "armee[" + GM_getValue(gameId+".armee"+i) + "]";
+            linkImage.title = GM_getValue(gameId+".armee"+i);
+            linkImage.src = "http://www.ritterburgwelt.de/rb/held/"
+                + GM_getValue(gameId+".armee"+i+".src") + ".gif";
+            linkImages.push(linkImage);
         }
-        tempText += '</form>';
-        var linkForm = document.createElement('form');
-        linkForm.innerHTML = tempText;
-        linkForm.method = "post";
         if (listNumber == 4) {
-            linkForm.target = "_blank";
-            linkForm.style.border = "1px solid red";
+            linkForm = createFormLink("armee", "rbarmee", linkImages, "_blank");
         } else {
-            linkForm.style.border = "1px solid black";
+            linkForm = createFormLink("armee", "rbarmee", linkImages, "");
         }
         document.getElementById('Leiste' + listNumber).appendChild(linkForm);
         createSeparation(listNumber);
@@ -417,28 +433,20 @@ createSeparation(4); createSeparation(4);
 // Dorflinks                    {{{1
 if (GM_getValue(gameId+".doerfer", 0)) {
     for (var listNumber = 3; listNumber <= 4; listNumber++) { 
-        var tempText = '<form method="post">' +
-            '<input type="hidden" name="name" value="' + session + '">' +
-            '<input type="hidden" name="passw" value="' + gameId + '">' +
-            '<input type="hidden" name="seite" value="rbkarte">' +
-            '<input type="hidden" name="bereich" value="dorf">';
+        var linkImages = new Array();
         for (var i = 1; i <= GM_getValue(gameId+".doerfer"); i ++) {
-            tempText += 
-                '<input type="image" name="mfeld[' +
-                GM_getValue(gameId+".dorf"+i) + ']" ' +
-                'title="' + GM_getValue(gameId+".dorf"+i) + '" ' +
-                'src="http://www.ritterburgwelt.de/rb/bild/buttons/b_map.gif"' +
-                ' border=0><br/>';
+            linkImage = document.createElement('input');
+            linkImage.type = "image";
+            linkImage.name = "mfeld[" + GM_getValue(gameId+".dorf"+i) + "]";
+            linkImage.title = GM_getValue(gameId+".dorf"+i);
+            linkImage.src = "http://www.ritterburgwelt.de/rb/"
+                + "bild/buttons/b_map.gif";
+            linkImages.push(linkImage);
         }
-        tempText += '</form>';
-        var linkForm = document.createElement('form');
-        linkForm.innerHTML = tempText;
-        linkForm.method = "post";
         if (listNumber == 4) {
-            linkForm.target = "_blank";
-            linkForm.style.border = "1px solid red";
+            linkForm = createFormLink("dorf", "rbkarte", linkImages, "_blank");
         } else {
-            linkForm.style.border = "1px solid black";
+            linkForm = createFormLink("dorf", "rbkarte", linkImages, "");
         }
         document.getElementById('Leiste' + listNumber).appendChild(linkForm);
         createSeparation(listNumber);
@@ -449,28 +457,30 @@ if (GM_getValue(gameId+".doerfer", 0)) {
 if (GM_getValue(gameId+".hb.mfeld")) {
     // Ring             {{{2
     for (var listNumber = 3; listNumber <= 4; listNumber++) { 
-        var linkForm = document.createElement('form');
-        linkForm.innerHTML = '<form method="post">' +
-            '<input type="hidden" name="name" value="' + session + '">' +
-            '<input type="hidden" name="passw" value="' + gameId + '">' +
-            '<input type="hidden" name="seite" value="3">' +
-            '<input type="hidden" name="bereich" value="dorf">' +
-            '<input type="hidden" name="modul" value="handel">' +
-            '<input type="hidden" name="mfeld" value="' +
-            GM_getValue(gameId+".hb.mfeld") + '">' +
-            '<input type="hidden" name="feld" value="' +
-            GM_getValue(gameId+".hb.feld") + '">' +
-            '<input type="image" name="Handelsring" ' +
-            'title="Handelsring" ' +
-            'src="http://www.ritterburgwelt.de/rb/bild/buttons/b_chronik.gif"' +
-            ' border=0></form>';
-        linkForm.method = "post";
+        var linkImages = new Array();
+        var linkImage = document.createElement('input');
+        linkImage.type = "image";
+        linkImage.name = "Handelsring"; linkImage.title="Handelsring";
+        linkImage.src = "http://www.ritterburgwelt.de/rb/"
+            + "bild/buttons/b_chronik.gif";
+        linkImages.push(linkImage);
         if (listNumber == 4) {
-            linkForm.target = "_blank";
-            linkForm.style.border = "1px solid red";
+            linkForm = createFormLink("dorf", "3", linkImages, "_blank");
         } else {
-            linkForm.style.border = "1px solid black";
+            linkForm = createFormLink("dorf", "3", linkImages, "");
         }
+        var newInput = document.createElement('input');
+        newInput.type = "hidden";
+        newInput.name = "modul"; newInput.value = "handel";
+        linkForm.appendChild(newInput);
+        newInput = document.createElement('input');
+        newInput.type = "hidden"; newInput.name = "mfeld";
+        newInput.value = GM_getValue(gameId+".hb.mfeld");
+        linkForm.appendChild(newInput);
+        newInput = document.createElement('input');
+        newInput.type = "hidden"; newInput.name = "feld";
+        newInput.value = GM_getValue(gameId+".hb.feld");
+        linkForm.appendChild(newInput);
         document.getElementById('Leiste' + listNumber).appendChild(linkForm);
         createSeparation(listNumber);
     }
@@ -488,32 +498,39 @@ if (GM_getValue(gameId+".hb.mfeld")) {
             feld = GM_getValue(gameId+".hb.feld");
         }
         for (var listNumber = 3; listNumber <= 4; listNumber++) { 
-            var linkForm = document.createElement('form');
-            var tempText = '<form method="post">' +
-                '<input type="hidden" name="name" value="' + session + '">' +
-                '<input type="hidden" name="passw" value="' + gameId + '">' +
-                '<input type="hidden" name="seite" value="31">' +
-                '<input type="hidden" name="bereich" value="dorf">' +
-                '<input type="hidden" name="modul" value="handel">' +
-                '<input type="hidden" name="mfeld2" value="' +
-                game["standard"].hb[i].mfeld + '">' +
-                '<input type="hidden" name="mfeld" value="' + mfeld + '">' +
-                '<input type="hidden" name="feld" value="' + feld + '">' +
-                '<input type="image" name="Angebot" ';
-            if (i == 0) tempText += 'title="EB" ';
-            if (i == 1) tempText += 'title="AB" ';
-            tempText +=
-                'src="http://www.ritterburgwelt.de/' +
-                'rb/bild/buttons/b_handel.gif"' +
-                ' border=0></form>';
-            linkForm.innerHTML = tempText;
-            linkForm.method = "post";
-            if (listNumber == 4) {
-                linkForm.target = "_blank";
-                linkForm.style.border = "1px solid red";
+            var linkImages = new Array();
+            var linkImage = document.createElement('input');
+            linkImage.type = "image";
+            linkImage.name = "Angebot";
+            if (i == 0) { 
+                linkImage.title="EB";
             } else {
-                linkForm.style.border = "1px solid black";
+                linkImage.title="AB";
             }
+            linkImage.src = "http://www.ritterburgwelt.de/rb/"
+                + "bild/buttons/b_handel.gif";
+            linkImages.push(linkImage);
+            if (listNumber == 4) {
+                linkForm = createFormLink("dorf", "31", linkImages, "_blank");
+            } else {
+                linkForm = createFormLink("dorf", "31", linkImages, "");
+            }
+            var newInput = document.createElement('input');
+            newInput.type = "hidden";
+            newInput.name = "modul"; newInput.value = "handel";
+            linkForm.appendChild(newInput);
+            newInput = document.createElement('input');
+            newInput.type = "hidden"; newInput.name = "mfeld2";
+            newInput.value = game["standard"].hb[i].mfeld;
+            linkForm.appendChild(newInput);
+            newInput = document.createElement('input');
+            newInput.type = "hidden";
+            newInput.name = "mfeld"; newInput.value = mfeld;
+            linkForm.appendChild(newInput);
+            newInput = document.createElement('input');
+            newInput.type = "hidden";
+            newInput.name = "feld"; newInput.value = feld;
+            linkForm.appendChild(newInput);
             document.getElementById('Leiste' + listNumber).appendChild(linkForm);
         }
     }   //              }}}2
