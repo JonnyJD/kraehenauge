@@ -302,7 +302,8 @@ if( gamePage == "rbstart" ) {
         }
     }
     //                                  }}}2
-    function farbTage(parentTag, tage, farbe) { // {{{2
+    function farbTage(parentTag, tage, farbe)   // {{{2
+    {
     // fuer die spaetere Faerbung
         var dauerNode = parentTag.firstChild;
         if (dauerNode.nodeType != 3) return; // schon farbig
@@ -550,8 +551,9 @@ newLink.appendChild(kskTag);
 document.getElementById('Leiste4').appendChild(newLink);
 //                              }}}1
 
-function sendDataWrapper(handler, type, data, responseFunction) {     {{{1
-    url = "http://kraehen.org/" + handler;
+function sendDataWrapper(handler, type, data, responseFunction) {{{1
+{
+    var url = "http://kraehen.org/" + handler;
     if (typeof(opera) !== "undefined") {
         var xmlhttp = new opera.XMLHttpRequest();
         xmlhttp.setRequestHeader("Content-type", type);
@@ -587,20 +589,22 @@ response.style.width = "auto";
 response.style.maxWidth = "600px";
 newDiv.appendChild(response);
 
-function sendToScanner() {      // {{{2
-    handler = "kskscanner";
-    type = "text/html";
-    data = wholePage;
+function sendToScanner()        // {{{2
+{
+    var handler = "kskscanner";
+    var type = "text/html";
+    var data = wholePage;
     function responseFunction(text) {
         document.getElementById("ServerAntwort").innerHTML = text;
     }
     sendDataWrapper(handler, type, data, responseFunction);
 }                               // }}}2
 
-function saveToServer() {      // {{{2
-    handler = "save?" + gamePage;
-    type = "text/html";
-    data = wholePage;
+function saveToServer()        // {{{2
+{
+    var handler = "save?" + gamePage;
+    var type = "text/html";
+    var data = wholePage;
     function responseFunction(text) {
         document.getElementById("ServerAntwort").innerHTML = text;
     }
@@ -617,7 +621,8 @@ if (gamePage == "rbftop10"
 }
 //                                      }}}1
 
-function createOutputArea(id) { //      {{{1
+function createOutputArea(id)   //      {{{1
+{
     var newDiv = document.createElement('div');
     newDiv.align = "center";
     document.getElementsByTagName('BODY')[0].appendChild(newDiv);
@@ -634,7 +639,8 @@ function createOutputArea(id) { //      {{{1
 
 // Antwort der Datenbank                {{{1
 
-function visibleText(htmlPage) {                                // {{{2
+function visibleText(htmlPage)                                  // {{{2
+{
     var copyText = htmlPage;
     // "herauskopieren" des sichtbaren Texts
     copyText = copyText.replace(/<head>(.|\n)*<\/head>/gi, "");
@@ -654,9 +660,10 @@ function visibleText(htmlPage) {                                // {{{2
 createOutputArea("DBAntwort");
 copyText = visibleText(wholePage);
 
-function sendToHandler(handler, fieldName, content, answer) {    // {{{2
-    type = "application/x-www-form-urlencoded";
-    data = a+pid+fieldName+'='+encodeURIComponent(content);
+function sendToHandler(handler, fieldName, content, answer)      // {{{2
+{
+    var type = "application/x-www-form-urlencoded";
+    var data = a+pid+fieldName+'='+encodeURIComponent(content);
     function responseFunction(text) {
         document.getElementById(answer).innerHTML = text;
     }
@@ -695,15 +702,16 @@ if (gameId == 'rbspiel1728') {
 
 // Landschaftserfassung         {{{1
 
-function listTerrain(terrain, floor, x, y, width, center, list) { //      {{{2
+function listTerrain(terrain, floor, x, y, width, center, list)   //      {{{2
+{
     if (!center) {
         // Zentrum aus linker oberer Ecke berechnen
-        xval = x + Math.floor(width/2);
-        yval = y + Math.floor(width/2);
+        var xval = x + Math.floor(width/2);
+        var yval = y + Math.floor(width/2);
     } else {
         // das Zentrum wurde gegeben
-        xval = x;
-        yval = y;
+        var xval = x;
+        var yval = y;
     }
     for (var i=0; i < terrain.length; i++) {
         x = xval + (i % width ) - Math.floor(width / 2);
@@ -860,7 +868,8 @@ if (gamePage == "rbfturm1"
 // }}}1
 
 // Armeesortierung              {{{1
-function isAllyArmee(imgEntry, allies) {  // {{{2
+function isAllyArmee(imgEntry, allies)    // {{{2
+{
     var box = imgEntry.parentNode.parentNode;
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
         allies+".gif","");
@@ -970,11 +979,12 @@ if( gamePage == "rbrinfo0" ) {
     restTageZeile.childNodes[0].appendChild(textNode);
     //                                                          }}}2
     // Funktion fuer die Ausgabe und Formatierung       {{{2
-    function zellenInfo(info, tage, zelle) {
+    function zellenInfo(info, tage, zelle)  
+    {
         if (zelle.childNodes >= 0) {
             zelle.appendChild(document.createElement("br"));
         }
-        divTag = document.createElement("div");
+        var divTag = document.createElement("div");
         divTag.style.textAlign = "right";
         divTag.style.fontStyle = "italic";
         divTag.appendChild(document.createTextNode(info));
