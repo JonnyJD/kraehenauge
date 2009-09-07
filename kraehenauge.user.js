@@ -158,14 +158,36 @@ else if (pageTitle.indexOf('Allianz ') == 0)
 // Aufpassen, dass interne forms noch funktionieren
 // test case: Waren zwischen Einheiten
 var oldCenter = document.getElementsByTagName('CENTER')[0];
+
+// Neue Haupttabelle erstellen
 var newTable = document.createElement('table');
-newTable.innerHTML = '<table><tr>' +
-    '<td align="center" valign="top"><div id="Leiste3"></div></td>' +
-    '<td align="center" valign="top"><div id="Leiste1"></div></td>' +
-    '<td id="zentrum"></td>' +
-    '<td align="center" valign="top"><div id="Leiste2"></div></td>' +
-    '<td align="center" valign="top"><div id="Leiste4"></div></td>' +
-    '</tr></table>';
+var newTr = document.createElement('tr');
+var newTd = document.createElement('td');
+newTd.style.textAlign = "center"; newTd.style.verticalAlign = "top";
+var newDiv = document.createElement('div');
+newDiv.id = "Leiste3";
+newTd.appendChild(newDiv); newTr.appendChild(newTd);
+newTd = document.createElement('td');
+newTd.style.textAlign = "center"; newTd.style.verticalAlign = "top";
+newDiv = document.createElement('div');
+newDiv.id = "Leiste1";
+newTd.appendChild(newDiv); newTr.appendChild(newTd);
+// Punkt um altes Zentrum einzuhaengen
+newTd = document.createElement('td');
+newTd.id = "zentrum";
+newTr.appendChild(newTd);
+newTd = document.createElement('td');
+newTd.style.textAlign = "center"; newTd.style.verticalAlign = "top";
+newDiv = document.createElement('div');
+newDiv.id = "Leiste2";
+newTd.appendChild(newDiv); newTr.appendChild(newTd);
+newTd = document.createElement('td');
+newTd.style.textAlign = "center"; newTd.style.verticalAlign = "top";
+newDiv = document.createElement('div');
+newDiv.id = "Leiste4";
+newTd.appendChild(newDiv); newTr.appendChild(newTd);
+newTable.appendChild(newTr);
+
 var newCenter = document.createElement('center');
 newCenter.appendChild(newTable);
 oldCenter.parentNode.replaceChild(newCenter, oldCenter);
