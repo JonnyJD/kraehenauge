@@ -79,6 +79,29 @@ versionInfo.innerHTML = '<br/>' + version;
 document.getElementsByTagName('CENTER')[1].appendChild(versionInfo);
 //                                              }}}1
 
+function sendDataWrapper(handler, type, data, responseFunction) {     {{{1
+    url = "http://kraehen.org/ext/" + handler;
+    if (typeof(opera) !== "undefined") {
+        var xmlhttp = new opera.XMLHttpRequest();
+        xmlhttp.setRequestHeader("Content-type", type);
+        xmlhttp.onload = function(){
+            responseFunction(this.responseText);
+        }
+        xmlhttp.open('POST', url, true);
+        xmlhttp.send(data);
+    } else {
+        GM_xmlhttpRequest({
+            method: 'POST',
+            url:    url,
+            headers: { "Content-type" : type },
+            data:   data,
+            onload: function(responseDetails) {
+                responseFunction(responseDetails.responseText);
+            },
+        })
+    }
+}                                                               }}}1
+
 function createOutputArea(id) { //      {{{1
     var newDiv = document.createElement('div');
     newDiv.align = "center";
@@ -117,36 +140,12 @@ createOutputArea("DBAntwort");
 copyText = visibleText(wholePage);
 
 function sendToHandler(handler, fieldName, content, answer) {    // {{{2
-    contentType = "application/x-www-form-urlencoded";
-    url = "http://kraehen.org/ext/"+handler;
+    type = "application/x-www-form-urlencoded";
     data = a+pid+fieldName+'='+encodeURIComponent(content);
     function responseFunction(text) {
         document.getElementById(answer).innerHTML = text;
     }
-    if (typeof(opera) !== "undefined") {
-        var xmlhttp = new opera.XMLHttpRequest();
-        xmlhttp.setRequestHeader("Content-type", contentType);
-        xmlhttp.onload = function(){
-            responseFunction(this.responseText);
-        }
-        xmlhttp.open('POST', url, true);
-        xmlhttp.send(data);
-    } else {
-        GM_xmlhttpRequest({
-            method: 'POST',
-            url:    url,
-            headers: { "Content-type" : contentType },
-            data:   data,
-            onload: function(responseDetails) {
-                responseFunction(responseDetails.responseText);
-            },
-            onerror: function(responseDetails) {
-                document.getElementById(answer).innerHTML
-                    = 'status: ' + responseDetails.status
-                    + '\n' + responseDetails.responseText;
-            }
-        })
-    }
+    sendDataWrapper(handler, type, data, responseFunction);
 }                                               // }}}2
 
 if (gamePage == "rbarmee") {
