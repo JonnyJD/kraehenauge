@@ -426,7 +426,7 @@ kskKarte.title = "Kr\xE4henkarte"
 kskKarte.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskKarte.style.border = "1px solid red";
 var newLink = document.createElement('a');
-newLink.href = "http://kraehen.org/show/karten/";
+newLink.href = "http://kraehen.org/show/karten";
 newLink.target = "_blank";
 newLink.appendChild(kskKarte);
 document.getElementById('Leiste4').appendChild(newLink);
