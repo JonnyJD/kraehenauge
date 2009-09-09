@@ -329,15 +329,33 @@ if (gamePage == "rbfturm1"
 
 // }}}1
 
-// Armeesortierung              {{{1
-function isAllyArmee(imgEntry, allies) {  // {{{2
+// Armeesortierung und Aktualisierung   {{{1
+function isShip(imgEntry)    // {{{2
+{
+    var pattern = new RegExp("http://www.ritterburgwelt.de/rb/bild/icons/bew4.gif","");
+    if (imgEntry.src == "http://www.ritterburgwelt.de/rb/bild/icons/bew4.gif") {
+        return true;
+    } else {
+        return false;
+    }
+}                                       // }}}2
+function isArmee(imgEntry)    // {{{2
+{
     var box = imgEntry.parentNode.parentNode;
-    var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
-        allies+".gif","");
     if (box.innerHTML.indexOf("Menschentransfer")	!= -1 // eigene Armee
         || box.innerHTML.indexOf("Dorf")		!= -1
         || box.innerHTML.indexOf("Aussenposten")	!= -1
        ) {
+        return false;
+    } else {
+        return true;
+    }
+}                                       // }}}2
+function isAllyArmee(imgEntry, allies)    // {{{2
+{
+    var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
+        allies+".gif","");
+    if (!isArmee(imgEntry)) {
         return false;
     } else {
         return pattern.exec(imgEntry.src);
@@ -351,37 +369,54 @@ if( gamePage == "rbarmee"
     var imgEntries = document.getElementsByTagName("img");
     var bundListe = new Array();
     var feindListe = new Array();
+    var lastAction = 0;
 
-    // Armmen identifizieren    {{{2
+    // Armeen identifizieren    {{{2
     for( var i = 0; i < imgEntries.length; i++ ) {
         if (isAllyArmee(imgEntries[i], friendlyAllies)) {
             // Verbuendete Armee
             bundListe.push(imgEntries[i].parentNode.parentNode);
+            lastAction = "bund";
         } else {
             if(isAllyArmee(imgEntries[i], hostileAllies)) {
                 // Feindliche Armee
                 feindListe.push(
                         imgEntries[i].parentNode.parentNode);
+                lastAction = "feind";
                 feind = true;
+            } else if (isShip(imgEntries[i])) {
+                if (lastAction == "bund") {
+                    bundListe.push(imgEntries[i].parentNode.parentNode);
+                } else if (lastAction == "feind") {
+                    feindListe.push(imgEntries[i].parentNode.parentNode);
+                }
+            } else {
+                lastAction == "none";
             }
         }
     }
     //                          }}}2
-    // feindliche Armeen an den Anfang  {{{2
+
+    // Armeeaktualisierung      {{{2
+    // var output = createOutputArea("Armeen");
+    // Ende Armeeaktualisierung }}}2
+
+    // Armeesortierung          {{{2
+    // feindliche Armeen an den Anfang  {{{3
     for( var i = feindListe.length -1; i > -1; i-- ) {
         var parentNode = feindListe[i].parentNode;
         parentNode.removeChild(feindListe[i]);
         parentNode.insertBefore(feindListe[i], parentNode.firstChild);
     }
-    //                                  }}}2
-    // verbuendete Armeen ganz ans Ende {{{2
+    //                                  }}}3
+    // verbuendete Armeen ganz ans Ende {{{3
     for( var i = 0; i < bundListe.length; i++ ) {
         var parentNode = bundListe[i].parentNode;
         parentNode.removeChild(bundListe[i]);
         parentNode.appendChild(bundListe[i]);
     }
-    //                                  }}}2
-    // Zusammenfassung          {{{2
+    //                                  }}}3
+    // Zusammenfassung          {{{3
     for( var i = 0; i < imgEntries.length; i++ ) {
         if (imgEntries[i].src
                 == "http://www.ritterburgwelt.de/rb/bild/gui/boxtrenn0.gif"
@@ -398,8 +433,10 @@ if( gamePage == "rbarmee"
         document.body.background ="";
         document.bgColor = "#FF0000";
     }
-    //                          }}}2
-} // ende Armeesortierung
+    //                          }}}3
+    // Ende Armeesortierung     }}}2
+
+} // ende Armeebearbeitung
 //                              }}}1
 
 // debugausgabe {{{1
