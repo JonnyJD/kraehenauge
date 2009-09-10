@@ -638,7 +638,27 @@ function createOutputArea(id)   //      {{{1
 }
 // }}}1
 
-// Antwort der Datenbank                {{{1
+function sendToHandler(handler, fieldName, content, answer)      // {{{1
+{
+    var type = "application/x-www-form-urlencoded";
+    var data = a+pid+fieldName+'='+encodeURIComponent(content);
+    function responseFunction(text) {
+        document.getElementById(answer).innerHTML = text;
+    }
+    sendDataWrapper(handler, type, data, responseFunction);
+}                                                               // }}}1
+
+createOutputArea("DBAntwort");
+createOutputArea("ServerZusammenfassung");
+createOutputArea("Fehlermeldungen");
+
+completeData = "";
+function fillDataSection(section, content)                      // {{{1
+{
+    completeData += "<" + section + ">\n" + content + "</" + section + ">\n";
+}                                                               // }}}1
+
+// Sende sichtbaren Text an den Server {{{1
 
 function visibleText(htmlPage)                                  // {{{2
 {
@@ -658,25 +678,7 @@ function visibleText(htmlPage)                                  // {{{2
     return copyText;
 }                                               // }}}2
 
-createOutputArea("DBAntwort");
 copyText = visibleText(wholePage);
-
-function sendToHandler(handler, fieldName, content, answer)      // {{{2
-{
-    var type = "application/x-www-form-urlencoded";
-    var data = a+pid+fieldName+'='+encodeURIComponent(content);
-    function responseFunction(text) {
-        document.getElementById(answer).innerHTML = text;
-    }
-    sendDataWrapper(handler, type, data, responseFunction);
-}                                               // }}}2
-
-createOutputArea("ServerZusammenfassung");
-createOutputArea("Fehlermeldungen");
-function fillDataSection(section, content)                      // {{{2
-{
-    sendToHandler("send/data", "data", content, "ServerZusammenfassung");
-}                                                               // }}}2
 
 if (gamePage == "rbarmee") {
 
@@ -967,19 +969,7 @@ if( gamePage == "rbarmee"
     //                          }}}2
 
     // Armeeaktualisierung      {{{2
-    var output = createOutputArea("Armeen");
-
-    function prepareArmee12(pos, id, img, name, owner, size, strength,
-            ruf, bp, maxBP, ap, maxAP) {
-        prepareArmee(pos, id, img, name, owner, size, strength,
-                ruf, bp, maxBP, ap, maxAP);
-    }
-    function prepareArmee7(pos, id, img, name, owner, size, strength) {
-        prepareArmee(pos, id, img, name, owner, size, strength,"","","","","");
-    }
-    function prepareArmee5(pos, id, img, name, owner) {
-        prepareArmee(pos, id, img, name, owner, "", "", "", "", "", "", "");
-    }
+    var armeeData = ""
     function prepareArmee(pos, id, img, name, owner, size, strength,
             ruf, bp, maxBP, ap, maxAP)
     {
@@ -990,9 +980,18 @@ if( gamePage == "rbarmee"
                     out += "|" + ruf + "|" + bp+"/"+maxBP + "|" + ap+"/"+maxAP;
                 }
             }
-            // erstmal nur anzeigen
-            output.appendChild(document.createTextNode(out));
-            output.appendChild(document.createElement("br"));
+            armeeData += out + "\n";
+    }
+    function prepareArmee12(pos, id, img, name, owner, size, strength,
+            ruf, bp, maxBP, ap, maxAP) {
+        prepareArmee(pos, id, img, name, owner, size, strength,
+                ruf, bp, maxBP, ap, maxAP);
+    }
+    function prepareArmee7(pos, id, img, name, owner, size, strength) {
+        prepareArmee(pos, id, img, name, owner, size, strength,"","","","","");
+    }
+    function prepareArmee5(pos, id, img, name, owner) {
+        prepareArmee(pos, id, img, name, owner, "", "", "", "", "", "", "");
     }
 
     // eigene Armeen (Bilder nur als input-img)
@@ -1090,6 +1089,8 @@ if( gamePage == "rbarmee"
         }
     }
 
+    fillDataSection("armeen", armeeData);
+
     // Ende Armeeaktualisierung }}}2
 
     // Armeesortierung          {{{2
@@ -1129,6 +1130,14 @@ if( gamePage == "rbarmee"
 
 } // ende Armeebearbeitung
 //                              }}}1
+
+if (gamePage == "rbarmee"
+        || gamePage == "rbfturm1"
+        || gamePage == "rbfturm2"
+        || gamePage == "rbfturma"
+        || gamePage == "rbfturms") {
+    sendToHandler("send/data", "data", completeData, "ServerZusammenfassung");
+}
 
 // Ressourcenauswertung         {{{1
 if( gamePage == "rbrinfo0" ) {
