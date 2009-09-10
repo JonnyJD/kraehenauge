@@ -671,6 +671,13 @@ function sendToHandler(handler, fieldName, content, answer)      // {{{2
     sendDataWrapper(handler, type, data, responseFunction);
 }                                               // }}}2
 
+createOutputArea("ServerZusammenfassung");
+createOutputArea("Fehlermeldungen");
+function fillDataSection(section, content)                      // {{{2
+{
+    sendToHandler("send/data", "data", content, "ServerZusammenfassung");
+}                                                               // }}}2
+
 if (gamePage == "rbarmee") {
 
     sendToHandler("send/text/armee", "dorftext", copyText, "DBAntwort");
@@ -742,7 +749,7 @@ function listTerrain(terrain, floor, x, y, width, center, list)   //      {{{2
 
 // Erfassung in der Armee               {{{2
 if (gamePage == "rbarmee") {
-    var output = createOutputArea("Landschaft");
+    var output = document.getElementById("Fehlermeldungen");
     var sendData = "";
 
     // Kartenmittelpunkt suchen
@@ -799,7 +806,7 @@ if (gamePage == "rbarmee") {
             // x, y sind schon gesendete Zentrumskoordinaten -> true
             sendData = listTerrain(terrain, floor, x, y, width, true, sendData);
 
-            sendToHandler("send/terrain", "data", sendData, "Landschaft");
+            fillDataSection("felder", sendData);
         }
     }
 
@@ -810,7 +817,7 @@ if (gamePage == "rbfturm1"
         || gamePage == "rbfturm2"
         || gamePage == "rbfturma"
         || gamePage == "rbfturms") {
-    var output = createOutputArea("Landschaft");
+    var output = document.getElementById("Fehlermeldungen");
     var sendData = "";
 
     // Karte suchen
@@ -862,7 +869,7 @@ if (gamePage == "rbfturm1"
             sendData += "\n";
         }
 
-        sendToHandler("send/terrain", "data", sendData, "Landschaft");
+        fillDataSection("felder", sendData);
     }
 }                                                       //      }}}2
 
