@@ -763,6 +763,8 @@ if (gamePage == "rbarmee") {
         var floor = fields[1];
         var x = parseInt(fields[2]);
         var y = parseInt(fields[3]);
+        // wird in der Armeesortierung gebraucht:
+        currentPos = " " + x + "," + y + " :";
         if (fields[1] == undefined || fields[1] == "Q") {
             var floor = "N";
         }
@@ -878,11 +880,21 @@ function isShip(imgEntry)    // {{{2
         return false;
     }
 }                                       // }}}2
-function isArmee(imgEntry)    // {{{2
+function isOwn(imgEntry)    // {{{2
+// Ist keine eigene Armee, Dorf oder Aussenposten
 {
     var box = imgEntry.parentNode.parentNode;
-    if (box.innerHTML.indexOf("Menschentransfer")	!= -1 // eigene Armee
-        || box.innerHTML.indexOf("Dorf")		!= -1
+    if (box.innerHTML.indexOf("Menschentransfer")	!= -1) {
+        return true;
+    } else {
+        return false;
+    }
+}                                       // }}}2
+function isArmee(imgEntry)    // {{{2
+// Ist kein Dorf oder Aussenposten
+{
+    var box = imgEntry.parentNode.parentNode;
+    if (box.innerHTML.indexOf("Dorf")		        != -1
         || box.innerHTML.indexOf("Aussenposten")	!= -1
        ) {
         return false;
@@ -890,11 +902,24 @@ function isArmee(imgEntry)    // {{{2
         return true;
     }
 }                                       // }}}2
+function isArmeeHandle(imgEntry)        // {{{2
+// Das Heldenbild der Armee, womit die Armee eindeutig ist
+{
+    var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held/"
+            + "(h?[0-9]+h?)","");
+    var match = pattern.exec(imgEntry.src);
+    if (isArmee && match) {
+        return match;
+    } else {
+        return false;
+    }
+}                                       // }}}2
 function isAllyArmee(imgEntry, allies)    // {{{2
+// Das Allianztag einer der Allianzen in allies
 {
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
         allies+".gif","");
-    if (!isArmee(imgEntry)) {
+    if (!isArmee(imgEntry) || isOwn(imgEntry)) {
         return false;
     } else {
         return pattern.exec(imgEntry.src);
@@ -937,7 +962,55 @@ if( gamePage == "rbarmee"
     //                          }}}2
 
     // Armeeaktualisierung      {{{2
-    // var output = createOutputArea("Armeen");
+    var output = createOutputArea("Armeen");
+
+    //var imgInput = document.getElementsByTagName("input");
+    // TODO: input type image -> eigene Armeen in Armeesicht
+    // TODO: eigene aktuell laufende Armee
+    for( var i = 0; i < imgEntries.length; i++ ) {
+        var match = isArmeeHandle(imgEntries[i]);
+        if (match) {
+            var pic = match[1];
+            if (gamePage == "rbarmee") {
+                // Position aus der Landschaftsaktualisierung
+                var pos = currentPos;
+                var outerTd = imgEntries[i].parentNode.parentNode
+                    .parentNode.parentNode.parentNode;
+                var name = outerTd.previousSibling.firstChild.firstChild.data;
+                var size = outerTd.previousSibling.childNodes[2].data;
+                var strength = outerTd.previousSibling.childNodes[4].data;
+                var owner = outerTd.nextSibling.childNodes[1].firstChild.data;
+                var secondForm = outerTd.nextSibling.nextSibling.firstChild;
+                // ID nur wenn angreifbar hier per Form (kein Schutz)
+                if (secondForm.getElementsByTagName) {
+                    var inputs = secondForm.getElementsByTagName("input");
+                    for (var j = 0; j < inputs.length; j++) {
+                        if (inputs[j].name == "armee2") {
+                            var id = inputs[j].value;
+                            break;
+                        }
+                    }
+                } else {
+                    // keine ID zu bekommen
+                    var id = "-1";
+                }
+                var out = pos+" | "+id+" | "+pic+" | "+name+" | "+owner
+                    +" | "+size+" | "+strength;
+            } else {
+                // in einer Turmsicht
+                var outerTd = imgEntries[i].parentNode.parentNode
+                    .parentNode.parentNode.parentNode;
+                var pos = outerTd.previousSibling.previousSibling
+                    .firstChild.data;
+                var name = outerTd.previousSibling.firstChild.data;
+                var id = outerTd.nextSibling.childNodes[0].value;
+                var owner = outerTd.nextSibling.childNodes[2].firstChild.data;
+                var out = pos+" | "+id+" | "+pic+" | "+name+" | "+owner;
+            }
+            output.appendChild(document.createTextNode(out));
+            output.appendChild(document.createElement("br"));
+        }
+    }
     // Ende Armeeaktualisierung }}}2
 
     // Armeesortierung          {{{2
