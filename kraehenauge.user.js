@@ -5,13 +5,13 @@
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
 // @include        file:///home/jonnyjd/rbstart.php.html
 // @author         JonnyJD
-// @version        1.3
+// @version        1.4
 // ==/UserScript==      }}}1
 
 // Da Opera obiges @include nicht versteht
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
-var version = 'Kr\xE4henauge 1.3';
+var version = 'Kr\xE4henauge 1.4';
 
 // Einstellungen        {{{1
 var game = {
@@ -763,8 +763,6 @@ if (gamePage == "rbarmee") {
         var floor = fields[1];
         var x = parseInt(fields[2]);
         var y = parseInt(fields[3]);
-        // wird in der Armeesortierung gebraucht:
-        currentPos = " " + x + "," + y + " :";
         if (fields[1] == undefined || fields[1] == "Q") {
             var floor = "N";
         }
@@ -906,7 +904,7 @@ function isArmeeHandle(imgEntry)        // {{{2
 // Das Heldenbild der Armee, womit die Armee eindeutig ist
 {
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held/"
-            + "(h?[0-9]+h?)","");
+            + "(h?[0-9]+h?|hsold[0-9]+)","");
     var match = pattern.exec(imgEntry.src);
     if (isArmee && match) {
         return match;
@@ -964,23 +962,97 @@ if( gamePage == "rbarmee"
     // Armeeaktualisierung      {{{2
     var output = createOutputArea("Armeen");
 
-    //var imgInput = document.getElementsByTagName("input");
-    // TODO: input type image -> eigene Armeen in Armeesicht
-    // TODO: eigene aktuell laufende Armee
+    function prepareArmee12(pos, id, img, name, owner, size, strength,
+            ruf, bp, maxBP, ap, maxAP) {
+        prepareArmee(pos, id, img, name, owner, size, strength,
+                ruf, bp, maxBP, ap, maxAP);
+    }
+    function prepareArmee7(pos, id, img, name, owner, size, strength) {
+        prepareArmee(pos, id, img, name, owner, size, strength,"","","","","");
+    }
+    function prepareArmee5(pos, id, img, name, owner) {
+        prepareArmee(pos, id, img, name, owner, "", "", "", "", "", "", "");
+    }
+    function prepareArmee(pos, id, img, name, owner, size, strength,
+            ruf, bp, maxBP, ap, maxAP)
+    {
+            var out = pos + "|" + id + "|" + img + "|" + name + "|" + owner;
+            if (size != "") {
+                out += "|" + size + "|" + strength;
+                if (ruf != "") {
+                    out += "|" + ruf + "|" + bp+"/"+maxBP + "|" + ap+"/"+maxAP;
+                }
+            }
+            // erstmal nur anzeigen
+            output.appendChild(document.createTextNode(out));
+            output.appendChild(document.createElement("br"));
+    }
+
+    // eigene Armeen (Bilder nur als input-img)
+    var inputs = document.getElementsByTagName("input");
+    for( var i = 0; i < inputs.length; i++ ) {
+        if (inputs[i].type == "image" && inputs[i].name == "Armee") {
+            var match = isArmeeHandle(inputs[i]);
+            var form = inputs[i].parentNode.parentNode
+                .parentNode.parentNode.parentNode;
+            var id = form.childNodes[3].value;
+            var outerTD = form.parentNode;
+            var name = outerTD.previousSibling.childNodes[0].firstChild.data;
+            if (name != "Held:") {
+                // gesichtetete Armee
+                var pos = currentPos; // von aktueller Armee
+                var size = outerTD.previousSibling.childNodes[2]
+                    .data.split(" ")[1];
+                var strength = outerTD.previousSibling.childNodes[4]
+                    .data.split(" ")[1];
+                var owner = outerTD.nextSibling.childNodes[1].firstChild.data;
+
+                prepareArmee7(pos, id, match[1], name, owner, size, strength);
+            } else {
+                // laufende/aktuelle Armee
+                var name = outerTD.nextSibling.firstChild.data;
+                var statTD = outerTD.nextSibling.nextSibling.nextSibling;
+                var bp = statTD.childNodes[2].firstChild.data.split(" ")[0];
+                var maxBP = bp.split("/")[1];
+                var bp = bp.split("/")[0];
+                var ap = statTD.childNodes[4].data.split(" ")[0];
+                var maxAP = ap.split("/")[1];
+                var ap = ap.split("/")[0];
+                var unitTD = outerTD.parentNode.nextSibling.childNodes[2];
+                var soldaten = unitTD.firstChild.data.split(" ")[0];
+                var siedler = unitTD.firstChild.data.split(" ")[3];
+                var size = parseInt(soldaten) + parseInt(siedler);
+                var ruf = unitTD.firstChild.data.split(" ")[6];
+                var strength = unitTD.childNodes[2].data.split(" ")[1];
+                var terrainTR = outerTD.parentNode.nextSibling.nextSibling;
+                var pos = terrainTR.childNodes[2].childNodes[1].firstChild.data;
+                // aktuelle Position, wird spaeter von anderen genutzt !!!
+                var currentPos = pos;
+
+                prepareArmee12(pos, id, match[1], name, "[self]",
+                        size, strength, ruf, bp, maxBP, ap, maxAP);
+            }
+        }
+    }
+
+    // fremde Armeen (normale img)
+    var imgEntries = document.getElementsByTagName("img");
     for( var i = 0; i < imgEntries.length; i++ ) {
         var match = isArmeeHandle(imgEntries[i]);
         if (match) {
-            var pic = match[1];
+            var img = match[1];
             if (gamePage == "rbarmee") {
                 // Position aus der Landschaftsaktualisierung
-                var pos = currentPos;
-                var outerTd = imgEntries[i].parentNode.parentNode
+                var pos = currentPos; // von aktueller Armee
+                var outerTD = imgEntries[i].parentNode.parentNode
                     .parentNode.parentNode.parentNode;
-                var name = outerTd.previousSibling.firstChild.firstChild.data;
-                var size = outerTd.previousSibling.childNodes[2].data;
-                var strength = outerTd.previousSibling.childNodes[4].data;
-                var owner = outerTd.nextSibling.childNodes[1].firstChild.data;
-                var secondForm = outerTd.nextSibling.nextSibling.firstChild;
+                var name = outerTD.previousSibling.firstChild.firstChild.data;
+                var size = outerTD.previousSibling.childNodes[2].data;
+                size = size.split(" ")[1];
+                var strength = outerTD.previousSibling.childNodes[4].data;
+                strength = strength.split(" ")[1];
+                var owner = outerTD.nextSibling.childNodes[1].firstChild.data;
+                var secondForm = outerTD.nextSibling.nextSibling.firstChild;
                 // ID nur wenn angreifbar hier per Form (kein Schutz)
                 if (secondForm.getElementsByTagName) {
                     var inputs = secondForm.getElementsByTagName("input");
@@ -991,26 +1063,26 @@ if( gamePage == "rbarmee"
                         }
                     }
                 } else {
-                    // keine ID zu bekommen
-                    var id = "-1";
+                    var id = "-1";      // keine ID zu bekommen
                 }
-                var out = pos+" | "+id+" | "+pic+" | "+name+" | "+owner
-                    +" | "+size+" | "+strength;
+
+                prepareArmee7(pos, id, img, name, owner, size, strength);
             } else {
                 // in einer Turmsicht
-                var outerTd = imgEntries[i].parentNode.parentNode
+                var outerTD = imgEntries[i].parentNode.parentNode
                     .parentNode.parentNode.parentNode;
-                var pos = outerTd.previousSibling.previousSibling
+                var pos = outerTD.previousSibling.previousSibling
                     .firstChild.data;
-                var name = outerTd.previousSibling.firstChild.data;
-                var id = outerTd.nextSibling.childNodes[0].value;
-                var owner = outerTd.nextSibling.childNodes[2].firstChild.data;
-                var out = pos+" | "+id+" | "+pic+" | "+name+" | "+owner;
+                pos = pos.split(" :")[0];
+                var name = outerTD.previousSibling.firstChild.data;
+                var id = outerTD.nextSibling.childNodes[0].value;
+                var owner = outerTD.nextSibling.childNodes[2].firstChild.data;
+
+                prepareArmee5(pos, id, img, name, owner);
             }
-            output.appendChild(document.createTextNode(out));
-            output.appendChild(document.createElement("br"));
         }
     }
+
     // Ende Armeeaktualisierung }}}2
 
     // Armeesortierung          {{{2
