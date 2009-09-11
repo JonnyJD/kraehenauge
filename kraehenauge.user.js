@@ -652,10 +652,45 @@ createOutputArea("DBAntwort");
 createOutputArea("ServerZusammenfassung");
 createOutputArea("Fehlermeldungen");
 
+// zu sendendes xml-Dokument vorbereiten                        // {{{1
+var xmlDataDoc = document.implementation.createDocument("", "", null);
+// root-Element
+var dataElem = xmlDataDoc.createElement("data");
+
+var augeElem = xmlDataDoc.createElement("auge");
+var versionElem = xmlDataDoc.createElement("version");
+versionElem.appendChild(xmlDataDoc.createTextNode(version));
+augeElem.appendChild(versionElem);
+var senderElem = xmlDataDoc.createElement("sender");
+senderElem.appendChild(xmlDataDoc.createTextNode(gameId));
+augeElem.appendChild(senderElem);
+dataElem.appendChild(augeElem);
+
+// hier kommen die gefundenen Spieldaten rein
+var rbElem = xmlDataDoc.createElement("rb");                    // }}}1
 completeData = "";
 function fillDataSection(section, content)                      // {{{1
 {
+    var elem = xmlDataDoc.createElement(section);
+    elem.appendChild(xmlDataDoc.createTextNode(content));
+    rbElem.appendChild(elem);
     completeData += "<" + section + ">\n" + content + "</" + section + ">\n";
+}                                                               // }}}1
+function sendXMLData(handler, doc, answer)                      // {{{1
+{
+    // fertiges rb-Element einhaengen
+    dataElem.appendChild(rbElem);
+    xmlDataDoc.appendChild(dataElem);
+    var serializer = new XMLSerializer();
+    if (typeof(opera) !== 'undefined') {
+        var data =serializer.serializeToString(doc);
+    } else {
+        var data = XML(serializer.serializeToString(doc)).toXMLString();
+    }
+    function responseFunction(text) {
+        document.getElementById(answer).innerHTML = text;
+    }
+    sendDataWrapper(handler, "text/xml", data, responseFunction)
 }                                                               // }}}1
 
 // Sende sichtbaren Text an den Server {{{1
@@ -994,7 +1029,7 @@ if( gamePage == "rbarmee"
         prepareArmee(pos, id, img, name, owner, "", "", "", "", "", "", "");
     }
 
-    // eigene Armeen (Bilder nur als input-img)
+    // eigene Armeen (Bilder nur als input-img)         {{{3
     var inputs = document.getElementsByTagName("input");
     for( var i = 0; i < inputs.length; i++ ) {
         if (inputs[i].type == "image" && inputs[i].name == "Armee") {
@@ -1024,13 +1059,23 @@ if( gamePage == "rbarmee"
                 var ap = statTD.childNodes[4].data.split(" ")[0];
                 var maxAP = ap.split("/")[1];
                 var ap = ap.split("/")[0];
-                var unitTD = outerTD.parentNode.nextSibling.childNodes[2];
+                var bewImg = form.nextSibling.src;
+                if (bewImg.indexOf("bew4.gif") == -1) {
+                    // laufender Held
+                    var unitTD = outerTD.parentNode.nextSibling.childNodes[2];
+                    var terrainTR = outerTD.parentNode.nextSibling.nextSibling;
+                } else {
+                    // Schiff
+                    var unitTD = outerTD.parentNode.nextSibling
+                        .nextSibling.nextSibling.childNodes[2];
+                    var terrainTR = outerTD.parentNode.nextSibling.nextSibling
+                        .nextSibling.nextSibling;
+                }
                 var soldaten = unitTD.firstChild.data.split(" ")[0];
                 var siedler = unitTD.firstChild.data.split(" ")[3];
                 var size = parseInt(soldaten) + parseInt(siedler);
                 var ruf = unitTD.firstChild.data.split(" ")[6];
                 var strength = unitTD.childNodes[2].data.split(" ")[1];
-                var terrainTR = outerTD.parentNode.nextSibling.nextSibling;
                 var pos = terrainTR.childNodes[2].childNodes[1].firstChild.data;
                 // aktuelle Position, wird spaeter von anderen genutzt !!!
                 var currentPos = pos;
@@ -1039,9 +1084,9 @@ if( gamePage == "rbarmee"
                         size, strength, ruf, bp, maxBP, ap, maxAP);
             }
         }
-    }
+    }                                                   // }}}3
 
-    // fremde Armeen (normale img)
+    // fremde Armeen (normale img)                      {{{3
     var imgEntries = document.getElementsByTagName("img");
     for( var i = 0; i < imgEntries.length; i++ ) {
         var match = isArmeeHandle(imgEntries[i]);
@@ -1087,7 +1132,7 @@ if( gamePage == "rbarmee"
                 prepareArmee5(pos, id, img, name, owner);
             }
         }
-    }
+    }                                           // }}}3
 
     fillDataSection("armeen", armeeData);
 
@@ -1137,6 +1182,7 @@ if (gamePage == "rbarmee"
         || gamePage == "rbfturma"
         || gamePage == "rbfturms") {
     sendToHandler("send/data", "data", completeData, "ServerZusammenfassung");
+    //sendXMLData("save?xml", xmlDataDoc, "ServerZusammenfassung")
 }
 
 // Ressourcenauswertung         {{{1
