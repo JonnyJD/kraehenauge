@@ -11,7 +11,9 @@
 // Da Opera obiges @include nicht versteht
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
-var version = 'Kr\xE4henauge 1.4';
+var clientName = 'Kr\xE4henauge';
+var clientVersion = '1.4';
+var version = clientName + clientVersion;
 
 // Einstellungen        {{{1
 var game = {
@@ -658,23 +660,22 @@ var xmlDataDoc = document.implementation.createDocument("", "", null);
 var dataElem = xmlDataDoc.createElement("data");
 
 var augeElem = xmlDataDoc.createElement("auge");
-var versionElem = xmlDataDoc.createElement("version");
-versionElem.appendChild(xmlDataDoc.createTextNode(version));
-augeElem.appendChild(versionElem);
 var senderElem = xmlDataDoc.createElement("sender");
-senderElem.appendChild(xmlDataDoc.createTextNode(gameId));
+senderElem.setAttribute("r_id",gameId.substr(7));
 augeElem.appendChild(senderElem);
+var clientElem = xmlDataDoc.createElement("client");
+clientElem.setAttribute("name",clientName);
+clientElem.setAttribute("version",clientVersion);
+augeElem.appendChild(clientElem);
 dataElem.appendChild(augeElem);
 
 // hier kommen die gefundenen Spieldaten rein
 var rbElem = xmlDataDoc.createElement("rb");                    // }}}1
-completeData = "";
 function fillDataSection(section, content)                      // {{{1
 {
     var elem = xmlDataDoc.createElement(section);
     elem.appendChild(xmlDataDoc.createTextNode(content));
     rbElem.appendChild(elem);
-    completeData += "<" + section + ">\n" + content + "</" + section + ">\n";
 }                                                               // }}}1
 function sendXMLData(handler, doc, answer)                      // {{{1
 {
@@ -1181,8 +1182,7 @@ if (gamePage == "rbarmee"
         || gamePage == "rbfturm2"
         || gamePage == "rbfturma"
         || gamePage == "rbfturms") {
-    sendToHandler("send/data", "data", completeData, "ServerZusammenfassung");
-    //sendXMLData("save?xml", xmlDataDoc, "ServerZusammenfassung")
+    sendXMLData("send/data", xmlDataDoc, "ServerZusammenfassung")
 }
 
 // Ressourcenauswertung         {{{1
