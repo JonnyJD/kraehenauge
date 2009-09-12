@@ -13,7 +13,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0) {
 
 var clientName = 'Kr\xE4henauge';
 var clientVersion = '1.4';
-var version = clientName + clientVersion;
+var version = clientName + " " + clientVersion;
 
 // Einstellungen        {{{1
 var game = {
@@ -671,6 +671,10 @@ dataElem.appendChild(augeElem);
 
 // hier kommen die gefundenen Spieldaten rein
 var rbElem = xmlDataDoc.createElement("rb");                    // }}}1
+function addDataSection(sectionElem)                            // {{{1
+{
+    rbElem.appendChild(sectionElem);
+}                                                               // }}}1
 function fillDataSection(section, content)                      // {{{1
 {
     var elem = xmlDataDoc.createElement(section);
@@ -747,8 +751,23 @@ if (gameId == 'rbspiel1728') {
 //                                      }}}1
 
 // Landschaftserfassung         {{{1
-
-function listTerrain(terrain, floor, x, y, width, center, list)   //      {{{2
+var felderElem = xmlDataDoc.createElement("felder");
+function addTerrain(floor, x, y, terrain, name)    // {{{2
+{
+    var feldElem = xmlDataDoc.createElement("feld");
+    feldElem.setAttribute("level", floor);
+    feldElem.setAttribute("x", x); feldElem.setAttribute("y", y);
+    var terrainElem = xmlDataDoc.createElement("terrain");
+    terrainElem.appendChild(xmlDataDoc.createTextNode(terrain));
+    feldElem.appendChild(terrainElem);
+    if (typeof(name) !== 'undefined') {
+        var nameElem = xmlDataDoc.createElement("name");
+        nameElem.appendChild(xmlDataDoc.createTextNode(name));
+        feldElem.appendChild(nameElem);
+    }
+    felderElem.appendChild(feldElem);
+}
+function listTerrain(terrain, floor, x, y, width, center)   //      {{{2
 {
     if (!center) {
         // Zentrum aus linker oberer Ecke berechnen
@@ -776,19 +795,15 @@ function listTerrain(terrain, floor, x, y, width, center, list)   //      {{{2
             // Das Zentrum braucht nicht doppelt uebertragen werden
             // wenn es schon vorher bekannt war
             // (Wurde schon zusammen mit dem Namen und Untertyp gesendet)
-            list += floor + " " + x + " " + y + " ";
-            list += terrain[i];
-            list += "\n";
+            addTerrain(floor, x, y, terrain[i]);
         }
 
     }
-    return list;
 }                                                               //      }}}2
 
 // Erfassung in der Armee               {{{2
 if (gamePage == "rbarmee") {
     var output = document.getElementById("Fehlermeldungen");
-    var sendData = "";
 
     // Kartenmittelpunkt suchen
     // = erstes Auftreten eines Kartenbildes im Code
@@ -811,12 +826,9 @@ if (gamePage == "rbarmee") {
         if (fields[1] == undefined || fields[1] == "Q") {
             var floor = "N";
         }
-        sendData += floor + " " + x + " " + y + " ";
-        // Terrain
-        sendData += imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
-        // Landschaftsname
-        sendData += tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1');
-        sendData += "\n";
+        var terrain = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
+        var name = tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1');
+        addTerrain(floor, x, y, terrain, name);
 
 
         // Kartenausschnitt finden
@@ -842,9 +854,9 @@ if (gamePage == "rbarmee") {
             }
             var width = Math.sqrt(terrain.length);
             // x, y sind schon gesendete Zentrumskoordinaten -> true
-            sendData = listTerrain(terrain, floor, x, y, width, true, sendData);
+            listTerrain(terrain, floor, x, y, width, true);
 
-            fillDataSection("felder", sendData);
+            addDataSection(felderElem);
         }
     }
 
@@ -856,7 +868,6 @@ if (gamePage == "rbfturm1"
         || gamePage == "rbfturma"
         || gamePage == "rbfturms") {
     var output = document.getElementById("Fehlermeldungen");
-    var sendData = "";
 
     // Karte suchen
     // = erstes Auftreten eines Kartenbildes im Code
@@ -902,12 +913,10 @@ if (gamePage == "rbfturm1"
         for (var i=0; i < coordList.length; i++) {
             var x = parseInt(coordList[i][1]);
             var y = parseInt(coordList[i][2]);
-            sendData += "N " + x + " " + y + " ";
-            sendData += terrain[i];
-            sendData += "\n";
+            addTerrain("N", x, y, terrain[i]);
         }
 
-        fillDataSection("felder", sendData);
+        addDataSection(felderElem);
     }
 }                                                       //      }}}2
 
@@ -1016,6 +1025,7 @@ if( gamePage == "rbarmee"
                     out += "|" + ruf + "|" + bp+"/"+maxBP + "|" + ap+"/"+maxAP;
                 }
             }
+            // TODO: Level, Quests?
             armeeData += out + "\n";
     }
     function prepareArmee12(pos, id, img, name, owner, size, strength,
@@ -1030,7 +1040,7 @@ if( gamePage == "rbarmee"
         prepareArmee(pos, id, img, name, owner, "", "", "", "", "", "", "");
     }
 
-    // eigene Armeen (Bilder nur als input-img)         {{{3
+    // eigene Armeen in Armeesicht (Bilder nur als input-img)   {{{3
     var inputs = document.getElementsByTagName("input");
     for( var i = 0; i < inputs.length; i++ ) {
         if (inputs[i].type == "image" && inputs[i].name == "Armee") {
@@ -1087,7 +1097,7 @@ if( gamePage == "rbarmee"
         }
     }                                                   // }}}3
 
-    // fremde Armeen (normale img)                      {{{3
+    // fremde Armeen und Turmsicht (normale img)        {{{3
     var imgEntries = document.getElementsByTagName("img");
     for( var i = 0; i < imgEntries.length; i++ ) {
         var match = isArmeeHandle(imgEntries[i]);
@@ -1125,7 +1135,7 @@ if( gamePage == "rbarmee"
                     .parentNode.parentNode.parentNode;
                 var pos = outerTD.previousSibling.previousSibling
                     .firstChild.data;
-                pos = pos.split(" :")[0];
+                pos = "N " + pos.split(" :")[0];
                 var name = outerTD.previousSibling.firstChild.data;
                 var id = outerTD.nextSibling.childNodes[0].value;
                 var owner = outerTD.nextSibling.childNodes[2].firstChild.data;
