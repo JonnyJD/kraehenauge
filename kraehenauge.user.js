@@ -17,7 +17,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0
     function sendDataWrapper(handler, type, data, responseFunction) {{{2
     {
         var url = "http://kraehen.org/" + handler;
-        if (typeof(opera) !== "undefined") {
+        if (typeof opera != "undefined") {
             var xmlhttp = new opera.XMLHttpRequest();
             xmlhttp.setRequestHeader("Content-type", type);
             xmlhttp.onload = function(){
@@ -101,7 +101,7 @@ var pages = {        // {{{1
 }
                      // }}}1
 // Kernvariablen        {{{1
-var wholePage = document.getElementsByTagName('HTML')[0].innerHTML;
+var wholePage = document.getElementsByTagName('html')[0].innerHTML;
 var session = document.getElementsByName('name')[0].value;
 var gameId = document.getElementsByName('passw')[0].value;
 var a="agent="+encodeURIComponent(version)+"&";
@@ -191,36 +191,36 @@ else if (pageTitle.indexOf('Allianz ') == 0)
 // Bereiche fuer die Linkleisten einfuegen      {{{1
 // Aufpassen, dass interne forms noch funktionieren
 // test case: Waren zwischen Einheiten
-var oldCenter = document.getElementsByTagName('CENTER')[0];
+var oldCenter = document.getElementsByTagName('center')[0];
 
 // Neue Haupttabelle erstellen
 var newTable = document.createElement('table');
-var newTr = document.createElement('tr');
-var newTd = document.createElement('td');
-newTd.style.textAlign = "center"; newTd.style.verticalAlign = "top";
+var newTR = document.createElement('tr');
+var newTD = document.createElement('td');
+newTD.style.textAlign = "center"; newTD.style.verticalAlign = "top";
 var newDiv = document.createElement('div');
 newDiv.id = "Leiste3";
-newTd.appendChild(newDiv); newTr.appendChild(newTd);
-newTd = document.createElement('td');
-newTd.style.textAlign = "center"; newTd.style.verticalAlign = "top";
+newTD.appendChild(newDiv); newTR.appendChild(newTD);
+newTD = document.createElement('td');
+newTD.style.textAlign = "center"; newTD.style.verticalAlign = "top";
 newDiv = document.createElement('div');
 newDiv.id = "Leiste1";
-newTd.appendChild(newDiv); newTr.appendChild(newTd);
+newTD.appendChild(newDiv); newTR.appendChild(newTD);
 // Punkt um altes Zentrum einzuhaengen
-newTd = document.createElement('td');
-newTd.id = "zentrum";
-newTr.appendChild(newTd);
-newTd = document.createElement('td');
-newTd.style.textAlign = "center"; newTd.style.verticalAlign = "top";
+newTD = document.createElement('td');
+newTD.id = "zentrum";
+newTR.appendChild(newTD);
+newTD = document.createElement('td');
+newTD.style.textAlign = "center"; newTD.style.verticalAlign = "top";
 newDiv = document.createElement('div');
 newDiv.id = "Leiste2";
-newTd.appendChild(newDiv); newTr.appendChild(newTd);
-newTd = document.createElement('td');
-newTd.style.textAlign = "center"; newTd.style.verticalAlign = "top";
+newTD.appendChild(newDiv); newTR.appendChild(newTD);
+newTD = document.createElement('td');
+newTD.style.textAlign = "center"; newTD.style.verticalAlign = "top";
 newDiv = document.createElement('div');
 newDiv.id = "Leiste4";
-newTd.appendChild(newDiv); newTr.appendChild(newTd);
-newTable.appendChild(newTr);
+newTD.appendChild(newDiv); newTR.appendChild(newTD);
+newTable.appendChild(newTR);
 
 var newCenter = document.createElement('center');
 newCenter.appendChild(newTable);
@@ -230,11 +230,11 @@ document.getElementById("zentrum").appendChild(oldCenter);
 // Spiel-ID zu Debugzwecken unten ausgeben      {{{1
 var gameInfo = document.createElement('div');
 gameInfo.innerHTML = '<div><br/>' + gameId + ' - ' + gamePage + '</div>';
-document.getElementsByTagName('CENTER')[2].appendChild(gameInfo);
+document.getElementsByTagName('center')[2].appendChild(gameInfo);
 // Versionsnummer unten ausgeben
 var versionInfo = document.createElement('div');
 versionInfo.innerHTML = '<br/>' + version;
-document.getElementsByTagName('CENTER')[2].appendChild(versionInfo);
+document.getElementsByTagName('center')[2].appendChild(versionInfo);
 //                                              }}}1
 function createFormLink(bereich, page, linkImages, target)       // {{{1
 {
@@ -588,7 +588,7 @@ document.getElementById('Leiste4').appendChild(newLink);
 // Antwort des Scanners vom Server      {{{1
 var newDiv = document.createElement('div');
 newDiv.align = "center";
-document.getElementsByTagName('BODY')[0].appendChild(newDiv);
+document.getElementsByTagName('body')[0].appendChild(newDiv);
 var response = document.createElement('div');
 response.id = "ServerAntwort";
 response.style.fontFamily = "monospace";
@@ -635,7 +635,7 @@ function createOutputArea(id)   //      {{{1
 {
     var newDiv = document.createElement('div');
     newDiv.align = "center";
-    document.getElementsByTagName('BODY')[0].appendChild(newDiv);
+    document.getElementsByTagName('body')[0].appendChild(newDiv);
     var response = document.createElement('div');
     response.id = id;
     response.style.backgroundColor = "#AF874E";
@@ -694,7 +694,7 @@ function sendXMLData(handler, doc, answer)                      // {{{1
     dataElem.appendChild(rbElem);
     xmlDataDoc.appendChild(dataElem);
     var serializer = new XMLSerializer();
-    if (typeof(opera) !== 'undefined') {
+    if (typeof opera != "undefined") {
         var data =serializer.serializeToString(doc);
     } else {
         var data = XML(serializer.serializeToString(doc)).toXMLString();
@@ -767,7 +767,7 @@ function addTerrain(floor, x, y, terrain, name)    // {{{2
     var terrainElem = xmlDataDoc.createElement("terrain");
     terrainElem.appendChild(xmlDataDoc.createTextNode(terrain));
     feldElem.appendChild(terrainElem);
-    if (typeof(name) !== 'undefined') {
+    if (typeof name != "undefined") {
         var nameElem = xmlDataDoc.createElement("name");
         nameElem.appendChild(xmlDataDoc.createTextNode(name));
         feldElem.appendChild(nameElem);
@@ -1022,30 +1022,70 @@ if( gamePage == "rbarmee"
 
     // Armeeaktualisierung      {{{2
     var armeeData = ""
-    function prepareArmee(pos, id, img, name, owner, size, strength,
+    var armeenElem = xmlDataDoc.createElement("armeen");
+    function addArmee(pos, id, img, name, owner, size, strength,        // {{{3
             ruf, bp, maxBP, ap, maxAP)
     {
-            var out = pos + "|" + id + "|" + img + "|" + name + "|" + owner;
-            if (size != "") {
-                out += "|" + size + "|" + strength;
-                if (ruf != "") {
-                    out += "|" + ruf + "|" + bp+"/"+maxBP + "|" + ap+"/"+maxAP;
-                }
+        var armeeElem = xmlDataDoc.createElement("armee");
+        if (id !== null) {
+            armeeElem.setAttribute("h_id", id);
+        }
+        var posElem = xmlDataDoc.createElement("position");
+        var expr = /(N|Q|U[0-9])?,? ?([0-9]+),([0-9]+)/;
+        fields = expr.exec(pos);
+        if (typeof fields[1] == "undefined" || fields[1] == "Q") {
+            level = "N";
+        } else {
+            level = fields[1];
+        }
+        posElem.setAttribute("level", level);
+        posElem.setAttribute("x", fields[2]);
+        posElem.setAttribute("y", fields[3]);
+        armeeElem.appendChild(posElem);
+        var bildElem = xmlDataDoc.createElement("bild");
+        bildElem.appendChild(xmlDataDoc.createTextNode(img));
+        armeeElem.appendChild(bildElem);
+        var nameElem = xmlDataDoc.createElement("name");
+        nameElem.appendChild(xmlDataDoc.createTextNode(name));
+        armeeElem.appendChild(nameElem);
+        var ritterElem = xmlDataDoc.createElement("ritter");
+        if (owner === null) {
+            ritterElem.setAttribute("r_id", gameId.substr(7));
+        } else {
+            ritterElem.appendChild(xmlDataDoc.createTextNode(owner));
+        }
+        armeeElem.appendChild(ritterElem);
+        if (typeof size != "undefined") {
+            var sizeElem = xmlDataDoc.createElement("size");
+            sizeElem.setAttribute("now", size);
+            if (typeof ruf != "undefined") {
+                sizeElem.setAttribute("max", ruf);
             }
-            // TODO: Level, Quests?
-            armeeData += out + "\n";
-    }
-    function prepareArmee12(pos, id, img, name, owner, size, strength,
-            ruf, bp, maxBP, ap, maxAP) {
-        prepareArmee(pos, id, img, name, owner, size, strength,
-                ruf, bp, maxBP, ap, maxAP);
-    }
-    function prepareArmee7(pos, id, img, name, owner, size, strength) {
-        prepareArmee(pos, id, img, name, owner, size, strength,"","","","","");
-    }
-    function prepareArmee5(pos, id, img, name, owner) {
-        prepareArmee(pos, id, img, name, owner, "", "", "", "", "", "", "");
-    }
+            armeeElem.appendChild(sizeElem);
+        }
+        if (typeof strength != "undefined") {
+            var strengthElem = xmlDataDoc.createElement("strength");
+            strengthElem.setAttribute("now", strength);
+            armeeElem.appendChild(strengthElem);
+        }
+        if (typeof bp != "undefined") {
+            var bpElem = xmlDataDoc.createElement("bp");
+            bpElem.setAttribute("now", bp);
+            if (typeof maxBP != "undefined") {
+                bpElem.setAttribute("max", maxBP);
+            }
+            armeeElem.appendChild(bpElem);
+        }
+        if (typeof ap != "undefined") {
+            var apElem = xmlDataDoc.createElement("ap");
+            apElem.setAttribute("now", ap);
+            if (typeof maxAP != "undefined") {
+                apElem.setAttribute("max", maxAP);
+            }
+            armeeElem.appendChild(apElem);
+        }
+        armeenElem.appendChild(armeeElem);
+    }                                                           // }}}3
 
     // eigene Armeen in Armeesicht (Bilder nur als input-img)   {{{3
     var inputs = document.getElementsByTagName("input");
@@ -1066,7 +1106,7 @@ if( gamePage == "rbarmee"
                     .data.split(" ")[1];
                 var owner = outerTD.nextSibling.childNodes[1].firstChild.data;
 
-                prepareArmee7(pos, id, match[1], name, owner, size, strength);
+                addArmee(pos, id, match[1], name, owner, size, strength);
             } else {
                 // laufende/aktuelle Armee
                 var name = outerTD.nextSibling.firstChild.data;
@@ -1097,8 +1137,9 @@ if( gamePage == "rbarmee"
                 var pos = terrainTR.childNodes[2].childNodes[1].firstChild.data;
                 // aktuelle Position, wird spaeter von anderen genutzt !!!
                 var currentPos = pos;
+                var owner = null;
 
-                prepareArmee12(pos, id, match[1], name, "[self]",
+                addArmee(pos, id, match[1], name, owner,
                         size, strength, ruf, bp, maxBP, ap, maxAP);
             }
         }
@@ -1132,27 +1173,26 @@ if( gamePage == "rbarmee"
                         }
                     }
                 } else {
-                    var id = "-1";      // keine ID zu bekommen
+                    var id = null;      // keine ID zu bekommen
                 }
 
-                prepareArmee7(pos, id, img, name, owner, size, strength);
+                addArmee(pos, id, img, name, owner, size, strength);
             } else {
                 // in einer Turmsicht
                 var outerTD = imgEntries[i].parentNode.parentNode
                     .parentNode.parentNode.parentNode;
                 var pos = outerTD.previousSibling.previousSibling
                     .firstChild.data;
-                pos = "N " + pos.split(" :")[0];
                 var name = outerTD.previousSibling.firstChild.data;
                 var id = outerTD.nextSibling.childNodes[0].value;
                 var owner = outerTD.nextSibling.childNodes[2].firstChild.data;
 
-                prepareArmee5(pos, id, img, name, owner);
+               addArmee(pos, id, img, name, owner);
             }
         }
     }                                           // }}}3
 
-    fillDataSection("armeen", armeeData);
+    addDataSection(armeenElem);
 
     // Ende Armeeaktualisierung }}}2
 
@@ -1338,7 +1378,7 @@ if (gamePage == "rbzug") {
     gueterZeilen = gueterTabelle.firstChild.childNodes; // beachte tbody
     //                          }}}2
     // Titelzeile               {{{2
-    newTD = document.createElement("TD");
+    newTD = document.createElement("td");
     newText = document.createTextNode("Z\xFCge");
     newTD.appendChild(newText);
     gueterZeilen[0].appendChild(newTD);
@@ -1350,14 +1390,14 @@ if (gamePage == "rbzug") {
         var danach = gueterZeilen[gut].childNodes[3].firstChild.data;
         if (diff < 0) {
             var restZuege = Math.floor(danach / Math.abs(diff))
-            var newTD = document.createElement("TD");
+            var newTD = document.createElement("td");
             newTD.appendChild(document.createTextNode(restZuege));
             if (restZuege <= zuegeGelb) newTD.style.backgroundColor = "yellow";
             if (restZuege <= zuegeRot) newTD.style.backgroundColor = "red";
             gueterZeilen[gut].appendChild(newTD);
         } else {
             var infinite = document.createTextNode(String.fromCharCode(8734));
-            var newTD = document.createElement("TD");
+            var newTD = document.createElement("td");
             newTD.appendChild(infinite);
             gueterZeilen[gut].appendChild(newTD);
         }
@@ -1373,13 +1413,13 @@ if (debugOut != "") {
 
 }
 
-// Reichs-IDs vom Server
+// Reichs-IDs vom Server                                {{{1
 if (document.location == "http://www.ritterburgwelt.de/rb/ajax_backend.php") {
     responses = document.getElementsByTagName("response");
     if (responses.length > 0) {
         var doc = responses[0];
         var serializer = new XMLSerializer();
-        if (typeof(opera) !== 'undefined') {
+        if (typeof opera != "undefined") {
             var xml =serializer.serializeToString(doc);
         } else {
             var xml = XML(serializer.serializeToString(doc)).toXMLString();
@@ -1391,6 +1431,6 @@ if (document.location == "http://www.ritterburgwelt.de/rb/ajax_backend.php") {
         }
         sendDataWrapper("send/response", "text/xml", xml, responseFunction)
     }
-}
+}                                               //      }}}1
 
 /* vim:set shiftwidth=4 expandtab smarttab foldmethod=marker: */
