@@ -3,12 +3,43 @@
 // @namespace      http://kraehen.org
 // @description    Dies ist das clientseitige KSK-Programm. Es unterstuetzt die Kraehen auf ihren Wegen in Alirion und gibt ihnen Ueberblick und schnelle Reaktionsmoeglichkeiten.
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
+// @include        http://www.ritterburgwelt.de/rb/ajax_backend.php
 // @include        file:///home/jonnyjd/rbstart.php.html
 // @author         JonnyJD
 // @version        1.4
 // ==/UserScript==      }}}1
+// Anmerkung: Opera versteht das @include nicht und laed immer!
 
-// Da Opera obiges @include nicht versteht
+// gemeinsam benutzte Funktionen        {{{1
+if (document.title.indexOf("RB \xA9 - ") == 0
+            || document.location
+            == "http://www.ritterburgwelt.de/rb/ajax_backend.php") {
+    function sendDataWrapper(handler, type, data, responseFunction) {{{2
+    {
+        var url = "http://kraehen.org/" + handler;
+        if (typeof(opera) !== "undefined") {
+            var xmlhttp = new opera.XMLHttpRequest();
+            xmlhttp.setRequestHeader("Content-type", type);
+            xmlhttp.onload = function(){
+                responseFunction(this.responseText);
+            }
+            xmlhttp.open('POST', url, true);
+            xmlhttp.send(data);
+        } else {
+            GM_xmlhttpRequest({
+                method: 'POST',
+                url:    url,
+                headers: { "Content-type" : type },
+                data:   data,
+                onload: function(responseDetails) {
+                    responseFunction(responseDetails.responseText);
+                },
+            })
+        }
+    }                                                               }}}2
+}                               //      }}}1
+
+// RB-Spielseite
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
 var clientName = 'Kr\xE4henauge';
@@ -553,30 +584,6 @@ newLink.target = "_blank";
 newLink.appendChild(kskTag);
 document.getElementById('Leiste4').appendChild(newLink);
 //                              }}}1
-
-function sendDataWrapper(handler, type, data, responseFunction) {{{1
-{
-    var url = "http://kraehen.org/" + handler;
-    if (typeof(opera) !== "undefined") {
-        var xmlhttp = new opera.XMLHttpRequest();
-        xmlhttp.setRequestHeader("Content-type", type);
-        xmlhttp.onload = function(){
-            responseFunction(this.responseText);
-        }
-        xmlhttp.open('POST', url, true);
-        xmlhttp.send(data);
-    } else {
-        GM_xmlhttpRequest({
-            method: 'POST',
-            url:    url,
-            headers: { "Content-type" : type },
-            data:   data,
-            onload: function(responseDetails) {
-                responseFunction(responseDetails.responseText);
-            },
-        })
-    }
-}                                                               }}}1
 
 // Antwort des Scanners vom Server      {{{1
 var newDiv = document.createElement('div');
@@ -1364,6 +1371,26 @@ if (debugOut != "") {
     gameInfo.appendChild(document.createTextNode(debugOut));
 }       //      }}}1
 
+}
+
+// Reichs-IDs vom Server
+if (document.location == "http://www.ritterburgwelt.de/rb/ajax_backend.php") {
+    responses = document.getElementsByTagName("response");
+    if (responses.length > 0) {
+        var doc = responses[0];
+        var serializer = new XMLSerializer();
+        if (typeof(opera) !== 'undefined') {
+            var xml =serializer.serializeToString(doc);
+        } else {
+            var xml = XML(serializer.serializeToString(doc)).toXMLString();
+        }
+        var type = "application/x-www-form-urlencoded";
+        var data = a+pid+'source='+encodeURIComponent(xml);
+        function responseFunction(text) {
+            if (text.length > 1) { alert(text); }
+        }
+        sendDataWrapper("send/response", "text/xml", xml, responseFunction)
+    }
 }
 
 /* vim:set shiftwidth=4 expandtab smarttab foldmethod=marker: */
