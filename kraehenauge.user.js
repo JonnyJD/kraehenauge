@@ -693,6 +693,8 @@ clientElem.setAttribute("version",clientVersion);
 augeElem.appendChild(clientElem);
 dataElem.appendChild(augeElem);
 
+var dataGathered = false;
+
 // hier kommen die gefundenen Spieldaten rein
 var rbElem = xmlDataDoc.createElement("rb");                    // }}}1
 function addDataSection(sectionElem)                            // {{{1
@@ -707,23 +709,27 @@ function fillDataSection(section, content)                      // {{{1
 }                                                               // }}}1
 function sendXMLData(handler, doc, answer)                      // {{{1
 {
-    // fertiges rb-Element einhaengen
-    dataElem.appendChild(rbElem);
-    xmlDataDoc.appendChild(dataElem);
-    var serializer = new XMLSerializer();
-    if (typeof opera != "undefined") {
-        var data =serializer.serializeToString(doc);
+    if (dataGathered) {
+        // fertiges rb-Element einhaengen
+        dataElem.appendChild(rbElem);
+        xmlDataDoc.appendChild(dataElem);
+        var serializer = new XMLSerializer();
+        if (typeof opera != "undefined") {
+            var data =serializer.serializeToString(doc);
+        } else {
+            var data = XML(serializer.serializeToString(doc)).toXMLString();
+        }
+        function responseFunction(text) {
+            document.getElementById(answer).innerHTML = text;
+        }
+        function responseFunction2(text) {
+            document.getElementById("Fehlermeldungen").innerHTML = text;
+        }
+        sendDataWrapper(handler, "text/xml", data, responseFunction)
+        //sendDataWrapper("save?xml", "text/xml", data, responseFunction2)
     } else {
-        var data = XML(serializer.serializeToString(doc)).toXMLString();
+        printWarning("Es wurden keine Armee- oder Terraindaten gefunden");
     }
-    function responseFunction(text) {
-        document.getElementById(answer).innerHTML = text;
-    }
-    function responseFunction2(text) {
-        document.getElementById("Fehlermeldungen").innerHTML = text;
-    }
-    sendDataWrapper(handler, "text/xml", data, responseFunction)
-    //sendDataWrapper("save?xml", "text/xml", data, responseFunction2)
 }                                                               // }}}1
 
 // Sende sichtbaren Text an den Server {{{1
@@ -781,7 +787,7 @@ if (gameId == 'rbspiel1728') {
 // Landschaftserfassung         {{{1
 try {
 var felderElem = xmlDataDoc.createElement("felder");
-function addTerrain(floor, x, y, terrain, name)    // {{{2
+function addTerrain(floor, x, y, terrain, name)         // {{{2
 {
     var feldElem = xmlDataDoc.createElement("feld");
     feldElem.setAttribute("level", floor);
@@ -795,7 +801,8 @@ function addTerrain(floor, x, y, terrain, name)    // {{{2
         feldElem.appendChild(nameElem);
     }
     felderElem.appendChild(feldElem);
-}
+    dataGathered = true;
+}                                                       // }}}2
 function listTerrain(terrain, floor, x, y, width, center)   //      {{{2
 {
     if (!center) {
@@ -1105,6 +1112,7 @@ if( gamePage == "rbarmee"
             armeeElem.appendChild(apElem);
         }
         armeenElem.appendChild(armeeElem);
+        dataGathered = true;
     }                                                           // }}}3
 
     // eigene Armeen in Armeesicht (Bilder als input-img name=Armee)    {{{3
