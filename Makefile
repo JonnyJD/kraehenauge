@@ -27,3 +27,6 @@ test: debug
 		-e 's|http://kraehen.org/|http://test.kraehen.org/|' \
 		-e 's|http://localhost/|http://test.kraehen.org/|' \
 		kraehenauge.user.js
+
+regress: local nodebug
+	cd regress; exec ./test.sh

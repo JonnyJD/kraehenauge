@@ -4,7 +4,8 @@
 // @description    Dies ist das clientseitige KSK-Programm. Es unterstuetzt die Kraehen auf ihren Wegen in Alirion und gibt ihnen Ueberblick und schnelle Reaktionsmoeglichkeiten.
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
 // @include        http://www.ritterburgwelt.de/rb/ajax_backend.php
-// @include        file:///home/jonnyjd/rbstart.php.html
+// @include        file://*/rbstart.php.html
+// @include        file://*/ajax_backend.php
 // @author         JonnyJD
 // @version        1.4
 // ==/UserScript==      }}}1
@@ -431,6 +432,7 @@ if( pageTitle.search(/Dorf (.*), Handelsd\xF6rfer/) == 0) {
 }
 //                                                      }}}1
 
+alert(gameId);
 // Armeelinks                   {{{1
 if (GM_getValue(gameId+".armeen", 0)) {
     for (var listNumber = 3; listNumber <= 4; listNumber++) { 
