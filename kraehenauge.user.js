@@ -980,7 +980,7 @@ function isArmeeHandle(imgEntry)        // {{{2
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held/"
             + "(h?[0-9]+h?|hsold[0-9]+)","");
     var match = pattern.exec(imgEntry.src);
-    if (isArmee && match) {
+    if (isArmee(imgEntry)  && match) {
         return match;
     } else {
         return false;
@@ -1107,6 +1107,7 @@ if( gamePage == "rbarmee"
     for( var i = 0; i < inputs.length; i++ ) {
         if (inputs[i].type == "image" && inputs[i].name == "Armee") {
             var match = isArmeeHandle(inputs[i]);
+            if (!match) { break; }
             var form = inputs[i].parentNode.parentNode
                 .parentNode.parentNode.parentNode;
             var id = form.childNodes[3].value;
@@ -1165,6 +1166,7 @@ if( gamePage == "rbarmee"
     for( var i = 0; i < inputs.length; i++ ) {
         if (inputs[i].type == "image" && inputs[i].name == "ok") {
             var match = isArmeeHandle(inputs[i]);
+            if (!match) { break; }
             var form = inputs[i].parentNode.parentNode
                 .parentNode.parentNode.parentNode;
             var id = form.childNodes[4].value;
