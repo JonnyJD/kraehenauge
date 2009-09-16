@@ -828,8 +828,8 @@ if (gamePage == "rbarmee") {
         var expr = /(Q|U[0-9])?,? ?([0-9]*),([0-9]*)/;
         fields = expr.exec(text);
         var floor = fields[1];
-        var x = parseInt(fields[2]);
-        var y = parseInt(fields[3]);
+        var x = parseInt(fields[2], 10);
+        var y = parseInt(fields[3], 10);
         if (fields[1] == undefined || fields[1] == "Q") {
             var floor = "N";
         }
@@ -918,8 +918,8 @@ if (gamePage == "rbfturm1"
             }
         }
         for (var i=0; i < coordList.length; i++) {
-            var x = parseInt(coordList[i][1]);
-            var y = parseInt(coordList[i][2]);
+            var x = parseInt(coordList[i][1], 10);
+            var y = parseInt(coordList[i][2], 10);
             addTerrain("N", x, y, terrain[i]);
         }
 
@@ -988,6 +988,8 @@ function isAllyArmee(imgEntry, allies)    // {{{2
 if( gamePage == "rbarmee" 
     || gamePage == "rbfturm1"
     || gamePage == "rbfturm2"
+    || gamePage == "rbfturma"
+    || gamePage == "rbfturms"
 ) {
     var imgEntries = document.getElementsByTagName("img");
     var bundListe = new Array();
@@ -1087,7 +1089,7 @@ if( gamePage == "rbarmee"
         armeenElem.appendChild(armeeElem);
     }                                                           // }}}3
 
-    // eigene Armeen in Armeesicht (Bilder nur als input-img)   {{{3
+    // eigene Armeen in Armeesicht (Bilder als input-img name=Armee)    {{{3
     var inputs = document.getElementsByTagName("input");
     for( var i = 0; i < inputs.length; i++ ) {
         if (inputs[i].type == "image" && inputs[i].name == "Armee") {
@@ -1131,7 +1133,7 @@ if( gamePage == "rbarmee"
                 }
                 var soldaten = unitTD.firstChild.data.split(" ")[0];
                 var siedler = unitTD.firstChild.data.split(" ")[3];
-                var size = parseInt(soldaten) + parseInt(siedler);
+                var size = parseInt(soldaten, 10) + parseInt(siedler, 10);
                 var ruf = unitTD.firstChild.data.split(" ")[6];
                 var strength = unitTD.childNodes[2].data.split(" ")[1];
                 var pos = terrainTR.childNodes[2].childNodes[1].firstChild.data;
@@ -1143,9 +1145,27 @@ if( gamePage == "rbarmee"
                         size, strength, ruf, bp, maxBP, ap, maxAP);
             }
         }
+    }                                                           //      }}}3
+
+    // eigene Armeen in Turmsicht (Bilder input-img name=ok)   {{{3
+    var inputs = document.getElementsByTagName("input");
+    for( var i = 0; i < inputs.length; i++ ) {
+        if (inputs[i].type == "image" && inputs[i].name == "ok") {
+            var match = isArmeeHandle(inputs[i]);
+            var form = inputs[i].parentNode.parentNode
+                .parentNode.parentNode.parentNode;
+            var id = form.childNodes[4].value;
+            var outerTD = form.parentNode;
+            var name = outerTD.previousSibling.firstChild.data;
+            var pos = outerTD.previousSibling.previousSibling
+                    .firstChild.data;
+            var owner = outerTD.nextSibling.childNodes[2].firstChild.data;
+
+            addArmee(pos, id, match[1], name, owner);
+        }
     }                                                   // }}}3
 
-    // fremde Armeen und Turmsicht (normale img)        {{{3
+    // fremde Armeen (normale img)              {{{3
     var imgEntries = document.getElementsByTagName("img");
     for( var i = 0; i < imgEntries.length; i++ ) {
         var match = isArmeeHandle(imgEntries[i]);
