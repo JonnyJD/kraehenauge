@@ -1,19 +1,20 @@
 
-clean:
+clean: nodebug
 	sed -i \
 		-e 's|http://test.kraehen.org/|http://kraehen.org/|' \
 		-e 's|http://localhost/|http://kraehen.org/|' \
-		-e 's|var DEBUG = true;|var DEBUG = false;|' \
 		kraehenauge.user.js
 
 debug:
 	sed -i \
 		-e 's|var DEBUG = false;|var DEBUG = true;|' \
+		-e 's|//sendDataWrapper("save?|sendDataWrapper("save?|' \
 		kraehenauge.user.js
 
 nodebug:
 	sed -i \
 		-e 's|var DEBUG = true;|var DEBUG = false;|' \
+		-e 's| sendDataWrapper("save?| //sendDataWrapper("save?|' \
 		kraehenauge.user.js
 
 local: debug

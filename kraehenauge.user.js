@@ -719,7 +719,11 @@ function sendXMLData(handler, doc, answer)                      // {{{1
     function responseFunction(text) {
         document.getElementById(answer).innerHTML = text;
     }
+    function responseFunction2(text) {
+        document.getElementById("Fehlermeldungen").innerHTML = text;
+    }
     sendDataWrapper(handler, "text/xml", data, responseFunction)
+    //sendDataWrapper("save?xml", "text/xml", data, responseFunction2)
 }                                                               // }}}1
 
 // Sende sichtbaren Text an den Server {{{1
@@ -786,7 +790,7 @@ function addTerrain(floor, x, y, terrain, name)    // {{{2
     terrainElem.appendChild(xmlDataDoc.createTextNode(terrain));
     feldElem.appendChild(terrainElem);
     if (typeof name != "undefined") {
-        var nameElem = xmlDataDoc.createElement("name");
+        var nameElem = xmlDataDoc.createElement("feldname");
         nameElem.appendChild(xmlDataDoc.createTextNode(name));
         feldElem.appendChild(nameElem);
     }
@@ -1061,7 +1065,7 @@ if( gamePage == "rbarmee"
         var bildElem = xmlDataDoc.createElement("bild");
         bildElem.appendChild(xmlDataDoc.createTextNode(img));
         armeeElem.appendChild(bildElem);
-        var nameElem = xmlDataDoc.createElement("name");
+        var nameElem = xmlDataDoc.createElement("held");
         nameElem.appendChild(xmlDataDoc.createTextNode(name));
         armeeElem.appendChild(nameElem);
         var ritterElem = xmlDataDoc.createElement("ritter");
