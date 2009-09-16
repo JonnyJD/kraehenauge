@@ -432,7 +432,6 @@ if( pageTitle.search(/Dorf (.*), Handelsd\xF6rfer/) == 0) {
 }
 //                                                      }}}1
 
-alert(gameId);
 // Armeelinks                   {{{1
 if (GM_getValue(gameId+".armeen", 0)) {
     for (var listNumber = 3; listNumber <= 4; listNumber++) { 
