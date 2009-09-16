@@ -23,7 +23,7 @@ local: debug
 		-e 's|http://test.kraehen.org/|http://localhost/|' \
 		kraehenauge.user.js
 
-test: debug
+test: nodebug
 	sed -i \
 		-e 's|http://kraehen.org/|http://test.kraehen.org/|' \
 		-e 's|http://localhost/|http://test.kraehen.org/|' \
