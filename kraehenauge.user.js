@@ -45,6 +45,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0) {
 var clientName = 'Kr\xE4henauge';
 var clientVersion = '1.4';
 var version = clientName + " " + clientVersion;
+var DEBUG = false;
 
 // Einstellungen        {{{1
 var game = {
@@ -661,6 +662,21 @@ createOutputArea("DBAntwort");
 createOutputArea("ServerZusammenfassung");
 createOutputArea("Fehlermeldungen");
 
+function printError(message, e)                 // {{{1
+{
+    printWarning(message + e);
+    if (DEBUG) {
+        // Erzwinge Abbruch, aber auch Details in der Konsole
+        printWarning("Details in der Fehlerkonsole");
+        throw e;
+    }
+}                                               // }}}1
+function printWarning(message)                    // {{{1
+{
+    var output = document.getElementById("Fehlermeldungen");
+    output.appendChild(document.createTextNode(message));
+    output.appendChild(document.createElement("br"));
+}                                               // }}}1
 // zu sendendes xml-Dokument vorbereiten                        // {{{1
 var xmlDataDoc = document.implementation.createDocument("", "", null);
 // root-Element
@@ -758,6 +774,7 @@ if (gameId == 'rbspiel1728') {
 //                                      }}}1
 
 // Landschaftserfassung         {{{1
+try {
 var felderElem = xmlDataDoc.createElement("felder");
 function addTerrain(floor, x, y, terrain, name)    // {{{2
 {
@@ -810,8 +827,6 @@ function listTerrain(terrain, floor, x, y, width, center)   //      {{{2
 
 // Erfassung in der Armee               {{{2
 if (gamePage == "rbarmee") {
-    var output = document.getElementById("Fehlermeldungen");
-
     // Kartenmittelpunkt suchen
     // = erstes Auftreten eines Kartenbildes im Code
     var imgEntries = document.getElementsByTagName("img");
@@ -819,8 +834,7 @@ if (gamePage == "rbarmee") {
     while (i < imgEntries.length
             && imgEntries[i].src.indexOf('/bild/karte/') == -1) { i++; }
     if (i == imgEntries.length) {
-        var text = "Kartenmitte konnte nicht ermittelt werden.";
-        output.appendChild(document.createTextNode(text));
+        printWarning("Kartenmitte konnte nicht ermittelt werden.");
     } else {
         // Koordinaten des Mittelpunkts
         var tdNode = imgEntries[i].parentNode.nextSibling;
@@ -845,9 +859,7 @@ if (gamePage == "rbarmee") {
         var i=0;
         while (i < tdEntries.length && tdEntries[i].width != 20) { i++; }
         if (i == tdEntries.length) {
-            output.appendChild(document.createElement("br"));
-            var text = "Kartenausschnitt nicht gefunden.";
-            output.appendChild(document.createTextNode(text));
+            printWarning("Kartenausschnitt nicht gefunden.");
         } else {
             i++; // Wir suchen die darauffolgende Zelle
             var imgEntries = tdEntries[i].getElementsByTagName("img");
@@ -874,8 +886,6 @@ if (gamePage == "rbfturm1"
         || gamePage == "rbfturm2"
         || gamePage == "rbfturma"
         || gamePage == "rbfturms") {
-    var output = document.getElementById("Fehlermeldungen");
-
     // Karte suchen
     // = erstes Auftreten eines Kartenbildes im Code
     var imgEntries = document.getElementsByTagName("img");
@@ -883,8 +893,7 @@ if (gamePage == "rbfturm1"
     while (i < imgEntries.length
             && imgEntries[i].src.indexOf('/bild/karte/') == -1) { i++; }
     if (i == imgEntries.length) {
-        var text = "Karte konnte nicht gefunden werden.";
-        output.appendChild(document.createTextNode(text));
+        printWarning("Karte konnte nicht gefunden werden.");
     } else {
         var tableNode = imgEntries[i].parentNode.parentNode.parentNode;
 
@@ -927,9 +936,13 @@ if (gamePage == "rbfturm1"
     }
 }                                                       //      }}}2
 
+} catch (e) {
+    printError("Fehler in der Landschaftserfassung: ", e);
+}
 // }}}1
 
 // Armeesortierung und Aktualisierung   {{{1
+try {
 function isShip(imgEntry)    // {{{2
 {
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/bild/icons/bew4.gif","");
@@ -1252,6 +1265,9 @@ if( gamePage == "rbarmee"
     // Ende Armeesortierung     }}}2
 
 } // ende Armeebearbeitung
+} catch (e) {
+    printError("Fehler in der Armeeerfassung: ", e);
+}
 //                              }}}1
 
 if (gamePage == "rbarmee"
@@ -1263,6 +1279,7 @@ if (gamePage == "rbarmee"
 }
 
 // Ressourcenauswertung         {{{1
+try {
 if( gamePage == "rbrinfo0" ) {
     // Finde die Warentabelle           {{{2
     var gueterTabelle = "";
@@ -1372,9 +1389,13 @@ if( gamePage == "rbrinfo0" ) {
     //                                                  }}}2
 
 } // ende Ressourcenauswertung
+} catch (e) {
+    printWarning("Fehler in der Ressourcenauswertung: " + e);
+}
 //                              }}}1
 
 // Zugauswertung                {{{1
+try {
 if (gamePage == "rbzug") {
     // finde die Gueterbilanz   {{{2
     var gueterTabelle = '';
@@ -1424,6 +1445,9 @@ if (gamePage == "rbzug") {
     }
     //                          }}}2
 } // Ende Zugauswertung
+} catch (e) {
+    printWarning("Fehler in der Zugauswertung: " + e);
+}
 //                              }}}1
 
 // debugausgabe {{{1
