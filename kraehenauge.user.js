@@ -859,35 +859,38 @@ if (gamePage == "rbarmee") {
         if (fields[1] == undefined || fields[1] == "Q") {
             var floor = "N";
         }
-        var terrain = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
-        var name = tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1');
-        addTerrain(floor, x, y, terrain, name);
+        if (fields[1] != "Q") {
+            var terrain = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
+            var name = tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1');
+            addTerrain(floor, x, y, terrain, name);
 
 
-        // Kartenausschnitt finden
-        // gekennzeichnet durch "<td width=20>&nbpsp;></td><td valign=top>"
-        // valign=top ist leider Standard, Suche nach width=20
-        var tdEntries = document.getElementsByTagName("td");
-        var i=0;
-        while (i < tdEntries.length && tdEntries[i].width != 20) { i++; }
-        if (i == tdEntries.length) {
-            printWarning("Kartenausschnitt nicht gefunden.");
-        } else {
-            i++; // Wir suchen die darauffolgende Zelle
-            var imgEntries = tdEntries[i].getElementsByTagName("img");
-            terrain = new Array();
-            for (var i=0; i < imgEntries.length; i++) {
-                if (imgEntries[i].src.indexOf("buttons") == -1) {
-                    // Alles was kein Button ist, ist hier ein Feld
-                    var num = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/,'$1');
-                    terrain.push(num);
+            // Kartenausschnitt finden
+            // gekennzeichnet durch "<td width=20>&nbpsp;></td><td valign=top>"
+            // valign=top ist leider Standard, Suche nach width=20
+            var tdEntries = document.getElementsByTagName("td");
+            var i=0;
+            while (i < tdEntries.length && tdEntries[i].width != 20) { i++; }
+            if (i == tdEntries.length) {
+                printWarning("Kartenausschnitt nicht gefunden.");
+            } else {
+                i++; // Wir suchen die darauffolgende Zelle
+                var imgEntries = tdEntries[i].getElementsByTagName("img");
+                terrain = new Array();
+                for (var i=0; i < imgEntries.length; i++) {
+                    if (imgEntries[i].src.indexOf("buttons") == -1) {
+                        // Alles was kein Button ist, ist hier ein Feld
+                        var num = imgEntries[i].src
+                            .replace(/.*\/([^\/]*)\.gif/,'$1');
+                        terrain.push(num);
+                    }
                 }
-            }
-            var width = Math.sqrt(terrain.length);
-            // x, y sind schon gesendete Zentrumskoordinaten -> true
-            listTerrain(terrain, floor, x, y, width, true);
+                var width = Math.sqrt(terrain.length);
+                // x, y sind schon gesendete Zentrumskoordinaten -> true
+                listTerrain(terrain, floor, x, y, width, true);
 
-            addDataSection(felderElem);
+                addDataSection(felderElem);
+            }
         }
     }
 
@@ -1060,59 +1063,61 @@ if( gamePage == "rbarmee"
         var posElem = xmlDataDoc.createElement("position");
         var expr = /(N|Q|U[0-9])?,? ?([0-9]+),([0-9]+)/;
         fields = expr.exec(pos);
-        if (typeof fields[1] == "undefined" || fields[1] == "Q") {
+        if (typeof fields[1] == "undefined") {
             level = "N";
         } else {
             level = fields[1];
         }
-        posElem.setAttribute("level", level);
-        posElem.setAttribute("x", fields[2]);
-        posElem.setAttribute("y", fields[3]);
-        armeeElem.appendChild(posElem);
-        var bildElem = xmlDataDoc.createElement("bild");
-        bildElem.appendChild(xmlDataDoc.createTextNode(img));
-        armeeElem.appendChild(bildElem);
-        var nameElem = xmlDataDoc.createElement("held");
-        nameElem.appendChild(xmlDataDoc.createTextNode(name));
-        armeeElem.appendChild(nameElem);
-        var ritterElem = xmlDataDoc.createElement("ritter");
-        if (owner === null) {
-            ritterElem.setAttribute("r_id", gameId.substr(7));
-        } else {
-            ritterElem.appendChild(xmlDataDoc.createTextNode(owner));
-        }
-        armeeElem.appendChild(ritterElem);
-        if (typeof size != "undefined") {
-            var sizeElem = xmlDataDoc.createElement("size");
-            sizeElem.setAttribute("now", size);
-            if (typeof ruf != "undefined") {
-                sizeElem.setAttribute("max", ruf);
+        if (level != "Q") {
+            posElem.setAttribute("level", level);
+            posElem.setAttribute("x", fields[2]);
+            posElem.setAttribute("y", fields[3]);
+            armeeElem.appendChild(posElem);
+            var bildElem = xmlDataDoc.createElement("bild");
+            bildElem.appendChild(xmlDataDoc.createTextNode(img));
+            armeeElem.appendChild(bildElem);
+            var nameElem = xmlDataDoc.createElement("held");
+            nameElem.appendChild(xmlDataDoc.createTextNode(name));
+            armeeElem.appendChild(nameElem);
+            var ritterElem = xmlDataDoc.createElement("ritter");
+            if (owner === null) {
+                ritterElem.setAttribute("r_id", gameId.substr(7));
+            } else {
+                ritterElem.appendChild(xmlDataDoc.createTextNode(owner));
             }
-            armeeElem.appendChild(sizeElem);
-        }
-        if (typeof strength != "undefined") {
-            var strengthElem = xmlDataDoc.createElement("strength");
-            strengthElem.setAttribute("now", strength);
-            armeeElem.appendChild(strengthElem);
-        }
-        if (typeof bp != "undefined") {
-            var bpElem = xmlDataDoc.createElement("bp");
-            bpElem.setAttribute("now", bp);
-            if (typeof maxBP != "undefined") {
-                bpElem.setAttribute("max", maxBP);
+            armeeElem.appendChild(ritterElem);
+            if (typeof size != "undefined") {
+                var sizeElem = xmlDataDoc.createElement("size");
+                sizeElem.setAttribute("now", size);
+                if (typeof ruf != "undefined") {
+                    sizeElem.setAttribute("max", ruf);
+                }
+                armeeElem.appendChild(sizeElem);
             }
-            armeeElem.appendChild(bpElem);
-        }
-        if (typeof ap != "undefined") {
-            var apElem = xmlDataDoc.createElement("ap");
-            apElem.setAttribute("now", ap);
-            if (typeof maxAP != "undefined") {
-                apElem.setAttribute("max", maxAP);
+            if (typeof strength != "undefined") {
+                var strengthElem = xmlDataDoc.createElement("strength");
+                strengthElem.setAttribute("now", strength);
+                armeeElem.appendChild(strengthElem);
             }
-            armeeElem.appendChild(apElem);
+            if (typeof bp != "undefined") {
+                var bpElem = xmlDataDoc.createElement("bp");
+                bpElem.setAttribute("now", bp);
+                if (typeof maxBP != "undefined") {
+                    bpElem.setAttribute("max", maxBP);
+                }
+                armeeElem.appendChild(bpElem);
+            }
+            if (typeof ap != "undefined") {
+                var apElem = xmlDataDoc.createElement("ap");
+                apElem.setAttribute("now", ap);
+                if (typeof maxAP != "undefined") {
+                    apElem.setAttribute("max", maxAP);
+                }
+                armeeElem.appendChild(apElem);
+            }
+            armeenElem.appendChild(armeeElem);
+            dataGathered = true;
         }
-        armeenElem.appendChild(armeeElem);
-        dataGathered = true;
     }                                                           // }}}3
 
     // eigene Armeen in Armeesicht (Bilder als input-img name=Armee)    {{{3
