@@ -31,3 +31,6 @@ test: nodebug
 
 regress: local nodebug
 	cd regress; exec ./test.sh
+
+test-regress: test
+	cd regress; exec ./test.sh

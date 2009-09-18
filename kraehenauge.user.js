@@ -171,6 +171,8 @@ else if (pageTitle.indexOf('Allianzen') == 0)
 // Individualseiten     {{{2
 else if (pageTitle.indexOf('Armee - Schiffsturm') == 0)
     gamePage = 'rbfturms';
+else if (pageTitle.indexOf('Armeekampf ') == 0)
+    gamePage = 'rbarmeewar';
 else if (pageTitle.indexOf('Armee') == 0)
     gamePage = 'rbarmee';
 else if (pageTitle.search(/Dorf (.*), Handelsbude/) == 0)
@@ -691,6 +693,18 @@ var clientElem = xmlDataDoc.createElement("client");
 clientElem.setAttribute("name",clientName);
 clientElem.setAttribute("version",clientVersion);
 augeElem.appendChild(clientElem);
+var sichtElem = xmlDataDoc.createElement("sicht");
+if(gamePage == "rbfturm1" || gamePage == "rbfturm2"
+    || gamePage == "rbfturma" || gamePage == "rbfturms") {
+    sichtElem.setAttribute("type","turm");
+} else if (gamePage == "rbarmee"
+            && wholePage.indexOf("aus dem Dorf rausgehen") == -1
+            && wholePage.indexOf("fliehen") == -1) {
+    sichtElem.setAttribute("type","armee");
+} else {
+    sichtElem.setAttribute("type","keine");
+}
+augeElem.appendChild(sichtElem);
 dataElem.appendChild(augeElem);
 
 var dataGathered = false;
@@ -756,7 +770,9 @@ copyText = visibleText(wholePage);
 
 if (gamePage == "rbarmee") {
 
-    sendToHandler("send/text/armee", "dorftext", copyText, "DBAntwort");
+    if (wholePage.indexOf("fliehen") == -1) {
+        sendToHandler("send/text/armee", "dorftext", copyText, "DBAntwort");
+    }
 }
 
 if (gamePage == "rbfturm1"
