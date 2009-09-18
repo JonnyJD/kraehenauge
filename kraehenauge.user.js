@@ -140,7 +140,7 @@ else if (pageTitle.indexOf('\xD6ffentliche Chronik') == 0)
 else if (pageTitle.indexOf('die letzten Ereignisse') == 0)
     gamePage = 'rbereignis';
 else if (pageTitle.indexOf('Nachrichten') == 0)
-    gamePage = 'rbnachr1';
+    gamePage = 'rbnachr1'; // rbnachr2 faellt hier auch drunter
 else if (pageTitle.indexOf('laufende Quests') == 0)
     gamePage = 'rbquest';
 else if (pageTitle.indexOf('T\xFCrme der Allianz') == 0)
@@ -173,6 +173,16 @@ else if (pageTitle.indexOf('Armee - Schiffsturm') == 0)
     gamePage = 'rbfturms';
 else if (pageTitle.indexOf('Armeekampf ') == 0)
     gamePage = 'rbarmeewar';
+else if (pageTitle.search(/Armee von (.*), Infos/) == 0)
+    gamePage = 'rbarmeei';
+else if (pageTitle.search(/Armee von (.*), Ausr\xFCsten/) == 0)
+    gamePage = 'rbarmeeruest';
+else if (pageTitle.search(/Armee von (.*), Tr\xE4nke einnehmen/) == 0)
+    gamePage = 'rbarmeetrank';
+else if (pageTitle.indexOf('G\xFCtertransfer zwischen Armeen') == 0)
+    gamePage = 'rbarmeegtr2';
+else if (pageTitle.indexOf('Menschentransfer zwischen Armeen') == 0)
+    gamePage = 'rbarmeemtr2';
 else if (pageTitle.indexOf('Armee') == 0)
     gamePage = 'rbarmee';
 else if (pageTitle.search(/Dorf (.*), Handelsbude/) == 0)
@@ -185,6 +195,8 @@ else if (pageTitle.search(/Dorf (.*), Turmsicht\(2\)/) == 0)
     gamePage = 'rbfturm2';
 else if (pageTitle.search(/Dorf (.*), Turmsicht/) == 0)
     gamePage = 'rbfturm1';
+else if (pageTitle.indexOf('Dorf ') == 0)
+    gamePage = 'rbkarte';
 else if (pageTitle.indexOf('Ressourcen im Dorf ') == 0)
     gamePage = 'rbrinfo';
 else if (pageTitle.indexOf('Allianz ') == 0)
