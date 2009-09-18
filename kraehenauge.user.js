@@ -696,13 +696,13 @@ augeElem.appendChild(clientElem);
 var sichtElem = xmlDataDoc.createElement("sicht");
 if(gamePage == "rbfturm1" || gamePage == "rbfturm2"
     || gamePage == "rbfturma" || gamePage == "rbfturms") {
-    sichtElem.setAttribute("type","turm");
+    sichtElem.setAttribute("typ","turm");
 } else if (gamePage == "rbarmee"
             && wholePage.indexOf("aus dem Dorf rausgehen") == -1
             && wholePage.indexOf("fliehen") == -1) {
-    sichtElem.setAttribute("type","armee");
+    sichtElem.setAttribute("typ","armee");
 } else {
-    sichtElem.setAttribute("type","keine");
+    sichtElem.setAttribute("typ","keine");
 }
 augeElem.appendChild(sichtElem);
 dataElem.appendChild(augeElem);
