@@ -1050,7 +1050,7 @@ if( gamePage == "rbarmee"
     var imgEntries = document.getElementsByTagName("img");
     var bundListe = new Array();
     var feindListe = new Array();
-    var lastAction = 0;
+    var lastAction = "none";
 
     // Armeen identifizieren    {{{2
     for( var i = 0; i < imgEntries.length; i++ ) {
@@ -1058,22 +1058,21 @@ if( gamePage == "rbarmee"
             // Verbuendete Armee
             bundListe.push(imgEntries[i].parentNode.parentNode);
             lastAction = "bund";
-        } else {
-            if(isAllyArmee(imgEntries[i], hostileAllies)) {
-                // Feindliche Armee
-                feindListe.push(
-                        imgEntries[i].parentNode.parentNode);
-                lastAction = "feind";
-                feind = true;
-            } else if (isShip(imgEntries[i])) {
-                if (lastAction == "bund") {
-                    bundListe.push(imgEntries[i].parentNode.parentNode);
-                } else if (lastAction == "feind") {
-                    feindListe.push(imgEntries[i].parentNode.parentNode);
-                }
-            } else {
-                lastAction == "none";
+        } else if(isAllyArmee(imgEntries[i], hostileAllies)) {
+            // Feindliche Armee
+            feindListe.push(imgEntries[i].parentNode.parentNode);
+            lastAction = "feind";
+            feind = true;
+        } else if (isShip(imgEntries[i])) {
+            //alert(lastAction + " - " + imgEntries[i-1].src);
+            if (lastAction == "bund") {
+                bundListe.push(imgEntries[i].parentNode.parentNode);
+            } else if (lastAction == "feind") {
+                feindListe.push(imgEntries[i].parentNode.parentNode);
             }
+        } else if (isArmeeHandle(imgEntries[i])) {
+        //} else {
+            lastAction = "none";
         }
     }
     //                          }}}2
