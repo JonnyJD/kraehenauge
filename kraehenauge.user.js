@@ -1355,8 +1355,8 @@ if(gamePage == "rbtavernesold") { //    {{{2
             var maxBP = bpTD.firstChild.data;
             var maxAP = bpTD.nextSibling.firstChild.data;
             var ruf = bpTD.nextSibling.nextSibling.firstChild.data;
-            var maxDauer = bpTD.nextSibling.nextSibling.firstChild.data;
-            maxDauer = maxDauer.split()[0];
+            var maxDauer = bpTD.nextSibling.nextSibling.nextSibling
+                .firstChild.data.split(" ")[0];
             var id = bpTD.nextSibling.nextSibling.nextSibling
                 .nextSibling.nextSibling.firstChild.name;
             id = id.replace(/armee\[(.+)\]/, '$1');
