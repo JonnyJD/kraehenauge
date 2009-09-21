@@ -1034,6 +1034,13 @@ function isArmeeHandle(imgEntry)        // {{{2
 function isAllyArmee(imgEntry, allies)    // {{{2
 // Das Allianztag einer der Allianzen in allies
 {
+    var box = imgEntry.parentNode.parentNode;
+    if (box.innerHTML.indexOf("Held:")          != -1
+        || box.innerHTML.indexOf("Bei:")        != -1
+       ) {
+        // den laufenden Held und der Transporterkapitaen nicht verschieben
+        return false;
+    }
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
         allies+".gif","");
     if (!isArmee(imgEntry) || isOwn(imgEntry)) {
@@ -1158,14 +1165,12 @@ if( gamePage == "rbarmee"
             lastAction = "feind";
             feind = true;
         } else if (isShip(imgEntries[i])) {
-            //alert(lastAction + " - " + imgEntries[i-1].src);
             if (lastAction == "bund") {
                 bundListe.push(imgEntries[i].parentNode.parentNode);
             } else if (lastAction == "feind") {
                 feindListe.push(imgEntries[i].parentNode.parentNode);
             }
         } else if (isArmeeHandle(imgEntries[i])) {
-        //} else {
             lastAction = "none";
         }
     }
@@ -1210,6 +1215,13 @@ if( gamePage == "rbarmee"
                     // laufender Held
                     var unitTD = outerTD.parentNode.nextSibling.childNodes[2];
                     var terrainTR = outerTD.parentNode.nextSibling.nextSibling;
+                    if (unitTD.firstChild.data.split(" ")[1] != "Soldaten") {
+                        // Ist Fahrgast in einem Transporter
+                        var unitTD = outerTD.parentNode.nextSibling
+                            .nextSibling.nextSibling.childNodes[2];
+                        var terrainTR = outerTD.parentNode.nextSibling
+                            .nextSibling.nextSibling.nextSibling;
+                    }
                 } else {
                     // Schiff
                     var unitTD = outerTD.parentNode.nextSibling
