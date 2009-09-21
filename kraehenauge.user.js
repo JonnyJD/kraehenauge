@@ -1359,7 +1359,7 @@ if(gamePage == "rbtavernesold") { //    {{{2
                 .firstChild.data.split(" ")[0];
             var id = bpTD.nextSibling.nextSibling.nextSibling
                 .nextSibling.nextSibling.firstChild.name;
-            id = id.replace(/armee\[(.+)\]/, '$1');
+            id = id.replace(/(armee|soeldner)\[(.+)\]/, '$2');
 
             addArmee(null, id, img, name, null, null, null,
                     ruf, null, maxBP, null, maxAP,
