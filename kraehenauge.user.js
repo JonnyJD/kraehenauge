@@ -1023,7 +1023,7 @@ function isArmeeHandle(imgEntry)        // {{{2
 // Das Heldenbild der Armee, womit die Armee eindeutig ist
 {
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held/"
-            + "(h[^/.]+|[0-9]+|transport[^/.]*)","");
+            + "(h[^/.]+|[0-9]+|e_[^/.]+|transport[^/.]*)","");
     var match = pattern.exec(imgEntry.src);
     if (isArmee(imgEntry)  && match) {
         return match;
