@@ -112,26 +112,28 @@ var debugOut = "";
 //                      }}}1
 
 // Seitenerkennung      {{{1
-var gamePage = '';
-var fontTags = document.getElementsByTagName('font');
-var pageTitle = '';
-for (var i=0; i < fontTags.length; i++) {
-    if (fontTags[i].face == "Diploma"
-        && fontTags[i].firstChild.data
-        && fontTags[i].firstChild.data.indexOf('\xA9') == -1
-        && (fontTags[i].size == 5 || fontTags[i].size == 6)
-    ) {
-        pageTitle = fontTags[i].firstChild.data;
-        break;
-    } else if (fontTags[i].face == "Diploma"
-        && fontTags[i].firstChild.nodeName == "CENTER"
-        && (fontTags[i].size == 5 || fontTags[i].size == 6)
-    ) {
-        // rbzug macht nen extra center tag
-        pageTitle = fontTags[i].firstChild.firstChild.data;
-        break;
+function getPageName()
+{
+    var gamePage = '';
+    var fontTags = document.getElementsByTagName('font');
+    var pageTitle = '';
+    for (var i=0; i < fontTags.length; i++) {
+        if (fontTags[i].face == "Diploma"
+            && fontTags[i].firstChild.data
+            && fontTags[i].firstChild.data.indexOf('\xA9') == -1
+            && (fontTags[i].size == 5 || fontTags[i].size == 6)
+        ) {
+            pageTitle = fontTags[i].firstChild.data;
+            break;
+        } else if (fontTags[i].face == "Diploma"
+            && fontTags[i].firstChild.nodeName == "CENTER"
+            && (fontTags[i].size == 5 || fontTags[i].size == 6)
+        ) {
+            // rbzug macht nen extra center tag
+            pageTitle = fontTags[i].firstChild.firstChild.data;
+            break;
+        }
     }
-}
 // allgemeine Seiten    {{{2
 if (pageTitle.indexOf('Thronsaal') == 0)
     gamePage = 'rbstart';
@@ -204,6 +206,9 @@ else if (pageTitle.search('Taverne im Dorf (.*), Söldner-Helden anheuern') == 0
 else if (pageTitle.indexOf('Allianz ') == 0)
     gamePage = 'rbally2';
 //                      }}}2
+    return gamePage
+}
+gamePage = getPageName();
 //                      }}}1
 
 // Bereiche fuer die Linkleisten einfuegen      {{{1
@@ -433,7 +438,7 @@ if( gamePage == "rbstart" ) {
 //                                                      }}}1
 
 // Handelsbude einlesen aus einer Handelsdorfseite      {{{1
-if( pageTitle.search(/Dorf (.*), Handelsd\xF6rfer/) == 0) {
+if(gamePage == "rbfhandelb") {
     // nur formlinks im unveraenderten mittelteil suchen
     var zentrum = document.getElementById("zentrum");
     var formEins = zentrum.getElementsByTagName("form")[0];
@@ -1154,26 +1159,30 @@ if( gamePage == "rbarmee"
     var lastAction = "none";
 
     // Armeen identifizieren    {{{2
-    for( var i = 0; i < imgEntries.length; i++ ) {
-        if (isAllyArmee(imgEntries[i], friendlyAllies)) {
-            // Verbuendete Armee
-            bundListe.push(imgEntries[i].parentNode.parentNode);
-            lastAction = "bund";
-        } else if(isAllyArmee(imgEntries[i], hostileAllies)) {
-            // Feindliche Armee
-            feindListe.push(imgEntries[i].parentNode.parentNode);
-            lastAction = "feind";
-            feind = true;
-        } else if (isShip(imgEntries[i])) {
-            if (lastAction == "bund") {
+    function identifyArmies()
+    {
+        for( var i = 0; i < imgEntries.length; i++ ) {
+            if (isAllyArmee(imgEntries[i], friendlyAllies)) {
+                // Verbuendete Armee
                 bundListe.push(imgEntries[i].parentNode.parentNode);
-            } else if (lastAction == "feind") {
+                lastAction = "bund";
+            } else if(isAllyArmee(imgEntries[i], hostileAllies)) {
+                // Feindliche Armee
                 feindListe.push(imgEntries[i].parentNode.parentNode);
+                lastAction = "feind";
+                feind = true;
+            } else if (isShip(imgEntries[i])) {
+                if (lastAction == "bund") {
+                    bundListe.push(imgEntries[i].parentNode.parentNode);
+                } else if (lastAction == "feind") {
+                    feindListe.push(imgEntries[i].parentNode.parentNode);
+                }
+            } else if (isArmeeHandle(imgEntries[i])) {
+                lastAction = "none";
             }
-        } else if (isArmeeHandle(imgEntries[i])) {
-            lastAction = "none";
         }
     }
+    identifyArmies();
     //                          }}}2
 
     // Armeeaktualisierung      {{{2
@@ -1181,6 +1190,8 @@ if( gamePage == "rbarmee"
 
     // eigene Armeen in Armeesicht (Bilder als input-img name=Armee)    {{{3
     var inputs = document.getElementsByTagName("input");
+    function ownArmiesInArmyView()
+    {
     for( var i = 0; i < inputs.length; i++ ) {
         if (inputs[i].type == "image" && inputs[i].name == "Armee") {
             var match = isArmeeHandle(inputs[i]);
@@ -1236,36 +1247,44 @@ if( gamePage == "rbarmee"
                 var strength = unitTD.childNodes[2].data.split(" ")[1];
                 var pos = terrainTR.childNodes[2].childNodes[1].firstChild.data;
                 // aktuelle Position, wird spaeter von anderen genutzt !!!
-                var currentPos = pos;
+                currentPos = pos;
                 var owner = "[self]";
 
                 addArmee(pos, id, match[1], name, owner,
                         size, strength, ruf, bp, maxBP, ap, maxAP);
             }
         }
+    }
     }                                                           //      }}}3
+    ownArmiesInArmyView();
 
     // eigene Armeen in Turmsicht (Bilder input-img name=ok)   {{{3
     var inputs = document.getElementsByTagName("input");
-    for( var i = 0; i < inputs.length; i++ ) {
-        if (inputs[i].type == "image" && inputs[i].name == "ok") {
-            var match = isArmeeHandle(inputs[i]);
-            if (!match) { break; }
-            var form = inputs[i].parentNode.parentNode
-                .parentNode.parentNode.parentNode;
-            var id = form.childNodes[4].value;
-            var outerTD = form.parentNode;
-            var name = outerTD.previousSibling.firstChild.data;
-            var pos = outerTD.previousSibling.previousSibling
-                    .firstChild.data;
-            var owner = outerTD.nextSibling.childNodes[2].firstChild.data;
+    function ownArmiesInTower()
+    {
+        for( var i = 0; i < inputs.length; i++ ) {
+            if (inputs[i].type == "image" && inputs[i].name == "ok") {
+                var match = isArmeeHandle(inputs[i]);
+                if (!match) { break; }
+                var form = inputs[i].parentNode.parentNode
+                    .parentNode.parentNode.parentNode;
+                var id = form.childNodes[4].value;
+                var outerTD = form.parentNode;
+                var name = outerTD.previousSibling.firstChild.data;
+                var pos = outerTD.previousSibling.previousSibling
+                        .firstChild.data;
+                var owner = outerTD.nextSibling.childNodes[2].firstChild.data;
 
-            addArmee(pos, id, match[1], name, owner);
+                addArmee(pos, id, match[1], name, owner);
+            }
         }
     }                                                   // }}}3
+    ownArmiesInTower();
 
     // fremde Armeen (normale img)              {{{3
     var imgEntries = document.getElementsByTagName("img");
+    function foreignArmies ()
+    {
     for( var i = 0; i < imgEntries.length; i++ ) {
         var match = isArmeeHandle(imgEntries[i]);
         if (match) {
@@ -1309,7 +1328,9 @@ if( gamePage == "rbarmee"
                addArmee(pos, id, img, name, owner);
             }
         }
+    }
     }                                           // }}}3
+    foreignArmies();
 
     addDataSection(armeenElem);
 
