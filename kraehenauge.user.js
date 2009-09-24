@@ -995,7 +995,6 @@ if (gamePage == "rbfturm1"
 try {
 function isShip(imgEntry)    // {{{2
 {
-    var pattern = new RegExp("http://www.ritterburgwelt.de/rb/bild/icons/bew4.gif","");
     if (imgEntry.src == "http://www.ritterburgwelt.de/rb/bild/icons/bew4.gif") {
         return true;
     } else {
@@ -1030,8 +1029,8 @@ function isArmeeHandle(imgEntry)        // {{{2
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held/"
             + "(h[^/.]+|[0-9]+|e_[^/.]+|transport[^/.]*)","");
     var match = pattern.exec(imgEntry.src);
-    if (isArmee(imgEntry)  && match) {
-        return match;
+    if (match && isArmee(imgEntry)) {
+        return true;
     } else {
         return false;
     }
@@ -1039,19 +1038,18 @@ function isArmeeHandle(imgEntry)        // {{{2
 function isAllyArmee(imgEntry, allies)    // {{{2
 // Das Allianztag einer der Allianzen in allies
 {
-    var box = imgEntry.parentNode.parentNode;
-    if (box.innerHTML.indexOf("Held:")          != -1
-        || box.innerHTML.indexOf("Bei:")        != -1
-       ) {
-        // den laufenden Held und der Transporterkapitaen nicht verschieben
-        return false;
-    }
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
         allies+".gif","");
-    if (!isArmee(imgEntry) || isOwn(imgEntry)) {
-        return false;
-    } else {
-        return pattern.exec(imgEntry.src);
+    match = pattern.exec(imgEntry.src);
+    var box = imgEntry.parentNode.parentNode;
+    if (match && isArmee(imgEntry) && !isOwn(imgEntry)
+            && box.innerHTML.indexOf("Held:")   == -1
+            && box.innerHTML.indexOf("Bei:")    == -1
+       ) {
+        // den laufenden Held, den Transporterkapitaen, Eigene
+        // und natuerlich Nicht-Armeen nicht verschieben
+        // Ausnahme fuer Schiffe kommt spaeter
+        return match;
     }
 }                                       // }}}2
 
