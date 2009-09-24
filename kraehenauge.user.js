@@ -1030,7 +1030,7 @@ function isArmeeHandle(imgEntry)        // {{{2
             + "(h[^/.]+|[0-9]+|e_[^/.]+|transport[^/.]*)","");
     var match = pattern.exec(imgEntry.src);
     if (match && isArmee(imgEntry)) {
-        return true;
+        return match;
     } else {
         return false;
     }
