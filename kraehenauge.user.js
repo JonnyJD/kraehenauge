@@ -1350,15 +1350,18 @@ if( gamePage == "rbarmee"
     }
     //                                  }}}3
     // Zusammenfassung          {{{3
-    for( var i = 0; i < imgEntries.length; i++ ) {
-        if (imgEntries[i].src
-                == "http://www.ritterburgwelt.de/rb/bild/gui/boxtrenn0.gif"
-                && (feindListe.length + bundListe.length) > 0) {
-            temp = document.createTextNode("Hier stehen " +
-                    feindListe.length + " Feinde und " +
-                    bundListe.length + " Verb\xFCndete.");
-            imgEntries[i].parentNode.parentNode.parentNode.appendChild(temp);
-            break;
+    if (feindListe.length + bundListe.length > 0) {
+        for( var i = 0; i < imgEntries.length; i++ ) {
+            if (imgEntries[i].src
+                    == "http://www.ritterburgwelt.de/rb/bild/gui/boxtrenn0.gif"
+                ) {
+                temp = document.createTextNode("Hier stehen " +
+                        feindListe.length + " Feinde und " +
+                        bundListe.length + " Verb\xFCndete.");
+                imgEntries[i].parentNode.parentNode.parentNode
+                    .appendChild(temp);
+                break;
+            }
         }
     }
 
