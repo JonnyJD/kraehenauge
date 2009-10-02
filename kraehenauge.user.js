@@ -649,7 +649,22 @@ if (gamePage == "rbftop10"
         || gamePage == "rbfhandel1"
         || gamePage == "rbrinfo"
         || gamePage == "rbrinfo0") {
-    sendToScanner();
+
+    /* rbfhandel1 hat eine Unterseite zum hinzufuegen von Warentypen
+     * diese soll nicht geschickt werden, weil der kskscanner
+     * diese falsch parst und die preisdatei korrumpiert
+     */
+    var mark_all = false;
+    var inputs = document.getElementsByTagName("input");
+    for( var i = 0; i < inputs.length; i++ ) {
+        if (inputs[i].type == "checkbox" && inputs[i].name == "mark_all") {
+            mark_all = true;
+            break;
+        }
+    }
+    if (!mark_all) {
+        sendToScanner();
+    }
     //saveToServer();
 }
 //                                      }}}1
