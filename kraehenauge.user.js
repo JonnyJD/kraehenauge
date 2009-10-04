@@ -232,6 +232,7 @@ newTD.appendChild(newDiv); newTR.appendChild(newTD);
 // Punkt um altes Zentrum einzuhaengen
 newTD = document.createElement('td');
 newTD.id = "zentrum";
+newTD.style.textAlign = "center"; newTD.style.verticalAlign = "top";
 newTR.appendChild(newTD);
 newTD = document.createElement('td');
 newTD.style.textAlign = "center"; newTD.style.verticalAlign = "top";
