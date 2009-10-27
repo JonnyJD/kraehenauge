@@ -17,7 +17,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0
             == "http://www.ritterburgwelt.de/rb/ajax_backend.php") {
     function sendDataWrapper(handler, type, data, responseFunction) {{{2
     {
-        var url = "http://test.kraehen.org/" + handler;
+        var url = "http://kraehen.org/" + handler;
         if (typeof opera != "undefined") {
             var xmlhttp = new opera.XMLHttpRequest();
             xmlhttp.setRequestHeader("Content-type", type);
@@ -483,7 +483,7 @@ kskKarte.title = "Kr\xE4henkarte"
 kskKarte.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskKarte.style.border = "1px solid red";
 var newLink = document.createElement('a');
-newLink.href = "http://test.kraehen.org/show/karten";
+newLink.href = "http://kraehen.org/show/karten";
 newLink.target = "_blank";
 newLink.appendChild(kskKarte);
 document.getElementById('Leiste4').appendChild(newLink);
@@ -603,7 +603,7 @@ kskTag.title = "Preise";
 kskTag.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskTag.style.border = "1px solid red";
 var newLink = document.createElement('a');
-newLink.href = "http://test.kraehen.org/preise";
+newLink.href = "http://kraehen.org/preise";
 newLink.target = "_blank";
 newLink.appendChild(kskTag);
 document.getElementById('Leiste4').appendChild(newLink);
