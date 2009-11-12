@@ -173,6 +173,8 @@ else if (pageTitle.indexOf('Allianzen') == 0)
 // Individualseiten     {{{2
 else if (pageTitle.indexOf('Armee - Schiffsturm') == 0)
     gamePage = 'rbfturms';
+else if (pageTitle.indexOf('Armee - Spionage') == 0)
+    gamePage = 'rbspiona1';
 else if (pageTitle.indexOf('Armeekampf ') == 0)
     gamePage = 'rbarmeewar';
 else if (pageTitle.search(/Armee von (.*), Infos/) == 0)
