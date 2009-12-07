@@ -1311,26 +1311,32 @@ if( gamePage == "rbarmee"
                 var outerTD = imgEntries[i].parentNode.parentNode
                     .parentNode.parentNode.parentNode;
                 var name = outerTD.previousSibling.firstChild.firstChild.data;
-                var size = outerTD.previousSibling.childNodes[2].data;
-                size = size.split(" ")[1];
-                var strength = outerTD.previousSibling.childNodes[4].data;
-                strength = strength.split(" ")[1];
-                var owner = outerTD.nextSibling.childNodes[1].firstChild.data;
-                var secondForm = outerTD.nextSibling.nextSibling.firstChild;
-                // ID nur wenn angreifbar hier per Form (kein Schutz)
-                if (secondForm.getElementsByTagName) {
-                    var inputs = secondForm.getElementsByTagName("input");
-                    for (var j = 0; j < inputs.length; j++) {
-                        if (inputs[j].name == "armee2") {
-                            var id = inputs[j].value;
-                            break;
+                if(name != "Bei:") {
+                    /* "Bei:" -> Kapitaen des Schiffs auf dem man ist
+                     * dieser wird spaeter auch weiter unten nochmal gezeigt,
+                     * also hier erstmal ignoriert
+                     */
+                    var size = outerTD.previousSibling.childNodes[2].data;
+                    size = size.split(" ")[1];
+                    var strength = outerTD.previousSibling.childNodes[4].data;
+                    strength = strength.split(" ")[1];
+                    var owner = outerTD.nextSibling.childNodes[1].firstChild.data;
+                    var secondForm = outerTD.nextSibling.nextSibling.firstChild;
+                    // ID nur wenn angreifbar hier per Form (kein Schutz)
+                    if (secondForm.getElementsByTagName) {
+                        var inputs = secondForm.getElementsByTagName("input");
+                        for (var j = 0; j < inputs.length; j++) {
+                            if (inputs[j].name == "armee2") {
+                                var id = inputs[j].value;
+                                break;
+                            }
                         }
+                    } else {
+                        var id = null;      // keine ID zu bekommen
                     }
-                } else {
-                    var id = null;      // keine ID zu bekommen
-                }
 
-                addArmee(pos, id, img, name, owner, size, strength);
+                    addArmee(pos, id, img, name, owner, size, strength);
+                }
             } else {
                 // in einer Turmsicht
                 var outerTD = imgEntries[i].parentNode.parentNode
