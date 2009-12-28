@@ -1075,17 +1075,22 @@ function isAllyArmee(imgEntry, allies)    // {{{2
     }
 }                                       // }}}2
 
-function addArmee(pos, id, img, name, owner, size, strength,        // {{{2
-        ruf, bp, maxBP, ap, maxAP, schiffsTyp, schiffsLast, dauer, maxDauer)
+function armeeObjekt(id, img, name) {                   // {{{2
+    this.id = id;
+    this.img = img;
+    this.name = name;
+    this.add = addArmee;
+}
+function addArmee()
 {
     var armeeElem = xmlDataDoc.createElement("armee");
-    if (id !== null) {
-        armeeElem.setAttribute("h_id", id);
+    if (this.id !== null) {
+        armeeElem.setAttribute("h_id", this.id);
     }
     var posElem = xmlDataDoc.createElement("position");
-    if (pos !== null) {
+    if (this.pos !== null) {
         var expr = /(N|Q|U[0-9])?,? ?([0-9]+),([0-9]+)/;
-        fields = expr.exec(pos);
+        fields = expr.exec(this.pos);
         if (typeof fields[1] == "undefined") {
             level = "N";
         } else {
@@ -1095,70 +1100,70 @@ function addArmee(pos, id, img, name, owner, size, strength,        // {{{2
         // spaeter noch Tempel moeglich
         posElem.appendChild(xmlDataDoc.createTextNode("taverne"));
     }
-    if (pos === null || level != "Q") {
-        if (pos != null) {
+    if (this.pos === null || level != "Q") {
+        if (this.pos != null) {
             posElem.setAttribute("level", level);
             posElem.setAttribute("x", fields[2]);
             posElem.setAttribute("y", fields[3]);
         }
         armeeElem.appendChild(posElem);
         var bildElem = xmlDataDoc.createElement("bild");
-        bildElem.appendChild(xmlDataDoc.createTextNode(img));
+        bildElem.appendChild(xmlDataDoc.createTextNode(this.img));
         armeeElem.appendChild(bildElem);
         var nameElem = xmlDataDoc.createElement("held");
-        nameElem.appendChild(xmlDataDoc.createTextNode(name));
+        nameElem.appendChild(xmlDataDoc.createTextNode(this.name));
         armeeElem.appendChild(nameElem);
-        if (owner) {
+        if (this.owner) {
             var ritterElem = xmlDataDoc.createElement("ritter");
-            if (owner == "[self]") {
+            if (this.owner == "[self]") {
                 ritterElem.setAttribute("r_id", gameId.substr(7));
             } else {
-                ritterElem.appendChild(xmlDataDoc.createTextNode(owner));
+                ritterElem.appendChild(xmlDataDoc.createTextNode(this.owner));
             }
             armeeElem.appendChild(ritterElem);
         }
-        if (size != "undefined" || typeof ruf != "undefined") {
+        if (this.size != "undefined" || typeof this.ruf != "undefined") {
             var sizeElem = xmlDataDoc.createElement("size");
-            if (size != null) {
-                sizeElem.setAttribute("now", size);
+            if (this.size != null) {
+                sizeElem.setAttribute("now", this.size);
             }
-            if (typeof ruf != "undefined") {
-                sizeElem.setAttribute("max", ruf);
+            if (typeof this.ruf != "undefined") {
+                sizeElem.setAttribute("max", this.ruf);
             }
             armeeElem.appendChild(sizeElem);
         }
-        if (typeof strength != "undefined" && strength !== null) {
+        if (typeof this.strength != "undefined" && this.strength !== null) {
             var strengthElem = xmlDataDoc.createElement("strength");
-            strengthElem.setAttribute("now", strength);
+            strengthElem.setAttribute("now", this.strength);
             armeeElem.appendChild(strengthElem);
         }
-        if (typeof bp != "undefined" || typeof maxBP != "undefined") {
+        if (typeof this.bp != "undefined" || typeof this.maxBP != "undefined") {
             var bpElem = xmlDataDoc.createElement("bp");
-            if (bp !== null) {
-                bpElem.setAttribute("now", bp);
+            if (this.bp !== null) {
+                bpElem.setAttribute("now", this.bp);
             }
-            if (typeof maxBP != "undefined") {
-                bpElem.setAttribute("max", maxBP);
+            if (typeof this.maxBP != "undefined") {
+                bpElem.setAttribute("max", this.maxBP);
             }
             armeeElem.appendChild(bpElem);
         }
-        if (typeof ap != "undefined" || typeof maxAP != "undefined") {
+        if (typeof this.ap != "undefined" || typeof maxAP != "undefined") {
             var apElem = xmlDataDoc.createElement("ap");
-            if (ap !== null) {
-                apElem.setAttribute("now", ap);
+            if (this.ap !== null) {
+                apElem.setAttribute("now", this.ap);
             }
             if (typeof maxAP != "undefined") {
-                apElem.setAttribute("max", maxAP);
+                apElem.setAttribute("max", this.maxAP);
             }
             armeeElem.appendChild(apElem);
         }
-        if (typeof dauer != "undefined" || typeof maxDauer != "undefined") {
+        if (typeof this.dauer != "undefined" || typeof this.maxDauer != "undefined") {
             var dauerElem = xmlDataDoc.createElement("dauer");
-            if (dauer !== null) {
-                dauerElem.setAttribute("now", dauer);
+            if (this.dauer !== null) {
+                dauerElem.setAttribute("now", this.dauer);
             }
-            if (typeof maxAP != "undefined") {
-                dauerElem.setAttribute("max", maxDauer);
+            if (typeof this.maxDauer != "undefined") {
+                dauerElem.setAttribute("max", this.maxDauer);
             }
             armeeElem.appendChild(dauerElem);
         }
@@ -1233,24 +1238,26 @@ if( gamePage == "rbarmee"
             var name = outerTD.previousSibling.childNodes[0].firstChild.data;
             if (name != "Held:") {
                 // gesichtetete Armee
-                var pos = currentPos; // von aktueller Armee
-                var size = outerTD.previousSibling.childNodes[2]
+                var armee = new armeeObjekt(id, match[1], name);
+                armee.pos = currentPos; // von aktueller Armee
+                armee.size = outerTD.previousSibling.childNodes[2]
                     .data.split(" ")[1];
-                var strength = outerTD.previousSibling.childNodes[4]
+                armee.strength = outerTD.previousSibling.childNodes[4]
                     .data.split(" ")[1];
-                var owner = outerTD.nextSibling.childNodes[1].firstChild.data;
+                armee.owner = outerTD.nextSibling.childNodes[1].firstChild.data;
 
-                addArmee(pos, id, match[1], name, owner, size, strength);
+                armee.add();
             } else {
                 // laufende/aktuelle Armee
                 var name = outerTD.nextSibling.firstChild.data;
+                var armee = new armeeObjekt(id, match[1], name);
                 var statTD = outerTD.nextSibling.nextSibling.nextSibling;
                 var bp = statTD.childNodes[2].firstChild.data.split(" ")[0];
-                var maxBP = bp.split("/")[1];
-                var bp = bp.split("/")[0];
+                armee.bp = bp.split("/")[0];
+                armee.maxBP = bp.split("/")[1];
                 var ap = statTD.childNodes[4].data.split(" ")[0];
-                var maxAP = ap.split("/")[1];
-                var ap = ap.split("/")[0];
+                armee.ap = ap.split("/")[0];
+                armee.maxAP = ap.split("/")[1];
                 var bewImg = form.nextSibling.src;
                 if (bewImg.indexOf("bew4.gif") == -1) {
                     // laufender Held
@@ -1272,16 +1279,16 @@ if( gamePage == "rbarmee"
                 }
                 var soldaten = unitTD.firstChild.data.split(" ")[0];
                 var siedler = unitTD.firstChild.data.split(" ")[3];
-                var size = parseInt(soldaten, 10) + parseInt(siedler, 10);
-                var ruf = unitTD.firstChild.data.split(" ")[6];
-                var strength = unitTD.childNodes[2].data.split(" ")[1];
-                var pos = terrainTR.childNodes[2].childNodes[1].firstChild.data;
+                armee.size = parseInt(soldaten, 10) + parseInt(siedler, 10);
+                armee.ruf = unitTD.firstChild.data.split(" ")[6];
+                armee.strength = unitTD.childNodes[2].data.split(" ")[1];
+                armee.pos = terrainTR.childNodes[2].childNodes[1]
+                    .firstChild.data;
                 // aktuelle Position, wird spaeter von anderen genutzt !!!
-                currentPos = pos;
-                var owner = "[self]";
+                currentPos = armee.pos;
+                armee.owner = "[self]";
 
-                addArmee(pos, id, match[1], name, owner,
-                        size, strength, ruf, bp, maxBP, ap, maxAP);
+                armee.add()
             }
         }
     }
@@ -1301,11 +1308,12 @@ if( gamePage == "rbarmee"
                 var id = form.childNodes[4].value;
                 var outerTD = form.parentNode;
                 var name = outerTD.previousSibling.firstChild.data;
-                var pos = outerTD.previousSibling.previousSibling
+                var armee = new armeeObjekt(id, match[1], name);
+                armee.pos = outerTD.previousSibling.previousSibling
                         .firstChild.data;
-                var owner = outerTD.nextSibling.childNodes[2].firstChild.data;
+                armee.owner = outerTD.nextSibling.childNodes[2].firstChild.data;
 
-                addArmee(pos, id, match[1], name, owner);
+                armee.add();
             }
         }
     }                                                   // }}}3
@@ -1330,38 +1338,40 @@ if( gamePage == "rbarmee"
                      * dieser wird spaeter auch weiter unten nochmal gezeigt,
                      * also hier erstmal ignoriert
                      */
+                    var armee = new armeeObjekt(null, img, name);
+                    armee.pos = pos;
                     var size = outerTD.previousSibling.childNodes[2].data;
-                    size = size.split(" ")[1];
+                    armee.size = size.split(" ")[1];
                     var strength = outerTD.previousSibling.childNodes[4].data;
-                    strength = strength.split(" ")[1];
-                    var owner = outerTD.nextSibling.childNodes[1].firstChild.data;
+                    armee.strength = strength.split(" ")[1];
+                    armee.owner = outerTD.nextSibling.childNodes[1]
+                        .firstChild.data;
                     var secondForm = outerTD.nextSibling.nextSibling.firstChild;
                     // ID nur wenn angreifbar hier per Form (kein Schutz)
                     if (secondForm.getElementsByTagName) {
                         var inputs = secondForm.getElementsByTagName("input");
                         for (var j = 0; j < inputs.length; j++) {
                             if (inputs[j].name == "armee2") {
-                                var id = inputs[j].value;
+                                armee.id = inputs[j].value;
                                 break;
                             }
                         }
-                    } else {
-                        var id = null;      // keine ID zu bekommen
                     }
 
-                    addArmee(pos, id, img, name, owner, size, strength);
+                    armee.add();
                 }
             } else {
                 // in einer Turmsicht
                 var outerTD = imgEntries[i].parentNode.parentNode
                     .parentNode.parentNode.parentNode;
-                var pos = outerTD.previousSibling.previousSibling
-                    .firstChild.data;
-                var name = outerTD.previousSibling.firstChild.data;
                 var id = outerTD.nextSibling.childNodes[0].value;
-                var owner = outerTD.nextSibling.childNodes[2].firstChild.data;
+                var name = outerTD.previousSibling.firstChild.data;
+                var armee = new armeeObjekt(id, img, name);
+                armee.pos = outerTD.previousSibling.previousSibling
+                    .firstChild.data;
+                armee.owner = outerTD.nextSibling.childNodes[2].firstChild.data;
 
-               addArmee(pos, id, img, name, owner);
+                armee.add();
             }
         }
     }
