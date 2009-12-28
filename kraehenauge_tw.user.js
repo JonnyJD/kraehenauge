@@ -321,7 +321,7 @@ if (gamePage == "rbfturm1"
                 var x = parseInt(coordList[i][1], 10);
                 var y = parseInt(coordList[i][2], 10);
                 sendData += "N " + x + " " + y + " ";
-                sendData += terrain[i];
+                sendData += terrain[terrainPos];
                 sendData += "\n";
                 terrainPos++;
             }
