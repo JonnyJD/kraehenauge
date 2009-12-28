@@ -994,10 +994,14 @@ if (gamePage == "rbfturm1"
                 }
             }
         }
+        var terrainPos = 0;
         for (var i=0; i < coordList.length; i++) {
-            var x = parseInt(coordList[i][1], 10);
-            var y = parseInt(coordList[i][2], 10);
-            addTerrain("N", x, y, terrain[i]);
+            if (coordList[i] !== null) {
+                var x = parseInt(coordList[i][1], 10);
+                var y = parseInt(coordList[i][2], 10);
+                addTerrain("N", x, y, terrain[terrainPos]);
+                terrainPos++;
+            }
         }
 
         addDataSection(felderElem);
