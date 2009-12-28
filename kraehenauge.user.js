@@ -1174,8 +1174,8 @@ if( gamePage == "rbarmee"
     || gamePage == "rbfturms"
 ) {
     var imgEntries = document.getElementsByTagName("img");
-    var bundListe = new Array();
-    var feindListe = new Array();
+    var bundListe = new Array(); // von TRs
+    var feindListe = new Array(); // von TRs
     var lastAction = "none";
 
     // Armeen identifizieren    {{{2
@@ -1186,10 +1186,20 @@ if( gamePage == "rbarmee"
                 // Verbuendete Armee
                 bundListe.push(imgEntries[i].parentNode.parentNode);
                 lastAction = "bund";
+                // Schiffszugehoerigkeit mitnehmen
+                var nextTR = bundListe[bundListe.length-1].nextSibling;
+                if (nextTR.childNodes[0].colSpan == 3) {
+                    bundListe.push(nextTR);
+                }
             } else if(isAllyArmee(imgEntries[i], hostileAllies)) {
                 // Feindliche Armee
                 feindListe.push(imgEntries[i].parentNode.parentNode);
                 lastAction = "feind";
+                // Schiffszugehoerigkeit mitnehmen
+                var nextTR = feindListe[feindListe.length-1].nextSibling;
+                if (nextTR.childNodes[0].colSpan == 3) {
+                    feindListe.push(nextTR);
+                }
                 feind = true;
             } else if (isShip(imgEntries[i])) {
                 if (lastAction == "bund") {
