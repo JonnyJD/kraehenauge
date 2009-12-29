@@ -1308,6 +1308,21 @@ if( gamePage == "rbarmee"
                     armee.schiff.img = schiffTR.childNodes[1].firstChild.src
                         .replace(/.*\/(.*).gif/,"$1");
                     armee.schiff.typ = armee.schiff.img; // nur Bild vorhanden
+
+                    // Reichweitenfaerbung
+                    var weiteTD = schiffTR.childNodes[3];
+                    var rw = weiteTD.childNodes[2].firstChild.data;
+                    var maxRW = weiteTD.childNodes[3].data.split("/")[1];
+                    if (rw <= Math.ceil(maxRW/2)) {
+                        var weiteSpan = weiteTD.childNodes[2];
+                        if (rw <= Math.ceil(maxRW/4)) {
+                            weiteSpan.style.fontSize = "1.5em";
+                            weiteSpan.style.color = "red";
+                        } else {
+                            weiteSpan.style.fontSize = "1.3em";
+                            weiteSpan.style.color = "yellow";
+                        }
+                    }
                 }
                 var soldaten = unitTD.firstChild.data.split(" ")[0];
                 var siedler = unitTD.firstChild.data.split(" ")[3];
