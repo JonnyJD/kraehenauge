@@ -1074,6 +1074,24 @@ function isAllyArmee(imgEntry, allies)    // {{{2
         return match;
     }
 }                                       // }}}2
+function getShip(imgEntry)            // {{{2
+{
+    var thisTable = imgEntry.parentNode.parentNode.parentNode.parentNode;
+    var nextTR = thisTable.parentNode.parentNode.nextSibling;
+    if (nextTR && nextTR.firstChild.nextSibling
+            && nextTR.firstChild.nextSibling.childNodes.length > 2
+            && isShip(nextTR.firstChild.nextSibling.childNodes[2]) ) {
+        schiff = new Object();
+        schiff.name = nextTR.firstChild.firstChild.firstChild.data;
+        schiff.typ =  nextTR.firstChild.childNodes[2].data
+            .replace(/\((.*)\)/,"$1");
+        schiff.img = nextTR.firstChild.nextSibling.firstChild.src
+            .replace(/.*\/(.*).gif/,"$1");
+        return schiff;
+    } else {
+        return null;
+    }
+}                                       // {{{2
 
 function armeeObjekt(id, img, name) {                   // {{{2
     this.id = id;
@@ -1157,6 +1175,11 @@ function addArmee()
             }
             armeeElem.appendChild(apElem);
         }
+        if (this.schiff !== null) {
+            var schiffElem = xmlDataDoc.createElement("schiff");
+            schiffElem.setAttribute("typ", this.schiff.typ);
+            armeeElem.appendChild(schiffElem);
+        }
         if (typeof this.dauer != "undefined" || typeof this.maxDauer != "undefined") {
             var dauerElem = xmlDataDoc.createElement("dauer");
             if (this.dauer !== null) {
@@ -1193,7 +1216,7 @@ if( gamePage == "rbarmee"
                 lastAction = "bund";
                 // Schiffszugehoerigkeit mitnehmen
                 var nextTR = bundListe[bundListe.length-1].nextSibling;
-                if (nextTR.childNodes[0].colSpan == 3) {
+                if (nextTR && nextTR.childNodes[0].colSpan == 3) {
                     bundListe.push(nextTR);
                 }
             } else if(isAllyArmee(imgEntries[i], hostileAllies)) {
@@ -1245,6 +1268,8 @@ if( gamePage == "rbarmee"
                 armee.strength = outerTD.previousSibling.childNodes[4]
                     .data.split(" ")[1];
                 armee.owner = outerTD.nextSibling.childNodes[1].firstChild.data;
+                // hier hoeher gehen wegen FORM tag
+                armee.schiff = getShip(inputs[i].parentNode);
 
                 armee.add();
             } else {
@@ -1270,12 +1295,18 @@ if( gamePage == "rbarmee"
                         var terrainTR = outerTD.parentNode.nextSibling
                             .nextSibling.nextSibling.nextSibling;
                     }
+                    armee.schiff = null;
                 } else {
                     // Schiff
                     var unitTD = outerTD.parentNode.nextSibling
                         .nextSibling.nextSibling.childNodes[2];
                     var terrainTR = outerTD.parentNode.nextSibling.nextSibling
                         .nextSibling.nextSibling;
+                    var schiffTR = outerTD.parentNode.nextSibling;
+                    armee.schiff = new Object();
+                    armee.schiff.typ = schiffTR.childNodes[2].firstChild.data;
+                    armee.schiff.img = schiffTR.childNodes[1].firstChild.src
+                        .replace(/.*\/(.*).gif/,"$1");
                 }
                 var soldaten = unitTD.firstChild.data.split(" ")[0];
                 var siedler = unitTD.firstChild.data.split(" ")[3];
@@ -1312,6 +1343,8 @@ if( gamePage == "rbarmee"
                 armee.pos = outerTD.previousSibling.previousSibling
                         .firstChild.data;
                 armee.owner = outerTD.nextSibling.childNodes[2].firstChild.data;
+                // hier hoeher gehen wegen FORM tag
+                armee.schiff = getShip(inputs[i].parentNode);
 
                 armee.add();
             }
@@ -1357,6 +1390,7 @@ if( gamePage == "rbarmee"
                             }
                         }
                     }
+                    armee.schiff = getShip(imgEntries[i]);
 
                     armee.add();
                 }
@@ -1370,6 +1404,7 @@ if( gamePage == "rbarmee"
                 armee.pos = outerTD.previousSibling.previousSibling
                     .firstChild.data;
                 armee.owner = outerTD.nextSibling.childNodes[2].firstChild.data;
+                armee.schiff = getShip(imgEntries[i]);
 
                 armee.add();
             }
