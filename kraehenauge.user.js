@@ -1142,7 +1142,7 @@ function addArmee()
         }
         if (this.size != "undefined" || typeof this.ruf != "undefined") {
             var sizeElem = xmlDataDoc.createElement("size");
-            if (this.size != null) {
+            if (typeof this.size !== "undefined") {
                 sizeElem.setAttribute("now", this.size);
             }
             if (typeof this.ruf != "undefined") {
@@ -1157,7 +1157,7 @@ function addArmee()
         }
         if (typeof this.bp != "undefined" || typeof this.maxBP != "undefined") {
             var bpElem = xmlDataDoc.createElement("bp");
-            if (this.bp !== null) {
+            if (typeof this.bp != "undefined") {
                 bpElem.setAttribute("now", this.bp);
             }
             if (typeof this.maxBP != "undefined") {
@@ -1167,7 +1167,7 @@ function addArmee()
         }
         if (typeof this.ap != "undefined" || typeof maxAP != "undefined") {
             var apElem = xmlDataDoc.createElement("ap");
-            if (this.ap !== null) {
+            if (typeof this.ap != "undefined") {
                 apElem.setAttribute("now", this.ap);
             }
             if (typeof maxAP != "undefined") {
@@ -1182,7 +1182,7 @@ function addArmee()
         }
         if (typeof this.dauer != "undefined" || typeof this.maxDauer != "undefined") {
             var dauerElem = xmlDataDoc.createElement("dauer");
-            if (this.dauer !== null) {
+            if (typeof this.dauer != "undefined") {
                 dauerElem.setAttribute("now", this.dauer);
             }
             if (typeof this.maxDauer != "undefined") {
@@ -1467,24 +1467,24 @@ if(gamePage == "rbtavernesold") { //    {{{2
             var img = match[1];
             var outerTD = imgEntries[i].parentNode;
             var name = outerTD.previousSibling.firstChild.data;
+            var armee = new armeeObjekt(null, img, name);
+            armee.pos = null;
+            armee.schiff = null;
+            armee.owner = null;
             var bpTD = outerTD.nextSibling.nextSibling.nextSibling
                 .nextSibling.nextSibling.nextSibling;
-            var maxBP = bpTD.firstChild.data;
-            var maxAP = bpTD.nextSibling.firstChild.data;
-            var ruf = bpTD.nextSibling.nextSibling.firstChild.data;
-            var maxDauer = bpTD.nextSibling.nextSibling.nextSibling
+            armee.maxBP = bpTD.firstChild.data;
+            armee.maxAP = bpTD.nextSibling.firstChild.data;
+            armee.ruf = bpTD.nextSibling.nextSibling.firstChild.data;
+            armee.maxDauer = bpTD.nextSibling.nextSibling.nextSibling
                 .firstChild.data.split(" ")[0];
             var id = bpTD.nextSibling.nextSibling.nextSibling
                 .nextSibling.nextSibling.firstChild.name;
             if (id) {
-                id = id.replace(/(armee|soeldner)\[(.+)\]/, '$2');
-            } else {
-                id = null;
+                armee.id = id.replace(/(armee|soeldner)\[(.+)\]/, '$2');
             }
 
-            addArmee(null, id, img, name, null, null, null,
-                    ruf, null, maxBP, null, maxAP,
-                    null, null, null, maxDauer);
+            armee.add();
         }
     }
 
