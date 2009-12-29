@@ -378,7 +378,7 @@ if( gamePage == "rbstart" ) {
             parentTag.appendChild(newText);
         }
         
-    }
+    }                                           // }}}2
     // faerben und einlesen             {{{2
     // Anmerkung: im DOM hat die Tabelle immer ein tbody tag
     var tote = 0;
@@ -1304,9 +1304,10 @@ if( gamePage == "rbarmee"
                         .nextSibling.nextSibling;
                     var schiffTR = outerTD.parentNode.nextSibling;
                     armee.schiff = new Object();
-                    armee.schiff.typ = schiffTR.childNodes[2].firstChild.data;
+                    armee.schiff.name = schiffTR.childNodes[2].firstChild.data;
                     armee.schiff.img = schiffTR.childNodes[1].firstChild.src
                         .replace(/.*\/(.*).gif/,"$1");
+                    armee.schiff.typ = armee.schiff.img; // nur Bild vorhanden
                 }
                 var soldaten = unitTD.firstChild.data.split(" ")[0];
                 var siedler = unitTD.firstChild.data.split(" ")[3];
