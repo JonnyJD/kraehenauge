@@ -481,11 +481,11 @@ if (GM_getValue(gameId+".armeen", 0)) {
 //                              }}}1
 // Kraehenkarte                 {{{1
 var kskKarte = document.createElement('img');
-kskKarte.title = "Kr\xE4henkarte"
+kskKarte.title = "Kr\xE4hendatenbank"
 kskKarte.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskKarte.style.border = "1px solid red";
 var newLink = document.createElement('a');
-newLink.href = "http://kraehen.org/show/karten";
+newLink.href = "http://kraehen.org/show";
 newLink.target = "_blank";
 newLink.appendChild(kskKarte);
 document.getElementById('Leiste4').appendChild(newLink);
