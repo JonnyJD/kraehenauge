@@ -374,6 +374,8 @@ if( gamePage == "rbarmee"
     var bundListe = new Array();
     var feindListe = new Array();
     var lastAction = 0;
+    var bundNum = 0; // in Bundliste sind auch Schiffe
+    var feindNum = 0; // in Feindliste sind auch Schiffe
 
     // Armeen identifizieren    {{{2
     for( var i = 0; i < imgEntries.length; i++ ) {
@@ -381,12 +383,14 @@ if( gamePage == "rbarmee"
             // Verbuendete Armee
             bundListe.push(imgEntries[i].parentNode.parentNode);
             lastAction = "bund";
+            bundNum++;
         } else {
             if(isAllyArmee(imgEntries[i], hostileAllies)) {
                 // Feindliche Armee
                 feindListe.push(
                         imgEntries[i].parentNode.parentNode);
                 lastAction = "feind";
+                feindNum++;
                 feind = true;
             } else if (isShip(imgEntries[i])) {
                 if (lastAction == "bund") {
@@ -426,8 +430,8 @@ if( gamePage == "rbarmee"
                 == "http://www.ritterburgwelt.de/rb/bild/gui/boxtrenn0.gif"
                 && (feindListe.length + bundListe.length) > 0) {
             temp = document.createTextNode("Hier stehen " +
-                    feindListe.length + " Feinde und " +
-                    bundListe.length + " Verb\xFCndete.");
+                    feindNum + " Feinde und " +
+                    bundNum + " Verb\xFCndete.");
             imgEntries[i].parentNode.parentNode.parentNode.appendChild(temp);
             break;
         }
