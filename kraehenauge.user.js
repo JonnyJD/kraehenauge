@@ -1213,6 +1213,8 @@ if( gamePage == "rbarmee"
     var bundListe = new Array(); // von TRs
     var feindListe = new Array(); // von TRs
     var lastAction = "none";
+    var bundNum = 0; // in Bundliste sind auch Schiffe
+    var feindNum = 0; // in Feindliste sind auch Schiffe
 
     // Armeen identifizieren    {{{2
     function identifyArmies()
@@ -1222,6 +1224,7 @@ if( gamePage == "rbarmee"
                 // Verbuendete Armee
                 bundListe.push(imgEntries[i].parentNode.parentNode);
                 lastAction = "bund";
+                bundNum++;
                 // Schiffszugehoerigkeit mitnehmen
                 var nextTR = bundListe[bundListe.length-1].nextSibling;
                 if (nextTR && nextTR.childNodes[0].colSpan == 3) {
@@ -1231,6 +1234,7 @@ if( gamePage == "rbarmee"
                 // Feindliche Armee
                 feindListe.push(imgEntries[i].parentNode.parentNode);
                 lastAction = "feind";
+                feindNum++;
                 // Schiffszugehoerigkeit mitnehmen
                 var nextTR = feindListe[feindListe.length-1].nextSibling;
                 if (nextTR.childNodes[0].colSpan == 3) {
@@ -1457,14 +1461,14 @@ if( gamePage == "rbarmee"
     }
     //                                  }}}3
     // Zusammenfassung          {{{3
-    if (feindListe.length + bundListe.length > 0) {
+    if (feindNum + bundNum > 0) {
         for( var i = 0; i < imgEntries.length; i++ ) {
             if (imgEntries[i].src
                     == "http://www.ritterburgwelt.de/rb/bild/gui/boxtrenn0.gif"
                 ) {
                 temp = document.createTextNode("Hier stehen " +
-                        feindListe.length + " Feinde und " +
-                        bundListe.length + " Verb\xFCndete.");
+                        feindNum + " Feinde und " +
+                        bundNum + " Verb\xFCndete.");
                 imgEntries[i].parentNode.parentNode.parentNode
                     .appendChild(temp);
                 break;
