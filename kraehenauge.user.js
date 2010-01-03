@@ -44,7 +44,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
 var clientName = 'Kr\xE4henauge';
-var clientVersion = '1.4';
+var clientVersion = '1.4 [trunk]';
 var version = clientName + " " + clientVersion;
 var DEBUG = false;
 
