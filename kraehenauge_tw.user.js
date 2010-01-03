@@ -11,7 +11,7 @@
 // Da Opera obiges @include nicht versteht
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
-var version = 'Kr\xE4henauge: TW-Edition 0.8.1';
+var version = 'Kr\xE4henauge: TW-Edition 0.8.1 [trunk]';
 
 // Einstellungen        {{{1
 // 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
