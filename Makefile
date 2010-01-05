@@ -34,3 +34,9 @@ regress: local nodebug
 
 test-regress: test
 	cd regress; exec ./test.sh
+
+doc:
+	cd ~/jsdoc/JSDoc-1.10.2; perl jsdoc.pl \
+		--project-name Kraehenauge \
+		--directory /var/www/doc.kraehen.org/tools/auge \
+		~/svn/auge/kraehenauge.user.js
