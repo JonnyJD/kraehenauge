@@ -1237,7 +1237,7 @@ if( gamePage == "rbarmee"
                 feindNum++;
                 // Schiffszugehoerigkeit mitnehmen
                 var nextTR = feindListe[feindListe.length-1].nextSibling;
-                if (nextTR.childNodes[0].colSpan == 3) {
+                if (nextTR && nextTR.childNodes[0].colSpan == 3) {
                     feindListe.push(nextTR);
                 }
                 feind = true;
