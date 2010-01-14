@@ -7,7 +7,7 @@
 // @include        file://*/rbstart.php.html
 // @include        file://*/ajax_backend.php
 // @author         JonnyJD
-// @version        1.4
+// @version        1.4.1
 // ==/UserScript==      }}}1
 // Anmerkung: Opera versteht das @include nicht und laed immer!
 
@@ -73,7 +73,7 @@ var game = {
 // 32 = Raeuber
 // Trenner ist | (regExp ODER)
 var friendlyAllies = "(60|59)";
-var hostileAllies  = "(32|38)";
+var hostileAllies  = "(32)";
 
 // Einstellungen Ressourcenauswertung und Zugauswertung
 // Bei welcher anzahl verbleibender Tage welche Farbe benutzt wird:
