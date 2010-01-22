@@ -1286,7 +1286,9 @@ if( gamePage == "rbarmee"
                 armee.add();
             } else {
                 // laufende/aktuelle Armee
-                var name = outerTD.nextSibling.firstChild.data;
+                var name = outerTD.nextSibling.firstChild.data
+                // hier ist ein Leerzeichen im HTML-code vor dem Armeenamen
+                    .replace(/^\s+/,'');
                 var armee = new armeeObjekt(id, match[1], name);
                 var statTD = outerTD.nextSibling.nextSibling.nextSibling;
                 var bp = statTD.childNodes[2].firstChild.data.split(" ")[0];
