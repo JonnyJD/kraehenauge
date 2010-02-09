@@ -7,7 +7,7 @@
 // @include        file://*/rbstart.php.html
 // @include        file://*/ajax_backend.php
 // @author         JonnyJD
-// @version        1.4.1
+// @version        1.4.2
 // ==/UserScript==      }}}1
 // Anmerkung: Opera versteht das @include nicht und laed immer!
 
@@ -44,7 +44,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
 var clientName = 'Kr\xE4henauge';
-var clientVersion = '1.4.1 [trunk]';
+var clientVersion = '1.4.2 [trunk]';
 var version = clientName + " " + clientVersion;
 var DEBUG = false;
 
@@ -175,6 +175,8 @@ else if (pageTitle.indexOf('Armee - Schiffsturm') == 0)
     gamePage = 'rbfturms';
 else if (pageTitle.indexOf('Armee - Spionage') == 0)
     gamePage = 'rbspiona1';
+else if (pageTitle.indexOf('Armee - Siedlertransport') == 0)
+    gamePage = 'rbmtransport2';
 else if (pageTitle.indexOf('Armeekampf ') == 0)
     gamePage = 'rbarmeewar';
 else if (pageTitle.search(/Armee von (.*), Infos/) == 0)
