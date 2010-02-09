@@ -355,46 +355,41 @@ if (gamePage == "rbarmee") {
         // Koordinaten des Mittelpunkts
         var tdNode = imgEntries[i].parentNode.nextSibling;
         text = tdNode.childNodes[1].firstChild.nodeValue;
-        var expr = /(Q|U[0-9])?,? ?([0-9]*),([0-9]*)/;
+        var expr = /(Q)?(U[0-9])?,? ?([0-9]*),([0-9]*)/;
         fields = expr.exec(text);
-        var floor = fields[1];
-        var x = parseInt(fields[2], 10);
-        var y = parseInt(fields[3], 10);
-        if (fields[1] == undefined || fields[1] == "Q") {
-            var floor = "N";
-        }
-        if (fields[1] != "Q") {
-            var terrain = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
-            var name = tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1');
-            addTerrain(floor, x, y, terrain, name);
+        var floor = fields[2];
+        var x = parseInt(fields[3], 10); var y = parseInt(fields[4], 10);
+        if (floor == undefined) { var floor = "N"; }
+        var terrain = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
+        var name = tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1');
+        addTerrain(floor, x, y, terrain, name);
 
 
-            // Kartenausschnitt finden
-            // gekennzeichnet durch "<td width=20>&nbpsp;></td><td valign=top>"
-            // valign=top ist leider Standard, Suche nach width=20
-            var tdEntries = document.getElementsByTagName("td");
-            var i=0;
-            while (i < tdEntries.length && tdEntries[i].width != 20) { i++; }
-            if (i == tdEntries.length) {
-                printWarning("Kartenausschnitt nicht gefunden.");
-            } else {
-                i++; // Wir suchen die darauffolgende Zelle
-                var imgEntries = tdEntries[i].getElementsByTagName("img");
-                terrain = new Array();
-                for (var i=0; i < imgEntries.length; i++) {
-                    if (imgEntries[i].src.indexOf("buttons") == -1) {
-                        // Alles was kein Button ist, ist hier ein Feld
-                        var num = imgEntries[i].src
-                            .replace(/.*\/([^\/]*)\.gif/,'$1');
-                        terrain.push(num);
-                    }
+        // Kartenausschnitt finden
+        // gekennzeichnet durch "<td width=20>&nbpsp;></td><td valign=top>"
+        // valign=top ist leider Standard, Suche nach width=20
+        var tdEntries = document.getElementsByTagName("td");
+        var i=0;
+        while (i < tdEntries.length && tdEntries[i].width != 20) { i++; }
+        if (i == tdEntries.length) {
+            printWarning("Kartenausschnitt nicht gefunden.");
+        } else {
+            i++; // Wir suchen die darauffolgende Zelle
+            var imgEntries = tdEntries[i].getElementsByTagName("img");
+            terrain = new Array();
+            for (var i=0; i < imgEntries.length; i++) {
+                if (imgEntries[i].src.indexOf("buttons") == -1) {
+                    // Alles was kein Button ist, ist hier ein Feld
+                    var num = imgEntries[i].src
+                        .replace(/.*\/([^\/]*)\.gif/,'$1');
+                    terrain.push(num);
                 }
-                var width = Math.sqrt(terrain.length);
-                // x, y sind schon gesendete Zentrumskoordinaten -> true
-                listTerrain(terrain, floor, x, y, width, true);
-
-                addDataSection(felderElem);
             }
+            var width = Math.sqrt(terrain.length);
+            // x, y sind schon gesendete Zentrumskoordinaten -> true
+            listTerrain(terrain, floor, x, y, width, true);
+
+            addDataSection(felderElem);
         }
     }
 
@@ -542,7 +537,7 @@ function getShip(imgEntry)            // {{{2
     } else {
         return null;
     }
-}                                       // {{{2
+}                                       // }}}2
 
 function armeeObjekt(id, img, name) {                   // {{{2
     this.id = id;
@@ -558,22 +553,22 @@ function addArmee()
     }
     var posElem = xmlDataDoc.createElement("position");
     if (this.pos !== null) {
-        var expr = /(N|Q|U[0-9])?,? ?([0-9]+),([0-9]+)/;
+        var expr = /(Q)?(N|U[0-9])?,? ?([0-9]+),([0-9]+)/;
         fields = expr.exec(this.pos);
-        if (typeof fields[1] == "undefined") {
+        if (typeof fields[2] == "undefined") {
             level = "N";
         } else {
-            level = fields[1];
+            level = fields[2];
         }
     } else {
         // spaeter noch Tempel moeglich
         posElem.appendChild(xmlDataDoc.createTextNode("taverne"));
     }
-    if (this.pos === null || level != "Q") {
+    if (this.pos === null || fields[1] != "Q") {
         if (this.pos != null) {
             posElem.setAttribute("level", level);
-            posElem.setAttribute("x", fields[2]);
-            posElem.setAttribute("y", fields[3]);
+            posElem.setAttribute("x", fields[3]);
+            posElem.setAttribute("y", fields[4]);
         }
         armeeElem.appendChild(posElem);
         var bildElem = xmlDataDoc.createElement("bild");
