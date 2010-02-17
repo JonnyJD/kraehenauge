@@ -1175,7 +1175,7 @@ function addArmee()
             if (typeof this.ap != "undefined") {
                 apElem.setAttribute("now", this.ap);
             }
-            if (typeof maxAP != "undefined") {
+            if (typeof this.maxAP != "undefined") {
                 apElem.setAttribute("max", this.maxAP);
             }
             armeeElem.appendChild(apElem);
