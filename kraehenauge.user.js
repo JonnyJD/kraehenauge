@@ -1543,18 +1543,11 @@ function addReich()
     if (typeof this.top10 != "undefined") {
         reichElem.setAttribute("top10", this.top10);
     }
-    if (typeof this.active != "undefined") {
-        if (this.active) {
-            reichElem.setAttribute("active", "true");
+    if (typeof this.status != "undefined") {
+        if (this.status !== null) {
+            reichElem.setAttribute("status", this.status);
         } else {
-            reichElem.setAttribute("active", "false");
-        }
-    }
-    if (typeof this.schutz != "undefined") {
-        if (this.schutz) {
-            reichElem.setAttribute("schutz", "true");
-        } else {
-            reichElem.setAttribute("schutz", "false");
+            reichElem.setAttribute("status", "");
         }
     }
     if (typeof this.last_turn != "undefined") {
@@ -1565,10 +1558,9 @@ function addReich()
     var ritterElem = xmlDataDoc.createElement("ritter");
     if (typeof this.r_id != "undefined") {
         ritterElem.setAttribute("r_id", this.r_id);
-    } else {
-        // name wird hier als Inhalt des Elements uebergeben
-        ritterElem.appendChild(xmlDataDoc.createTextNode(this.rittername));
     }
+    // name wird hier als Inhalt des Elements uebergeben
+    ritterElem.appendChild(xmlDataDoc.createTextNode(this.rittername));
     reichElem.appendChild(ritterElem);
 
     // Allianz (nicht unter Ritter moeglich leider)
@@ -1607,10 +1599,16 @@ if( gamePage == "rbreiche" ) {
                     reich.a_id = match[1];
                 }
             }
+            iTags = cells[0].getElementsByTagName("i")
+            if (iTags.length > 0) {
+                reich.status = iTags[0].firstChild.data;
+            } else {
+                reich.status = null;
+            }
             reich.name = cells[1].firstChild.data.replace(/^\s*/,"");
             reich.level = cells[2].firstChild.data.replace(/^\s*/,"");
             reich.last_turn = cells[4].firstChild.data.replace(/^\s*/,"");
-            var inputs = cells[0].getElementsByTagName("input");
+            var inputs = trEntries[i].getElementsByTagName("input");
             for (var j = 0; j < inputs.length; j++) {
                 if (inputs[j].name == "sid2") {
                     reich.r_id = inputs[j].value;
