@@ -7,7 +7,7 @@
 // @include        file://*/rbstart.php.html
 // @include        file://*/ajax_backend.php
 // @author         JonnyJD
-// @version        1.4.2
+// @version        1.4.3
 // ==/UserScript==      }}}1
 // Anmerkung: Opera versteht das @include nicht und laed immer!
 
@@ -17,7 +17,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0
             == "http://www.ritterburgwelt.de/rb/ajax_backend.php") {
     function sendDataWrapper(handler, type, data, responseFunction) {{{2
     {
-        var url = "http://kraehen.org/" + handler;
+        var url = "http://localhost/" + handler;
         if (typeof opera != "undefined") {
             var xmlhttp = new opera.XMLHttpRequest();
             xmlhttp.setRequestHeader("Content-type", type);
@@ -44,9 +44,9 @@ if (document.title.indexOf("RB \xA9 - ") == 0
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
 var clientName = 'Kr\xE4henauge';
-var clientVersion = '1.4.2 [trunk]';
+var clientVersion = '1.4.3 [trunk]';
 var version = clientName + " " + clientVersion;
-var DEBUG = false;
+var DEBUG = true;
 
 // Einstellungen        {{{1
 var game = {
@@ -487,7 +487,7 @@ kskKarte.title = "Kr\xE4hendatenbank"
 kskKarte.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskKarte.style.border = "1px solid red";
 var newLink = document.createElement('a');
-newLink.href = "http://kraehen.org/show";
+newLink.href = "http://localhost/show";
 newLink.target = "_blank";
 newLink.appendChild(kskKarte);
 document.getElementById('Leiste4').appendChild(newLink);
@@ -607,7 +607,7 @@ kskTag.title = "Preise";
 kskTag.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskTag.style.border = "1px solid red";
 var newLink = document.createElement('a');
-newLink.href = "http://kraehen.org/preise";
+newLink.href = "http://localhost/preise";
 newLink.target = "_blank";
 newLink.appendChild(kskTag);
 document.getElementById('Leiste4').appendChild(newLink);
@@ -787,7 +787,7 @@ function sendXMLData(handler, doc, answer)                      // {{{1
             document.getElementById("Fehlermeldungen").innerHTML = text;
         }
         sendDataWrapper(handler, "text/xml", data, responseFunction)
-        //sendDataWrapper("save?xml", "text/xml", data, responseFunction2)
+        sendDataWrapper("save?xml", "text/xml", data, responseFunction2)
     } else {
         printWarning("Es wurden keine Armee- oder Terraindaten gefunden");
     }
@@ -1523,11 +1523,88 @@ if(gamePage == "rbtavernesold") { //    {{{2
 }
 //                              }}}1
 
+// Reichserfassung              {{{1
+try {
+function reichObjekt() {                   // {{{2
+    this.add = addReich;
+}
+function addReich()
+{
+    var reichElem = xmlDataDoc.createElement("reich");
+
+    // Attribute
+    if (typeof this.name != "undefined") {
+        reichElem.setAttribute("name", this.name);
+    }
+    if (typeof this.level != "undefined") {
+        reichElem.setAttribute("level", this.level);
+    }
+    if (typeof this.top10 != "undefined") {
+        reichElem.setAttribute("top10", this.top10);
+    }
+    if (typeof this.active != "undefined") {
+        if (this.active) {
+            reichElem.setAttribute("active", "true");
+        } else {
+            reichElem.setAttribute("active", "false");
+        }
+    }
+    if (typeof this.schutz != "undefined") {
+        if (this.schutz) {
+            reichElem.setAttribute("schutz", "true");
+        } else {
+            reichElem.setAttribute("schutz", "false");
+        }
+    }
+    if (typeof this.last_turn != "undefined") {
+        reichElem.setAttribute("last_turn", this.last_turn);
+    }
+
+    // Ritter
+    var ritterElem = xmlDataDoc.createElement("ritter");
+    if (typeof this.r_id != "undefined") {
+        ritterElem.setAttribute("r_id", this.r_id);
+    } else {
+        // name wird hier als Inhalt des Elements uebergeben
+        ritterElem.appendChild(xmlDataDoc.createTextNode(this.owner));
+    }
+    reichElem.appendChild(ritterElem);
+
+    // Allianz (nicht unter Ritter moeglich leider)
+    if (typeof this.a_id != "undefined" || typeof this.a_tag != "undefined") {
+        var allianzElem = xmlDataDoc.createElement("allianz");
+        if (typeof this.a_id != "undefined") {
+            allianzElem.setAttribute("a_id", this.a_id);
+        } else {
+            allianzElem.setAttribute("tag", this.a_tag);
+        }
+        reichElem.appendChild(allianzElem);
+    }
+
+    // fertiges Produkt einhaengen
+    reicheElem.appendChild(reichElem);
+    dataGathered = true;
+}                                                           // }}}2
+if( gamePage == "rbreiche" ) {
+    var reicheElem = xmlDataDoc.createElement("reiche");
+
+    // Dummy
+    reich = new reichObjekt();
+    reich.add()
+
+    addDataSection(reicheElem);
+} // ende rbreiche
+} catch (e) {
+    printWarning("Fehler in der Reichserfassung: " + e);
+}
+//                              }}}1
+
 if (gamePage == "rbarmee"
         || gamePage == "rbfturm1"
         || gamePage == "rbfturm2"
         || gamePage == "rbfturma"
         || gamePage == "rbfturms"
+        || gamePage == "rbreiche"
         || gamePage == "rbtavernesold") {
     sendXMLData("send/data", xmlDataDoc, "ServerZusammenfassung")
 }
