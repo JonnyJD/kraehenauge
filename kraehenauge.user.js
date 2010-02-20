@@ -17,7 +17,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0
             == "http://www.ritterburgwelt.de/rb/ajax_backend.php") {
     function sendDataWrapper(handler, type, data, responseFunction) {{{2
     {
-        var url = "http://localhost/" + handler;
+        var url = "http://kraehen.org/" + handler;
         if (typeof opera != "undefined") {
             var xmlhttp = new opera.XMLHttpRequest();
             xmlhttp.setRequestHeader("Content-type", type);
@@ -46,7 +46,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0) {
 var clientName = 'Kr\xE4henauge';
 var clientVersion = '1.4.3 [trunk]';
 var version = clientName + " " + clientVersion;
-var DEBUG = true;
+var DEBUG = false;
 
 // Einstellungen        {{{1
 var game = {
@@ -487,7 +487,7 @@ kskKarte.title = "Kr\xE4hendatenbank"
 kskKarte.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskKarte.style.border = "1px solid red";
 var newLink = document.createElement('a');
-newLink.href = "http://localhost/show";
+newLink.href = "http://kraehen.org/show";
 newLink.target = "_blank";
 newLink.appendChild(kskKarte);
 document.getElementById('Leiste4').appendChild(newLink);
@@ -607,7 +607,7 @@ kskTag.title = "Preise";
 kskTag.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskTag.style.border = "1px solid red";
 var newLink = document.createElement('a');
-newLink.href = "http://localhost/preise";
+newLink.href = "http://kraehen.org/preise";
 newLink.target = "_blank";
 newLink.appendChild(kskTag);
 document.getElementById('Leiste4').appendChild(newLink);
@@ -787,7 +787,7 @@ function sendXMLData(handler, doc, answer)                      // {{{1
             document.getElementById("Fehlermeldungen").innerHTML = text;
         }
         sendDataWrapper(handler, "text/xml", data, responseFunction)
-        sendDataWrapper("save?xml", "text/xml", data, responseFunction2)
+        //sendDataWrapper("save?xml", "text/xml", data, responseFunction2)
     } else {
         printWarning("Es wurden keine Armee- oder Terraindaten gefunden");
     }
