@@ -1525,6 +1525,7 @@ if(gamePage == "rbtavernesold") { //    {{{2
 
 // Reichserfassung              {{{1
 try {
+
 function reichObjekt() {                   // {{{2
     this.add = addReich;
 }
@@ -1566,7 +1567,7 @@ function addReich()
         ritterElem.setAttribute("r_id", this.r_id);
     } else {
         // name wird hier als Inhalt des Elements uebergeben
-        ritterElem.appendChild(xmlDataDoc.createTextNode(this.owner));
+        ritterElem.appendChild(xmlDataDoc.createTextNode(this.rittername));
     }
     reichElem.appendChild(ritterElem);
 
@@ -1585,12 +1586,42 @@ function addReich()
     reicheElem.appendChild(reichElem);
     dataGathered = true;
 }                                                           // }}}2
+
 if( gamePage == "rbreiche" ) {
     var reicheElem = xmlDataDoc.createElement("reiche");
 
-    // Dummy
-    reich = new reichObjekt();
-    reich.add()
+    var trEntries = document.getElementsByTagName("tr");
+    for( var i = 0; i < trEntries.length; i++ ) {
+        if (trEntries[i].id.search(/zeile_[0-9]+_tabelle_/) == 0) {
+            var cells = trEntries[i].getElementsByTagName("td");
+            reich = new reichObjekt();
+
+            reich.rittername = cells[0].getElementsByTagName("b")[0]
+                .firstChild.data;
+            var imgEntries = cells[0].getElementsByTagName("img");
+            if (imgEntries.length > 0) {
+                exp = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
+                        "([0-9]+).gif","");
+                match = imgEntries[0].src.match(exp);
+                if (match) {
+                    reich.a_id = match[1];
+                }
+            }
+            reich.name = cells[1].firstChild.data.replace(/^\s*/,"");
+            reich.level = cells[2].firstChild.data.replace(/^\s*/,"");
+            reich.last_turn = cells[4].firstChild.data.replace(/^\s*/,"");
+            var inputs = cells[0].getElementsByTagName("input");
+            for (var j = 0; j < inputs.length; j++) {
+                if (inputs[j].name == "sid2") {
+                    reich.r_id = inputs[j].value;
+                    break;
+                }
+            }
+
+            // "fertiges" Reich hinzufuegen
+            reich.add()
+        }
+    }
 
     addDataSection(reicheElem);
 } // ende rbreiche
