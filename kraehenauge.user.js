@@ -789,7 +789,7 @@ function sendXMLData(handler, doc, answer)                      // {{{1
         sendDataWrapper(handler, "text/xml", data, responseFunction)
         //sendDataWrapper("save?xml", "text/xml", data, responseFunction2)
     } else {
-        printWarning("Es wurden keine Armee- oder Terraindaten gefunden");
+        printWarning("Es wurden keine zu sendenden Daten gefunden");
     }
 }                                                               // }}}1
 
@@ -1640,7 +1640,7 @@ if( gamePage == "rbreiche" ) {  // {{{2
 
 if( gamePage == "rbnachr1" ) {  // {{{2
     var reicheElem = xmlDataDoc.createElement("reiche");
-    reich = new reichObjekt();
+    var reich = new reichObjekt();
     reich.status = null; // wird moeglicherweise spaeter ueberschrieben
 
     var listEntries = document.getElementsByTagName("li");
@@ -1687,10 +1687,11 @@ if( gamePage == "rbnachr1" ) {  // {{{2
         }
     }
 
-    // fertiges Reich hinzufuegen
-    reich.add();
-
-    addDataSection(reicheElem);
+    if (typeof reich.name != "undefined") {
+        // fertiges Reich hinzufuegen
+        reich.add();
+        addDataSection(reicheElem);
+    }
 } // ende rbnachr1                      }}}2
 
 
