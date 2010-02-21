@@ -748,6 +748,8 @@ if(gamePage == "rbfturm1" || gamePage == "rbfturm2"
             && wholePage.indexOf("aus dem Dorf rausgehen") == -1
             && wholePage.indexOf("fliehen") == -1) {
     sichtElem.setAttribute("typ","armee");
+} else if (gamePage == "rbftop10") {
+    sichtElem.setAttribute("typ","top10");
 } else {
     sichtElem.setAttribute("typ","keine");
 }
@@ -833,12 +835,6 @@ if (gamePage == "rbfturm1"
 
 // datenpflegeseite kann momentan nicht von allen benutzt werden
 if (gameId == 'rbspiel1728') {
-    if (gamePage == 'rbftop10') {
-
-        sendToHandler("send/text/top10", "wahl=top10&textbereich",
-                copyText, "DBAntwort");
-    }
-
     if (gamePage == 'rbally2') {
 
         sendToHandler("send/text/allianz", "wahl=alli&textbereich",
@@ -1695,6 +1691,30 @@ if( gamePage == "rbnachr1" ) {  // {{{2
 } // ende rbnachr1                      }}}2
 
 
+if( gamePage == "rbftop10" ) {  // {{{2
+    var reicheElem = xmlDataDoc.createElement("reiche");
+    var trEntries = document.getElementsByTagName("tr");
+    for (var i = 0; i < trEntries.length; i++) {
+        var row = trEntries[i];
+        if (row.firstChild.firstChild &&
+                row.firstChild.firstChild.firstChild &&
+                row.firstChild.firstChild.firstChild.data &&
+                row.firstChild.firstChild.firstChild.data.match(/[0-9]+\./)) {
+            reich = new reichObjekt();
+            reich.top10 = row.firstChild.firstChild.firstChild.data
+                .match(/([0-9]+)\./)[1];
+            bTags = row.childNodes[1].getElementsByTagName("b");
+            reich.rittername = bTags[0].firstChild.data;
+            imgs = row.childNodes[1].getElementsByTagName("img");
+            reich.getAlly(imgs, bTags);
+
+            reich.add();
+        }
+    }
+
+    addDataSection(reicheElem);
+} // ende rbftop10                      }}}2
+
 } catch (e) {
     printWarning("Fehler in der Reichserfassung: " + e);
 }
@@ -1707,6 +1727,7 @@ if (gamePage == "rbarmee"
         || gamePage == "rbfturms"
         || gamePage == "rbreiche"
         || gamePage == "rbnachr1"
+        || gamePage == "rbftop10"
         || gamePage == "rbtavernesold") {
     sendXMLData("send/data", xmlDataDoc, "ServerZusammenfassung")
 }
