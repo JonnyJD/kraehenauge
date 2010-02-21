@@ -1588,8 +1588,8 @@ if( gamePage == "rbreiche" ) {
             var cells = trEntries[i].getElementsByTagName("td");
             reich = new reichObjekt();
 
-            reich.rittername = cells[0].getElementsByTagName("b")[0]
-                .firstChild.data;
+            bTags = cells[0].getElementsByTagName("b")
+            reich.rittername = bTags[0].firstChild.data;
             var imgEntries = cells[0].getElementsByTagName("img");
             if (imgEntries.length > 0) {
                 exp = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
@@ -1598,6 +1598,8 @@ if( gamePage == "rbreiche" ) {
                 if (match) {
                     reich.a_id = match[1];
                 }
+            } else if (bTags.length >= 2) {
+                reich.a_tag = bTags[1].firstChild.data.match(/\[(.*)\]/)[1];
             }
             iTags = cells[0].getElementsByTagName("i")
             if (iTags.length > 0) {
