@@ -7,7 +7,7 @@
 // @include        file://*/rbstart.php.html
 // @include        file://*/ajax_backend.php
 // @author         JonnyJD
-// @version        0.9.2
+// @version        0.9.3
 // ==/UserScript==      }}}1
 // Anmerkung: Opera versteht das @include nicht und laed immer!
 
@@ -44,7 +44,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
 var clientName = 'Kr\xE4henauge: TW-Edition';
-var clientVersion = '0.9.2 [trunk]';
+var clientVersion = '0.9.3 [trunk]';
 var version = clientName + " " + clientVersion;
 var DEBUG = false;
 
@@ -93,6 +93,12 @@ if (pageTitle.indexOf('Thronsaal') == 0)
     gamePage = 'rbstart';
 else if (pageTitle.indexOf('T\xFCrme der Allianz') == 0)
     gamePage = 'rbfturma';
+else if (pageTitle.indexOf('Nachrichten') == 0)
+    gamePage = 'rbnachr1'; // rbnachr2 faellt hier auch drunter
+else if (pageTitle.indexOf('eigene Punktzahl') == 0)
+    gamePage = 'rbftop10';
+else if (pageTitle.indexOf('\xDCbersicht der Reiche') == 0)
+    gamePage = 'rbreiche';
 else if (pageTitle.indexOf('Allianzen') == 0)
     gamePage = 'rbally1';
 //                      }}}2
@@ -203,6 +209,8 @@ if(gamePage == "rbfturm1" || gamePage == "rbfturm2"
             && wholePage.indexOf("aus dem Dorf rausgehen") == -1
             && wholePage.indexOf("fliehen") == -1) {
     sichtElem.setAttribute("typ","armee");
+} else if (gamePage == "rbftop10") {
+    sichtElem.setAttribute("typ","top10");
 } else {
     sichtElem.setAttribute("typ","keine");
 }
@@ -244,7 +252,7 @@ function sendXMLData(handler, doc, answer)                      // {{{1
         sendDataWrapper(handler, "text/xml", data, responseFunction)
         //sendDataWrapper("save?xml", "text/xml", data, responseFunction2)
     } else {
-        printWarning("Es wurden keine Armee- oder Terraindaten gefunden");
+        printWarning("Es wurden keine zu sendenden Daten gefunden");
     }
 }                                                               // }}}1
 
@@ -964,11 +972,215 @@ if(gamePage == "rbtavernesold") { //    {{{2
 }
 //                              }}}1
 
+// Reichserfassung              {{{1
+try {
+
+function reichObjekt() {                   // {{{2
+    this.add = addReich;
+    this.getAlly = reichGetAlly;
+}
+
+function addReich()
+{
+    var reichElem = xmlDataDoc.createElement("reich");
+
+    // Attribute
+    if (typeof this.name != "undefined") {
+        reichElem.setAttribute("name", this.name);
+    }
+    if (typeof this.level != "undefined") {
+        reichElem.setAttribute("level", this.level);
+    }
+    if (typeof this.top10 != "undefined") {
+        reichElem.setAttribute("top10", this.top10);
+    }
+    if (typeof this.status != "undefined") {
+        if (this.status !== null) {
+            reichElem.setAttribute("status", this.status);
+        } else {
+            reichElem.setAttribute("status", "");
+        }
+    }
+    if (typeof this.last_turn != "undefined") {
+        reichElem.setAttribute("last_turn", this.last_turn);
+    }
+
+    // Ritter
+    var ritterElem = xmlDataDoc.createElement("ritter");
+    if (typeof this.r_id != "undefined") {
+        ritterElem.setAttribute("r_id", this.r_id);
+    }
+    // name wird hier als Inhalt des Elements uebergeben
+    ritterElem.appendChild(xmlDataDoc.createTextNode(this.rittername));
+    reichElem.appendChild(ritterElem);
+
+    // Allianz (nicht unter Ritter moeglich leider)
+    if (typeof this.a_id != "undefined" || typeof this.a_tag != "undefined") {
+        var allianzElem = xmlDataDoc.createElement("allianz");
+        if (typeof this.a_id != "undefined") {
+            if (this.a_id !== null) {
+                allianzElem.setAttribute("a_id", this.a_id);
+            } else {
+                allianzElem.setAttribute("a_id", 0);
+            }
+        } else {
+            allianzElem.setAttribute("tag", this.a_tag);
+        }
+        reichElem.appendChild(allianzElem);
+    }
+
+    // fertiges Produkt einhaengen
+    reicheElem.appendChild(reichElem);
+    dataGathered = true;
+}
+
+function reichGetAlly(imgEntries, bTag) {
+        if (imgEntries.length > 0) {
+            exp = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
+                    "([0-9]+).gif","");
+            match = imgEntries[0].src.match(exp);
+            if (match) {
+                this.a_id = match[1];
+            }
+        } else if (bTags.length >= 2) {
+            this.a_tag = bTags[1].firstChild.data.match(/\[(.*)\]/)[1];
+        } else {
+            this.a_id = null;
+        }
+}                                                           // }}}2
+
+if( gamePage == "rbreiche" ) {  // {{{2
+    var reicheElem = xmlDataDoc.createElement("reiche");
+
+    var trEntries = document.getElementsByTagName("tr");
+    for( var i = 0; i < trEntries.length; i++ ) {
+        if (trEntries[i].id.search(/zeile_[0-9]+_tabelle_/) == 0) {
+            var cells = trEntries[i].getElementsByTagName("td");
+            reich = new reichObjekt();
+
+            bTags = cells[0].getElementsByTagName("b")
+            reich.rittername = bTags[0].firstChild.data;
+            var imgEntries = cells[0].getElementsByTagName("img");
+            reich.getAlly(imgEntries, bTags);
+            iTags = cells[0].getElementsByTagName("i")
+            if (iTags.length > 0) {
+                reich.status = iTags[0].firstChild.data;
+            } else {
+                reich.status = null;
+            }
+            reich.name = cells[1].firstChild.data.replace(/^\s*/,"");
+            reich.level = cells[2].firstChild.data.replace(/^\s*/,"");
+            reich.last_turn = cells[4].firstChild.data.replace(/^\s*/,"");
+            var inputs = trEntries[i].getElementsByTagName("input");
+            for (var j = 0; j < inputs.length; j++) {
+                if (inputs[j].name == "sid2") {
+                    reich.r_id = inputs[j].value;
+                    break;
+                }
+            }
+
+            // "fertiges" Reich hinzufuegen
+            reich.add();
+        }
+    }
+
+    addDataSection(reicheElem);
+} // ende rbreiche                      }}}2
+
+if( gamePage == "rbnachr1" ) {  // {{{2
+    var reicheElem = xmlDataDoc.createElement("reiche");
+    var reich = new reichObjekt();
+    reich.status = null; // wird moeglicherweise spaeter ueberschrieben
+
+    var listEntries = document.getElementsByTagName("li");
+    for(var i = 0; i < listEntries.length; i++ ) {
+        var item = listEntries[i];
+
+        if (typeof item.firstChild.data != "undefined") {
+            if (item.firstChild.data == "Herrscher ") {
+                var bTags = item.getElementsByTagName("b");
+                reich.rittername = bTags[0].firstChild.data;
+                var imgs = item.getElementsByTagName("img");
+                reich.getAlly(imgs, bTags);
+            }
+            if (item.firstChild.data == "Reich ") {
+                reich.name = item.childNodes[1].firstChild.firstChild.data;
+            }
+            if (item.firstChild.data.search("Level ") == 0) {
+                reich.level = item.firstChild.data.match(/Level ([0-9]+)/)[1];
+            }
+            if (item.firstChild.data.search("Letzter Zug ") == 0) {
+                reich.last_turn = item.firstChild.data
+                    .match(/Letzter Zug (.*)/)[1];
+            }
+        } else if (item.firstChild.firstChild.firstChild
+                && item.firstChild.firstChild.firstChild.data) {
+            inaktivString = "Das Reich befindet sich auf der Inaktivenliste";
+            if (item.firstChild.firstChild.firstChild.data
+                    .search(inaktivString) == 0) {
+                reich.status = "Inaktiv";
+            }
+            schutzString = "Das Reich befindet sich auf der Schutzliste";
+            if (item.firstChild.firstChild.firstChild.data
+                    .search(schutzString) == 0) {
+                reich.status = "Schutzliste";
+            }
+        }
+    }
+
+    var inputs = document.getElementsByTagName("input");
+    for (var j = 0; j < inputs.length; j++) {
+        if (inputs[j].name == "sid2") {
+            reich.r_id = inputs[j].value;
+            break;
+        }
+    }
+
+    if (typeof reich.name != "undefined") {
+        // fertiges Reich hinzufuegen
+        reich.add();
+        addDataSection(reicheElem);
+    }
+} // ende rbnachr1                      }}}2
+
+
+if( gamePage == "rbftop10" ) {  // {{{2
+    var reicheElem = xmlDataDoc.createElement("reiche");
+    var trEntries = document.getElementsByTagName("tr");
+    for (var i = 0; i < trEntries.length; i++) {
+        var row = trEntries[i];
+        if (row.firstChild.firstChild &&
+                row.firstChild.firstChild.firstChild &&
+                row.firstChild.firstChild.firstChild.data &&
+                row.firstChild.firstChild.firstChild.data.match(/[0-9]+\./)) {
+            reich = new reichObjekt();
+            reich.top10 = row.firstChild.firstChild.firstChild.data
+                .match(/([0-9]+)\./)[1];
+            bTags = row.childNodes[1].getElementsByTagName("b");
+            reich.rittername = bTags[0].firstChild.data;
+            imgs = row.childNodes[1].getElementsByTagName("img");
+            reich.getAlly(imgs, bTags);
+
+            reich.add();
+        }
+    }
+
+    addDataSection(reicheElem);
+} // ende rbftop10                      }}}2
+
+} catch (e) {
+    printWarning("Fehler in der Reichserfassung: " + e);
+}
+//                              }}}1
+
 if (gamePage == "rbarmee"
         || gamePage == "rbfturm1"
         || gamePage == "rbfturm2"
         || gamePage == "rbfturma"
         || gamePage == "rbfturms"
+        || gamePage == "rbreiche"
+        || gamePage == "rbnachr1"
+        || gamePage == "rbftop10"
         || gamePage == "rbtavernesold") {
     sendXMLData("send/data", xmlDataDoc, "ServerZusammenfassung")
 }
