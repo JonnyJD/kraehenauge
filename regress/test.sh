@@ -15,16 +15,16 @@ if [ -e $ziel ]; then
 fi
 
 echo
-echo "Bitte rufen sie die Datei 'trunk/rbstart.php.html' mit dem Browser auf"
+echo "Bitte rufen sie die Datei 'rbstart.php.html' mit dem Browser auf"
 echo
 for testfile in *.html; do
 	echo $testfile " -> " $ziel
 	cp "$testfile" "$ziel"
-	echo "  (bitte 'trunk/rbstart.php.html' testen)  "
+	echo "  (bitte 'rbstart.php.html' testen)  "
 	# warte auf Eingabe
 	read KEY
 done
-echo "bitte auch 'trunk/regress/ajax_backend.php' testen"
+echo "bitte auch 'regress/ajax_backend.php' testen"
 rm $ziel
 
 if [ -e `basename $ziel` ]; then
