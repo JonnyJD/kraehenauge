@@ -815,11 +815,11 @@ function visibleText(htmlPage)                                  // {{{2
     return copyText;
 }                                               // }}}2
 
-copyText = visibleText(wholePage);
 
 if (gamePage == "rbarmee") {
 
     if (wholePage.indexOf("fliehen") == -1) {
+        copyText = visibleText(wholePage);
         sendToHandler("send/text/armee", "dorftext", copyText, "DBAntwort");
     }
 }
@@ -830,6 +830,7 @@ if (gamePage == "rbfturm1"
     || gamePage == "rbfturms"
     || gamePage == "rbfhandelb") {
 
+    copyText = visibleText(wholePage);
     sendToHandler("send/text/turm", "text", copyText, "DBAntwort");
 }
 
