@@ -600,6 +600,73 @@ if (GM_getValue(gameId+".hb.mfeld")) {
 }
 createSeparation(3);
 createSeparation(4);
+    if (gameId == "rbspiel1728") {
+        // Agrus 1         {{{2
+        var linkImages = new Array();
+        var linkImage = document.createElement('input');
+        linkImage.type = "image";
+        linkImage.name = "reich";
+        linkImage.title="Argrus1";
+        linkImage.src = "http://www.ritterburgwelt.de/rb/"
+            + "bild/buttons/b_name.gif";
+        linkImages.push(linkImage);
+        linkForm = createFormLink("thronsaal", "rbnachr2", linkImages, "");
+        newInput = document.createElement('input');
+        newInput.type = "hidden"; newInput.name = "sid2";
+        newInput.value = "1";
+        linkForm.appendChild(newInput);
+        document.getElementById('Leiste3').appendChild(linkForm);
+        //              }}}2
+        // Keiner 2         {{{2
+        var linkImages = new Array();
+        var linkImage = document.createElement('input');
+        linkImage.type = "image";
+        linkImage.name = "reich";
+        linkImage.title="Keiner2";
+        linkImage.src = "http://www.ritterburgwelt.de/rb/"
+            + "bild/buttons/b_name.gif";
+        linkImages.push(linkImage);
+        linkForm = createFormLink("thronsaal", "rbnachr2", linkImages, "");
+        newInput = document.createElement('input');
+        newInput.type = "hidden"; newInput.name = "sid2";
+        newInput.value = "2";
+        linkForm.appendChild(newInput);
+        document.getElementById('Leiste3').appendChild(linkForm);
+        //              }}}2
+        // Niemand 172         {{{2
+        var linkImages = new Array();
+        var linkImage = document.createElement('input');
+        linkImage.type = "image";
+        linkImage.name = "reich";
+        linkImage.title="Niemand172";
+        linkImage.src = "http://www.ritterburgwelt.de/rb/"
+            + "bild/buttons/b_name.gif";
+        linkImages.push(linkImage);
+        linkForm = createFormLink("thronsaal", "rbnachr2", linkImages, "");
+        newInput = document.createElement('input');
+        newInput.type = "hidden"; newInput.name = "sid2";
+        newInput.value = "172";
+        linkForm.appendChild(newInput);
+        document.getElementById('Leiste3').appendChild(linkForm);
+        //              }}}2
+        // Keiner 174         {{{2
+        var linkImages = new Array();
+        var linkImage = document.createElement('input');
+        linkImage.type = "image";
+        linkImage.name = "reich";
+        linkImage.title="Keiner174";
+        linkImage.src = "http://www.ritterburgwelt.de/rb/"
+            + "bild/buttons/b_name.gif";
+        linkImages.push(linkImage);
+        linkForm = createFormLink("thronsaal", "rbnachr2", linkImages, "");
+        newInput = document.createElement('input');
+        newInput.type = "hidden"; newInput.name = "sid2";
+        newInput.value = "174";
+        linkForm.appendChild(newInput);
+        document.getElementById('Leiste3').appendChild(linkForm);
+        //              }}}2
+        createSeparation(3);
+    }
 //                              }}}1
 // kskpreise                    {{{1
 var kskTag = document.createElement('img');
@@ -1680,7 +1747,11 @@ if( gamePage == "rbnachr1" ) {  // {{{2
     for (var j = 0; j < inputs.length; j++) {
         if (inputs[j].name == "sid2") {
             reich.r_id = inputs[j].value;
-            break;
+            if (gameId != "rbspiel1728") {
+                // hier werden keine extra Nachrichtenlinks angezeigt
+                // der 1. sid2 link ist deshalb der gesuchte
+                break;
+            }
         }
     }
 
