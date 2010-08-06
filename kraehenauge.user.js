@@ -181,6 +181,8 @@ else if (pageTitle.indexOf('Allianzen') == 0)
 // Individualseiten     {{{2
 else if (pageTitle.indexOf('Armee - Schiffsturm') == 0)
     gamePage = 'rbfturms';
+else if (pageTitle.indexOf('Armee - Sp\xE4hen') == 0)
+    gamePage = 'rbfturme'; // Entdecker
 else if (pageTitle.indexOf('Armee - Spionage') == 0)
     gamePage = 'rbspiona1';
 else if (pageTitle.indexOf('Armee - Siedlertransport') == 0)
@@ -836,6 +838,7 @@ if (gamePage == "rbfturm1"
     || gamePage == "rbfturm2"
     || gamePage == "rbfturma"
     || gamePage == "rbfturms"
+    || gamePage == "rbfturme"
     || gamePage == "rbfhandelb") {
 
     copyText = visibleText(wholePage);
@@ -1211,6 +1214,7 @@ if( gamePage == "rbarmee"
     || gamePage == "rbfturm2"
     || gamePage == "rbfturma"
     || gamePage == "rbfturms"
+    || gamePage == "rbfturme"
 ) {
     var imgEntries = document.getElementsByTagName("img");
     var bundListe = new Array(); // von TRs
@@ -1759,6 +1763,7 @@ if (gamePage == "rbarmee"
         || gamePage == "rbfturm2"
         || gamePage == "rbfturma"
         || gamePage == "rbfturms"
+        || gamePage == "rbfturme"
         || gamePage == "rbreiche"
         || gamePage == "rbnachr1"
         || gamePage == "rbftop10"
