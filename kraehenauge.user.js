@@ -15,7 +15,8 @@
 if (document.title.indexOf("RB \xA9 - ") == 0
             || document.location
             == "http://www.ritterburgwelt.de/rb/ajax_backend.php") {
-    function sendDataWrapper(handler, type, data, responseFunction) {{{2
+
+    function sendDataWrapper(handler, type, data, responseFunction) // {{{2
     {
         var url = "http://kraehen.org/" + handler;
         if (typeof opera != "undefined") {
@@ -37,7 +38,14 @@ if (document.title.indexOf("RB \xA9 - ") == 0
                 },
             })
         }
-    }                                                               }}}2
+    }                                                               //}}}2
+    
+    function splitPosition(pos) {   // {{{2
+        /* fields: 0=alles 1=Q 2=level 3=X 4=Y */
+        var expr = /(Q)?(N|U[0-9])?,? ?([0-9]+),([0-9]+)/;
+        return expr.exec(pos);
+    }                               // }}}2
+
 }                               //      }}}1
 
 // RB-Spielseite
@@ -911,8 +919,7 @@ if (gamePage == "rbarmee") {
         // Koordinaten des Mittelpunkts
         var tdNode = imgEntries[i].parentNode.nextSibling;
         text = tdNode.childNodes[1].firstChild.nodeValue;
-        var expr = /(Q)?(U[0-9])?,? ?([0-9]*),([0-9]*)/;
-        fields = expr.exec(text);
+        fields = splitPosition(text);
         var floor = fields[2];
         var x = parseInt(fields[3], 10); var y = parseInt(fields[4], 10);
         if (floor == undefined) { var floor = "N"; }
@@ -931,6 +938,9 @@ if (gamePage == "rbarmee") {
             printWarning("Kartenausschnitt nicht gefunden.");
         } else {
             i++; // Wir suchen die darauffolgende Zelle
+            // speichere Kartenbereich, fuer Import-Karte
+            kartenBereich = tdEntries[i].parentNode;
+            // lese die Kartenfelder
             var imgEntries = tdEntries[i].getElementsByTagName("img");
             terrain = new Array();
             for (var i=0; i < imgEntries.length; i++) {
@@ -1109,8 +1119,7 @@ function addArmee()
     }
     var posElem = xmlDataDoc.createElement("position");
     if (this.pos !== null) {
-        var expr = /(Q)?(N|U[0-9])?,? ?([0-9]+),([0-9]+)/;
-        fields = expr.exec(this.pos);
+        fields = splitPosition(this.pos);
         if (typeof fields[2] == "undefined") {
             level = "N";
         } else {
@@ -1517,6 +1526,30 @@ if(gamePage == "rbtavernesold") { //    {{{2
 
 } catch (e) {
     printError("Fehler in der Armeeerfassung: ", e);
+}
+//                              }}}1
+
+// Importierte Armeekarte       {{{1
+try {
+if( gamePage == "rbarmee" ) {
+    iframe = document.createElement('iframe');
+    fields = splitPosition(currentPos);
+    x = fields[3];
+    y = fields[4];
+    iframe.src = "http://kraehen.org/import/karte/" + x + "." + y;
+    if (typeof fields[2] != "undefined") {
+        iframe.src += "/" + fields[2];
+    }
+    sicht = 2;
+    iframe.src += "/" + sicht;
+    iframe.width = 32*(2*sicht+1) + 15;
+    iframe.height = 32*(2*sicht+1) + 15;
+    iframe.frameBorder = 0;
+    iframe.scrolling = "no";
+    kartenBereich.appendChild(iframe);
+}
+} catch (e) {
+    printError("Fehler bei der Importkarte: ", e);
 }
 //                              }}}1
 
