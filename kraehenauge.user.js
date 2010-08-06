@@ -18,7 +18,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0
 
     function sendDataWrapper(handler, type, data, responseFunction) // {{{2
     {
-        var url = "http://kraehen.org/" + handler;
+        var url = "http://localhost/" + handler;
         if (typeof opera != "undefined") {
             var xmlhttp = new opera.XMLHttpRequest();
             xmlhttp.setRequestHeader("Content-type", type);
@@ -54,7 +54,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0) {
 var clientName = 'Kr\xE4henauge';
 var clientVersion = '1.4.4 [trunk]';
 var version = clientName + " " + clientVersion;
-var DEBUG = false;
+var DEBUG = true;
 
 // Einstellungen        {{{1
 var game = {
@@ -495,7 +495,7 @@ kskKarte.title = "Kr\xE4hendatenbank"
 kskKarte.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskKarte.style.border = "1px solid red";
 var newLink = document.createElement('a');
-newLink.href = "http://kraehen.org/show";
+newLink.href = "http://localhost/show";
 newLink.target = "_blank";
 newLink.appendChild(kskKarte);
 document.getElementById('Leiste4').appendChild(newLink);
@@ -615,7 +615,7 @@ kskTag.title = "Preise";
 kskTag.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskTag.style.border = "1px solid red";
 var newLink = document.createElement('a');
-newLink.href = "http://kraehen.org/preise";
+newLink.href = "http://localhost/preise";
 newLink.target = "_blank";
 newLink.appendChild(kskTag);
 document.getElementById('Leiste4').appendChild(newLink);
@@ -797,7 +797,7 @@ function sendXMLData(handler, doc, answer)                      // {{{1
             document.getElementById("Fehlermeldungen").innerHTML = text;
         }
         sendDataWrapper(handler, "text/xml", data, responseFunction)
-        //sendDataWrapper("save?xml", "text/xml", data, responseFunction2)
+        sendDataWrapper("save?xml", "text/xml", data, responseFunction2)
     } else {
         printWarning("Es wurden keine zu sendenden Daten gefunden");
     }
@@ -1536,14 +1536,14 @@ if( gamePage == "rbarmee" ) {
     fields = splitPosition(currentPos);
     x = fields[3];
     y = fields[4];
-    iframe.src = "http://kraehen.org/import/karte/" + x + "." + y;
+    iframe.src = "http://localhost/import/karte/" + x + "." + y;
     if (typeof fields[2] != "undefined") {
         iframe.src += "/" + fields[2];
     }
     sicht = 2;
     iframe.src += "/" + sicht;
-    iframe.width = 32*(2*sicht+1) + 15;
-    iframe.height = 32*(2*sicht+1) + 15;
+    iframe.width = 32*(2*sicht+1);
+    iframe.height = 32*(2*sicht+1);
     iframe.frameBorder = 0;
     iframe.scrolling = "no";
     kartenBereich.appendChild(iframe);
