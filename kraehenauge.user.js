@@ -968,6 +968,7 @@ if (gamePage == "rbarmee") {
 if (gamePage == "rbfturm1"
         || gamePage == "rbfturm2"
         || gamePage == "rbfturma"
+        || gamePage == "rbfturme"
         || gamePage == "rbfturms") {
     // Karte suchen
     // = erstes Auftreten eines Kartenbildes im Code
@@ -999,7 +1000,7 @@ if (gamePage == "rbfturm1"
             for (var i=0; i < trNode.childNodes.length; i++) {
                 var currNode = trNode.childNodes[i];
                 // nodeType == 3 -> text node
-                if (currNode.firstChild.nodeType == "3"
+                if (currNode.firstChild && currNode.firstChild.nodeType == "3"
                         && currNode.innerHTML != "&nbsp;&nbsp;"
                         && currNode.innerHTML != "&nbsp;") {
                     var text = currNode.firstChild.nodeValue;
