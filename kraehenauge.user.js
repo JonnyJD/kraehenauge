@@ -1520,6 +1520,9 @@ if(gamePage == "rbtavernesold") { //    {{{2
                 .nextSibling.nextSibling.firstChild.name;
             if (id) {
                 armee.id = id.replace(/(armee|soeldner)\[(.+)\]/, '$2');
+                // zeige ID hinter dem Namen
+                outerTD.previousSibling.firstChild.data
+                    = name + " (" + armee.id + ")";
             }
 
             armee.add();
