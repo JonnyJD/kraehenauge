@@ -849,6 +849,7 @@ if (gamePage == "rbfturm1"
 if (gameId == 'rbspiel1728') {
     if (gamePage == 'rbally2') {
 
+        copyText = visibleText(wholePage);
         sendToHandler("send/text/allianz", "wahl=alli&textbereich",
                 copyText, "DBAntwort");
     }
