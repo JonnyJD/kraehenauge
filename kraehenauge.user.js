@@ -787,10 +787,11 @@ function sendXMLData(handler, doc, answer)                      // {{{1
         dataElem.appendChild(rbElem);
         xmlDataDoc.appendChild(dataElem);
         var serializer = new XMLSerializer();
-        if (typeof opera != "undefined") {
-            var data =serializer.serializeToString(doc);
-        } else {
+        if (typeof XML == "function") {
+            // firefox kann das XML "schick" einruecken noch
             var data = XML(serializer.serializeToString(doc)).toXMLString();
+        } else {
+            var data =serializer.serializeToString(doc);
         }
         function responseFunction(text) {
             document.getElementById(answer).innerHTML = text;
