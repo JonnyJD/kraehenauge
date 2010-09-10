@@ -268,7 +268,8 @@
 						escape(filterExcept(this,'responseText'))+'\n'+
 						filterExcept(this,'status')+'\n'+
 						filterExcept(this,'statusText')+'\n'+
-						serializeRequestHeaders(getAllXMLHttpHeaders( this ))
+						serializeRequestHeaders(getAllXMLHttpHeaders( this )),
+						'*'
 					);
 			};
 			
@@ -284,13 +285,13 @@
 			try{
 				XMLHttpRequest_send.call(xmlhttp, postArgs);
 			}catch(ex){
-				postMessage.call( evsource, crossDocResponse+ts+'\nERROR\n'+ex.message );
+				postMessage.call( evsource, crossDocResponse+ts+'\nERROR\n'+ex.message, '*' );
 			}
 			
 		},false);
 		
 		var target = iskestrelup ? window.parent : window.parent.document;
-		postMessage.call( target, acknowledge+ts );
+		postMessage.call( target, acknowledge+ts, '*' );
 		
 	}
 	else{		
@@ -519,7 +520,8 @@
 					postMessage.call( ev.source,
 						crossDocRequest+ts+'\n'+method+'\n'+uri+'\n'+
 						username+'\n'+password+'\n'+escape(args||'')+'\n'+
-						serializeRequestHeaders( requestHeaders )
+						serializeRequestHeaders( requestHeaders ),
+						'*'
 					);
 				}
 
