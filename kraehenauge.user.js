@@ -859,11 +859,7 @@ function sendToScanner()        // {{{2
     function responseFunction(text) {
         document.getElementById("ServerAntwort").innerHTML = text;
     }
-    // umgehe FF Mac http auth Problem
-    if (navigator.platform.indexOf("Mac") != 0
-            || navigator.appName != "Netscape") {
-        sendDataWrapper(handler, type, data, responseFunction);
-    }
+    sendDataWrapper(handler, type, data, responseFunction);
 }                               // }}}2
 
 function saveToServer()        // {{{2
