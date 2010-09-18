@@ -205,7 +205,8 @@ clientElem.setAttribute("version",clientVersion);
 augeElem.appendChild(clientElem);
 var sichtElem = xmlDataDoc.createElement("sicht");
 if(gamePage == "rbfturm1" || gamePage == "rbfturm2"
-    || gamePage == "rbfturma" || gamePage == "rbfturms") {
+    || gamePage == "rbfturma" || gamePage == "rbfturms"
+    || gamePage == "rbfturme") {
     sichtElem.setAttribute("typ","turm");
 } else if (gamePage == "rbarmee"
             && wholePage.indexOf("aus dem Dorf rausgehen") == -1
