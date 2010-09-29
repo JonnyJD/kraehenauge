@@ -965,10 +965,13 @@ if(gamePage == "rbfturm1" || gamePage == "rbfturm2"
     || gamePage == "rbfturma" || gamePage == "rbfturms"
     || gamePage == "rbfturme") {
     sichtElem.setAttribute("typ","turm");
-} else if (gamePage == "rbarmee"
-            && wholePage.indexOf("aus dem Dorf rausgehen") == -1
-            && wholePage.indexOf("fliehen") == -1) {
-    sichtElem.setAttribute("typ","armee");
+} else if (gamePage == "rbarmee") {
+    if (wholePage.indexOf("aus dem Dorf rausgehen") != -1
+        || wholePage.indexOf("fliehen") != -1) {
+        sichtElem.setAttribute("typ","versteckt");
+    } else {
+        sichtElem.setAttribute("typ","armee");
+    }
 } else if (gamePage == "rbftop10") {
     sichtElem.setAttribute("typ","top10");
 } else {
