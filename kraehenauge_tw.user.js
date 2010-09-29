@@ -44,7 +44,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
 var clientName = 'Kr\xE4henauge: TW-Edition';
-var clientVersion = '0.9.3 [trunk]';
+var clientVersion = '0.9.4 [trunk]';
 var version = clientName + " " + clientVersion;
 var DEBUG = false;
 
@@ -54,7 +54,7 @@ var DEBUG = false;
 // 32 = Raeuber
 // Trenner ist | (regExp ODER)
 var friendlyAllies = "(60|59)";
-var hostileAllies  = "(32)";
+var hostileAllies  = "(32|70)";
 //                       }}}1
 // Kernvariablen        {{{1
 var wholePage = document.getElementsByTagName('html')[0].innerHTML;
