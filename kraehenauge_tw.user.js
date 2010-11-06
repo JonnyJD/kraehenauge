@@ -69,6 +69,7 @@ var debugOut = "";
 function getPageName()
 {
     var gamePage = '';
+    var titleTag = document.getElementsByTagName('title')[0].firstChild.data;
     var fontTags = document.getElementsByTagName('font');
     var pageTitle = '';
     for (var i=0; i < fontTags.length; i++) {
@@ -111,6 +112,8 @@ else if (pageTitle.indexOf('Armee - Spionage') == 0)
     gamePage = 'rbspiona1';
 else if (pageTitle.indexOf('Armee - Siedlertransport') == 0)
     gamePage = 'rbmtransport2';
+else if (titleTag.indexOf('Armee - Monsterjagd') != -1)
+    gamePage = 'rbjagen';
 else if (pageTitle.indexOf('Armeekampf ') == 0)
     gamePage = 'rbarmeewar';
 else if (pageTitle.search(/Armee von (.*), Infos/) == 0)
