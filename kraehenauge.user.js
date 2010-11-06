@@ -256,7 +256,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0
 
     function splitPosition(pos) {   // {{{2
         /* fields: 0=alles 1=Q 2=level 3=X 4=Y */
-        var expr = /(Q)?(N|U[0-9])?,? ?([0-9]+),([0-9]+)/;
+        var expr = /(Q)?(N|U[0-9]+)?,? ?([0-9]+),([0-9]+)/;
         return expr.exec(pos);
     }                               // }}}2
 
