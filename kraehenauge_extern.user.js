@@ -372,7 +372,7 @@ if (gamePage == "rbarmee") {
         // Koordinaten des Mittelpunkts
         var tdNode = imgEntries[i].parentNode.nextSibling;
         text = tdNode.childNodes[1].firstChild.nodeValue;
-        var expr = /(Q)?(U[0-9])?,? ?([0-9]*),([0-9]*)/;
+        var expr = /(Q)?(U[0-9]+)?,? ?([0-9]*),([0-9]*)/;
         fields = expr.exec(text);
         var floor = fields[2];
         var x = parseInt(fields[3], 10); var y = parseInt(fields[4], 10);
@@ -571,7 +571,7 @@ function addArmee()
     }
     var posElem = xmlDataDoc.createElement("position");
     if (this.pos !== null) {
-        var expr = /(Q)?(N|U[0-9])?,? ?([0-9]+),([0-9]+)/;
+        var expr = /(Q)?(N|U[0-9]+)?,? ?([0-9]+),([0-9]+)/;
         fields = expr.exec(this.pos);
         if (typeof fields[2] == "undefined") {
             level = "N";
