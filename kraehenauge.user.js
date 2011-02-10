@@ -1977,7 +1977,7 @@ if( gamePage == "rbftop10" ) {  // {{{2
 } // ende rbftop10                      }}}2
 
 } catch (e) {
-    printWarning("Fehler in der Reichserfassung: " + e);
+    printError("Fehler in der Reichserfassung: ", e);
 }
 //                              }}}1
 
@@ -2106,7 +2106,7 @@ if( gamePage == "rbrinfo0" ) {
 
 } // ende Ressourcenauswertung
 } catch (e) {
-    printWarning("Fehler in der Ressourcenauswertung: " + e);
+    printError("Fehler in der Ressourcenauswertung: ", e);
 }
 //                              }}}1
 
@@ -2162,7 +2162,7 @@ if (gamePage == "rbzug") {
     //                          }}}2
 } // Ende Zugauswertung
 } catch (e) {
-    printWarning("Fehler in der Zugauswertung: " + e);
+    printError("Fehler in der Zugauswertung: ", e);
 }
 //                              }}}1
 
