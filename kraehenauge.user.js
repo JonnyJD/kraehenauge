@@ -2087,9 +2087,18 @@ if( gamePage == "rbrinfo0" ) {
             .childNodes[gesamt];
         var zellenText = zelle.firstChild;
         if (zellenText.firstChild) {
-            var anzahl = zellenText.childNodes[0].firstChild.nodeValue;
-            var veraenderung = zellenText.childNodes[1].nodeValue;
-            veraenderung = veraenderung.replace(/\((.*)\)/,"$1");			
+            if (zellenText.childNodes[0].firstChild) {
+                // Summe in bold tag
+                var anzahl = zellenText.childNodes[0].firstChild.nodeValue;
+                var veraenderung = zellenText.childNodes[1].nodeValue;
+                veraenderung = veraenderung.replace(/\((.*)\)/,"$1");
+            } else {
+                // Die Null ist nicht in bold
+                expr = /([0-9]+)\s\((-?[0-9]+)\)/;
+                vals = expr.exec(zellenText.childNodes[0].nodeValue);
+                var anzahl = vals[1];
+                var veraenderung = vals[2];
+            }
             if (veraenderung < 0) {
                 var restTage = Math.floor(anzahl / Math.abs(veraenderung));
                 if (restTage < restTageReich) { restTageReich = restTage; }
