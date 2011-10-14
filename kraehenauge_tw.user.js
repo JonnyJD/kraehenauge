@@ -7,9 +7,13 @@
 // @include        file://*/rbstart.php.html
 // @include        file://*/ajax_backend.php
 // @author         JonnyJD
-// @version        1.4.4
+// @version        1.4.5
 // ==/UserScript==      }}}1
 // Anmerkung: Opera versteht das @include nicht und laed immer!
+
+var operaBrowser = (typeof opera != "undefined");
+// Opera kann Formulare auch so in Tabs oeffnen
+var leftLinksOnly = operaBrowser;
 
 // gemeinsam benutzte Funktionen        {{{1
 if (document.title.indexOf("RB \xA9 - ") == 0
@@ -266,7 +270,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
 var clientName = 'Kr\xE4henauge: TW-Edition';
-var clientVersion = '1.4.4 [trunk]';
+var clientVersion = '1.4.5 [trunk]';
 var version = clientName + " " + clientVersion;
 var DEBUG = false;
 
@@ -524,7 +528,7 @@ function appendMainLink(listNumber, page, target)       // {{{1
 {
     if (page == "|") {
         createSeparation(listNumber);
-    } else {
+    } else if (!leftLinksOnly || listNumber==1 || listNumber==3) {
         var linkImage = document.createElement('input');
         linkImage.type = "image";
         linkImage.name = pages[page].name; linkImage.title = pages[page].name;
@@ -549,6 +553,18 @@ function appendMainLinkBoth(page)                           // {{{1
     appendMainLink(1, page, "");
     appendMainLink(2, page, "_blank");
 }                                                       // }}}1
+function appendExternalLink(link, sep)                       // {{{1
+{
+    if (leftLinksOnly) {
+        var leiste = 3;
+    } else {
+        var leiste = 4;
+    }
+    document.getElementById('Leiste'+leiste).appendChild(link);
+    if (sep) {
+        createSeparation(leiste); createSeparation(leiste);
+    }
+}                                                       // }}}1
 // Hauptlinkleisten     {{{1
 if (game[gameId] && game[gameId].links) {
     var links = game[gameId].links;
@@ -568,8 +584,7 @@ var newLink = document.createElement('a');
 newLink.href = "http://forum.ritterburgwelt.de";
 newLink.target = "_blank";
 newLink.appendChild(rbTag);
-document.getElementById('Leiste4').appendChild(newLink);
-createSeparation(4); createSeparation(4);
+appendExternalLink(newLink,sep=true);
 //                      }}}1
 
 // Armeedaten lesen und markieren (Erinnerung)          {{{1
@@ -683,7 +698,7 @@ if(gamePage == "rbfhandelb") {
 
 // Armeelinks                   {{{1
 if (GM_getValue(gameId+".armeen", 0)) {
-    for (var listNumber = 3; listNumber <= 4; listNumber++) { 
+    for (var listNumber = 3; listNumber <= 4-leftLinksOnly; listNumber++) { 
         var linkImages = new Array();
         for (var i = 1; i <= GM_getValue(gameId+".armeen"); i++) {
             linkImage = document.createElement('input');
@@ -713,12 +728,11 @@ var newLink = document.createElement('a');
 newLink.href = "http://kraehen.org/tw/show";
 newLink.target = "_blank";
 newLink.appendChild(kskKarte);
-document.getElementById('Leiste4').appendChild(newLink);
-createSeparation(4); createSeparation(4);
+appendExternalLink(newLink,sep=true);
 //                              }}}1
 // Dorflinks                    {{{1
 if (GM_getValue(gameId+".doerfer", 0)) {
-    for (var listNumber = 3; listNumber <= 4; listNumber++) { 
+    for (var listNumber = 3; listNumber <= 4-leftLinksOnly; listNumber++) { 
         var linkImages = new Array();
         for (var i = 1; i <= GM_getValue(gameId+".doerfer"); i ++) {
             linkImage = document.createElement('input');
@@ -742,7 +756,7 @@ if (GM_getValue(gameId+".doerfer", 0)) {
 // HBlinks                      {{{1
 if (GM_getValue(gameId+".hb.mfeld")) {
     // Ring             {{{2
-    for (var listNumber = 3; listNumber <= 4; listNumber++) { 
+    for (var listNumber = 3; listNumber <= 4-leftLinksOnly; listNumber++) { 
         var linkImages = new Array();
         var linkImage = document.createElement('input');
         linkImage.type = "image";
@@ -779,7 +793,9 @@ createSeparation(4);
 // Antwort des Scanners vom Server      {{{1
 var newDiv = document.createElement('div');
 newDiv.align = "center";
-document.getElementsByTagName('body')[0].appendChild(newDiv);
+var centerTable = document.getElementsByTagName('center')[0].firstChild;
+var centerCell = centerTable.firstChild.childNodes[2];
+centerCell.appendChild(newDiv);
 var response = document.createElement('div');
 response.id = "ServerAntwort";
 response.style.fontFamily = "monospace";
@@ -788,6 +804,7 @@ response.style.backgroundColor = "black";
 response.style.color = "green";
 response.style.width = "auto";
 response.style.maxWidth = "600px";
+newDiv.appendChild(document.createElement("br"));
 newDiv.appendChild(response);
 
 function sendToScanner()        // {{{2
@@ -812,14 +829,16 @@ function createOutputArea(id)   //      {{{1
 {
     var newDiv = document.createElement('div');
     newDiv.align = "center";
-    document.getElementsByTagName('body')[0].appendChild(newDiv);
+    var centerTable = document.getElementsByTagName('center')[0].firstChild;
+    var centerCell = centerTable.firstChild.childNodes[2];
+    centerCell.appendChild(newDiv);
     var response = document.createElement('div');
     response.id = id;
     response.style.backgroundColor = "#AF874E";
     response.style.width = "auto";
     response.style.maxWidth = "600px";
-    newDiv.appendChild(response);
     newDiv.appendChild(document.createElement("br"));
+    newDiv.appendChild(response);
     return response;
 }
 // }}}1
