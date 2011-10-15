@@ -12,8 +12,6 @@
 // Anmerkung: Opera versteht das @include nicht und laed immer!
 
 var operaBrowser = (typeof opera != "undefined");
-// Opera kann Formulare auch so in Tabs oeffnen
-var leftLinksOnly = operaBrowser;
 
 // gemeinsam benutzte Funktionen        {{{1
 if (document.title.indexOf("RB \xA9 - ") == 0
@@ -418,6 +416,10 @@ else if (pageTitle.search(/Armee von (.*), Tr\xE4nke einnehmen/) == 0)
     gamePage = 'rbarmeetrank';
 else if (pageTitle.indexOf('G\xFCtertransfer zwischen Armeen') == 0)
     gamePage = 'rbarmeegtr2';
+else if (pageTitle.indexOf('G\xFCtertransfer - Dorf') == 0)
+    gamePage = 'rbarmeegtr3';
+else if (pageTitle.indexOf('Transfer - Dorf') == 0)
+    gamePage = 'rbarmeemtr';
 else if (pageTitle.indexOf('Menschentransfer zwischen Armeen') == 0)
     gamePage = 'rbarmeemtr2';
 else if (pageTitle.indexOf('Armee') == 0)
@@ -446,54 +448,63 @@ else if (pageTitle.indexOf('Allianz ') == 0)
 gamePage = getPageName();
 //                      }}}1
 
-// Bereiche fuer die Linkleisten einfuegen      {{{1
-// Aufpassen, dass interne forms noch funktionieren
-// test case: Waren zwischen Einheiten
-var oldCenter = document.getElementsByTagName('center')[0];
+// Opera kann Formulare auch so in Tabs oeffnen
+var leftLinksOnly = operaBrowser;
+// Opera Bug: lange Formulare funktionieren nicht nach replaceNode
+var noLinks = operaBrowser && (gamePage == "rbarmeegtr2"
+                            || gamePage == "rbarmeegtr3"
+                            || gamePage == "rbfhandel1"
+                            );
+if (!noLinks) {
+    // Bereiche fuer die Linkleisten einfuegen      {{{1
+    // Aufpassen, dass interne forms noch funktionieren
+    // test case: Waren zwischen Einheiten
+    var oldCenter = document.getElementsByTagName('center')[0];
 
-// Neue Haupttabelle erstellen
-var newTable = document.createElement('table');
-var newTR = document.createElement('tr');
-var newTD = document.createElement('td');
-newTD.style.textAlign = "center"; newTD.style.verticalAlign = "top";
-var newDiv = document.createElement('div');
-newDiv.id = "Leiste3";
-newTD.appendChild(newDiv); newTR.appendChild(newTD);
-newTD = document.createElement('td');
-newTD.style.textAlign = "center"; newTD.style.verticalAlign = "top";
-newDiv = document.createElement('div');
-newDiv.id = "Leiste1";
-newTD.appendChild(newDiv); newTR.appendChild(newTD);
-// Punkt um altes Zentrum einzuhaengen
-newTD = document.createElement('td');
-newTD.id = "zentrum";
-newTD.style.textAlign = "center"; newTD.style.verticalAlign = "top";
-newTR.appendChild(newTD);
-newTD = document.createElement('td');
-newTD.style.textAlign = "center"; newTD.style.verticalAlign = "top";
-newDiv = document.createElement('div');
-newDiv.id = "Leiste2";
-newTD.appendChild(newDiv); newTR.appendChild(newTD);
-newTD = document.createElement('td');
-newTD.style.textAlign = "center"; newTD.style.verticalAlign = "top";
-newDiv = document.createElement('div');
-newDiv.id = "Leiste4";
-newTD.appendChild(newDiv); newTR.appendChild(newTD);
-newTable.appendChild(newTR);
+    // Neue Haupttabelle erstellen
+    var newTable = document.createElement('table');
+    var newTR = document.createElement('tr');
+    var newTD = document.createElement('td');
+    newTD.style.textAlign = "center"; newTD.style.verticalAlign = "top";
+    var newDiv = document.createElement('div');
+    newDiv.id = "Leiste3";
+    newTD.appendChild(newDiv); newTR.appendChild(newTD);
+    newTD = document.createElement('td');
+    newTD.style.textAlign = "center"; newTD.style.verticalAlign = "top";
+    newDiv = document.createElement('div');
+    newDiv.id = "Leiste1";
+    newTD.appendChild(newDiv); newTR.appendChild(newTD);
+    // Punkt um altes Zentrum einzuhaengen
+    newTD = document.createElement('td');
+    newTD.id = "zentrum";
+    newTD.style.textAlign = "center"; newTD.style.verticalAlign = "top";
+    newTR.appendChild(newTD);
+    newTD = document.createElement('td');
+    newTD.style.textAlign = "center"; newTD.style.verticalAlign = "top";
+    newDiv = document.createElement('div');
+    newDiv.id = "Leiste2";
+    newTD.appendChild(newDiv); newTR.appendChild(newTD);
+    newTD = document.createElement('td');
+    newTD.style.textAlign = "center"; newTD.style.verticalAlign = "top";
+    newDiv = document.createElement('div');
+    newDiv.id = "Leiste4";
+    newTD.appendChild(newDiv); newTR.appendChild(newTD);
+    newTable.appendChild(newTR);
 
-var newCenter = document.createElement('center');
-newCenter.appendChild(newTable);
-oldCenter.parentNode.replaceChild(newCenter, oldCenter);
-document.getElementById("zentrum").appendChild(oldCenter);
+    var newCenter = document.createElement('center');
+    newCenter.appendChild(newTable);
+    oldCenter.parentNode.replaceChild(newCenter, oldCenter);
+    document.getElementById("zentrum").appendChild(oldCenter);
 //                                              }}}1
+}
 // Spiel-ID zu Debugzwecken unten ausgeben      {{{1
 var gameInfo = document.createElement('div');
 gameInfo.innerHTML = '<div><br/>' + gameId + ' - ' + gamePage + '</div>';
-document.getElementsByTagName('center')[2].appendChild(gameInfo);
+document.getElementsByTagName('center')[2-noLinks].appendChild(gameInfo);
 // Versionsnummer unten ausgeben
 var versionInfo = document.createElement('div');
 versionInfo.innerHTML = '<br/>' + version;
-document.getElementsByTagName('center')[2].appendChild(versionInfo);
+document.getElementsByTagName('center')[2-noLinks].appendChild(versionInfo);
 //                                              }}}1
 function createFormLink(bereich, page, linkImages, target)       // {{{1
 {
@@ -569,6 +580,7 @@ function appendExternalLink(link, sep)                       // {{{1
         createSeparation(leiste); createSeparation(leiste);
     }
 }                                                       // }}}1
+if (!noLinks) {
 // Hauptlinkleisten     {{{1
 if (game[gameId] && game[gameId].links) {
     var links = game[gameId].links;
@@ -590,6 +602,7 @@ newLink.target = "_blank";
 newLink.appendChild(kskTag);
 appendExternalLink(newLink,sep=true);
 //                      }}}1
+}
 
 // Armeedaten lesen und markieren (Erinnerung)          {{{1
 if( gamePage == "rbstart" ) {
@@ -700,6 +713,7 @@ if(gamePage == "rbfhandelb") {
 }
 //                                                      }}}1
 
+if (!noLinks) {
 // Armeelinks                   {{{1
 if (GM_getValue(gameId+".armeen", 0)) {
     for (var listNumber = 3; listNumber <= 4-leftLinksOnly; listNumber++) { 
@@ -853,6 +867,7 @@ newLink.target = "_blank";
 newLink.appendChild(kskTag);
 appendExternalLink(newLink);
 //                              }}}1
+}
 
 // Antwort des Scanners vom Server      {{{1
 var newDiv = document.createElement('div');
@@ -926,9 +941,13 @@ function createOutputArea(id)   //      {{{1
 {
     var newDiv = document.createElement('div');
     newDiv.align = "center";
-    var centerTable = document.getElementsByTagName('center')[0].firstChild;
-    var centerCell = centerTable.firstChild.childNodes[2];
-    centerCell.appendChild(newDiv);
+    if (noLinks) {
+        document.getElementsByTagName('body')[0].appendChild(newDiv);
+    } else {
+        var centerTable = document.getElementsByTagName('center')[0].firstChild;
+        var centerCell = centerTable.firstChild.childNodes[2];
+        centerCell.appendChild(newDiv);
+    }
     var response = document.createElement('div');
     response.id = id;
     response.style.backgroundColor = "#AF874E";
