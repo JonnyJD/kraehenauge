@@ -7,7 +7,7 @@
 // @include        file://*/rbstart.php.html
 // @include        file://*/ajax_backend.php
 // @author         JonnyJD
-// @version        1.4.5
+// @version        1.4.6
 // ==/UserScript==      }}}1
 // Anmerkung: Opera versteht das @include nicht und laed immer!
 
@@ -268,7 +268,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
 var clientName = 'Kr\xE4henauge: ALLYTMP-Edition';
-var clientVersion = '1.4.5';
+var clientVersion = '1.4.6';
 var version = clientName + " " + clientVersion;
 var DEBUG = false;
 
@@ -394,8 +394,11 @@ else if (pageTitle.indexOf('Allianzen') == 0)
 // Individualseiten     {{{2
 else if (pageTitle.indexOf('Armee - Schiffsturm') == 0)
     gamePage = 'rbfturms';
+else if (pageTitle.indexOf('Armee - Sp\xE4hen') == 0
+        && wholePage.indexOf("Sp\xE4hrichtung w\xE4hlen") != -1)
+    gamePage = 'rbspaehen'; // Entdecker
 else if (pageTitle.indexOf('Armee - Sp\xE4hen') == 0)
-    gamePage = 'rbfturme'; // Entdecker
+    gamePage = 'rbspaehen1'; // Entdecker
 else if (pageTitle.indexOf('Armee - Spionage') == 0)
     gamePage = 'rbspiona1';
 else if (pageTitle.indexOf('Armee - Siedlertransport') == 0)
@@ -450,6 +453,7 @@ var leftLinksOnly = operaBrowser;
 var noLinks = operaBrowser && (gamePage == "rbarmeegtr2"
                             || gamePage == "rbarmeegtr3"
                             || gamePage == "rbfhandel1"
+                            || gamePage == "rbspaehen" // nur die Seite davor
                             );
 if (!noLinks) {
     // Bereiche fuer die Linkleisten einfuegen      {{{1
@@ -872,7 +876,7 @@ augeElem.appendChild(clientElem);
 var sichtElem = xmlDataDoc.createElement("sicht");
 if(gamePage == "rbfturm1" || gamePage == "rbfturm2"
     || gamePage == "rbfturma" || gamePage == "rbfturms"
-    || gamePage == "rbfturme") {
+    || gamePage == "rbspaehen1") {
     sichtElem.setAttribute("typ","turm");
 } else if (gamePage == "rbarmee") {
     if (wholePage.indexOf("aus dem Dorf rausgehen") != -1
@@ -962,7 +966,7 @@ if (gamePage == "rbfturm1"
     || gamePage == "rbfturm2"
     || gamePage == "rbfturma"
     || gamePage == "rbfturms"
-    || gamePage == "rbfturme"
+    || gamePage == "rbspaehen1"
     || gamePage == "rbfhandelb") {
 
     copyText = visibleText(wholePage);
@@ -1093,7 +1097,7 @@ if (gamePage == "rbarmee") {
 if (gamePage == "rbfturm1"
         || gamePage == "rbfturm2"
         || gamePage == "rbfturma"
-        || gamePage == "rbfturme"
+        || gamePage == "rbspaehen1"
         || gamePage == "rbfturms") {
     // Karte suchen
     // = erstes Auftreten eines Kartenbildes im Code
@@ -1340,7 +1344,7 @@ if( gamePage == "rbarmee"
     || gamePage == "rbfturm2"
     || gamePage == "rbfturma"
     || gamePage == "rbfturms"
-    || gamePage == "rbfturme"
+    || gamePage == "rbspaehen1"
 ) {
     var imgEntries = document.getElementsByTagName("img");
     var bundListe = new Array(); // von TRs
@@ -1868,7 +1872,7 @@ if (gamePage == "rbarmee"
         || gamePage == "rbfturm2"
         || gamePage == "rbfturma"
         || gamePage == "rbfturms"
-        || gamePage == "rbfturme"
+        || gamePage == "rbspaehen1"
         || gamePage == "rbreiche"
         || gamePage == "rbnachr1"
         || gamePage == "rbftop10"
