@@ -739,7 +739,7 @@ if (GM_getValue(gameId+".armeen", 0)) {
 //                              }}}1
 // Kraehenkarte                 {{{1
 var kskKarte = document.createElement('img');
-kskKarte.title = "Kr\xE4hendatenbank"
+kskKarte.title = "Kr\xE4hennest"
 kskKarte.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
 kskKarte.style.border = "1px solid red";
 var newLink = document.createElement('a');

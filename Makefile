@@ -4,6 +4,8 @@ export: clean
 						> kraehenauge_p.user.js
 	sed -e 's/ALLYTMP/DR/' -e 's/allytmp/dr/' kraehenauge_ally.user.js \
 						> kraehenauge_dr.user.js
+	sed -e 's/ALLYTMP/Extern/' -e 's/allytmp/ext/' \
+		kraehenauge_ally.user.js > kraehenauge_extern.user.js
 
 clean: nodebug
 	sed -i \
