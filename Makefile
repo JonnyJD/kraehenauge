@@ -5,6 +5,8 @@ export: clean
 	sed -e 's/ALLYTMP/DR/' -e 's/allytmp/dr/' kraehenauge_ally.user.js \
 						> kraehenauge_dr.user.js
 	sed -e 's/ALLYTMP/Extern/' -e 's/allytmp/ext/' \
+		-e 's/friendlyAllies = \".*\"/friendlyAllies = \"\"/' \
+		-e 's/hostileAllies  = \".*\"/hostileAllies  = \"\(32\)\"/' \
 		kraehenauge_ally.user.js > kraehenauge_extern.user.js
 
 clean: nodebug
