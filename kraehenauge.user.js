@@ -1265,8 +1265,7 @@ if (gamePage == "rbfturm1"
                         && currNode.innerHTML != "&nbsp;&nbsp;"
                         && currNode.innerHTML != "&nbsp;") {
                     var text = currNode.firstChild.nodeValue;
-                    var expr = /([0-9]*),([0-9]*)/;
-                    coords = expr.exec(text);
+                    coords = splitPosition(text);
                     coordList.push(coords);
                 }
             }
@@ -1274,9 +1273,10 @@ if (gamePage == "rbfturm1"
         var terrainPos = 0;
         for (var i=0; i < coordList.length; i++) {
             if (coordList[i] !== null) {
-                var x = parseInt(coordList[i][1], 10);
-                var y = parseInt(coordList[i][2], 10);
-                addTerrain("N", x, y, terrain[terrainPos]);
+                var x = parseInt(coordList[i][3], 10);
+                var y = parseInt(coordList[i][4], 10);
+                var level = coordList[i][2];
+                addTerrain(level, x, y, terrain[terrainPos]);
                 terrainPos++;
             }
         }
