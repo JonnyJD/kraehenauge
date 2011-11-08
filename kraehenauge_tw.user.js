@@ -993,7 +993,12 @@ if (gamePage == "rbarmee") {
 
     if (wholePage.indexOf("fliehen") == -1) {
         copyText = visibleText(wholePage);
-        sendToHandler("send/text/armee", "dorftext", copyText, "DBAntwort");
+        if (copyText.search("U[0-9]+, ") == -1) {
+            sendToHandler("send/text/armee", "dorftext", copyText, "DBAntwort");
+        } else {
+            text = "Keine Dorfdaten aus einer Hoehle gesendet"
+            document.getElementById("DBAntwort").innerHTML = text;
+        }
     }
 }
 
@@ -1005,7 +1010,12 @@ if (gamePage == "rbfturm1"
     || gamePage == "rbfhandelb") {
 
     copyText = visibleText(wholePage);
-    sendToHandler("send/text/turm", "text", copyText, "DBAntwort");
+    if (copyText.search("U[0-9]+, ") == -1) {
+        sendToHandler("send/text/turm", "text", copyText, "DBAntwort");
+    } else {
+        text = "Keine Dorfdaten aus einer Hoehle gesendet"
+        document.getElementById("DBAntwort").innerHTML = text;
+    }
 }
 
 // datenpflegeseite kann momentan nicht von allen benutzt werden
