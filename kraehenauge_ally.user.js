@@ -1154,6 +1154,7 @@ if (gamePage == "rbfturm1"
                 var x = parseInt(coordList[i][3], 10);
                 var y = parseInt(coordList[i][4], 10);
                 var level = coordList[i][2];
+                if (level == undefined) { level = "N"; }
                 addTerrain(level, x, y, terrain[terrainPos]);
                 terrainPos++;
             }
