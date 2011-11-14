@@ -1843,7 +1843,7 @@ if( gamePage == "rbarmee" ) {
             kartenBereich.removeChild(iframe);
         }
     }
-    newInput.addEventListener("click", changeKartenschalter);
+    newInput.addEventListener("click", changeKartenschalter, false);
     newDiv.appendChild(newInput);
     var textNode = document.createTextNode(" Importkarte");
     newDiv.appendChild(textNode);
