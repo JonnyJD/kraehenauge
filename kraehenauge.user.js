@@ -972,6 +972,15 @@ function sendToHandler(handler, fieldName, content, answer)      // {{{1
     }
     sendDataWrapper(handler, type, data, responseFunction);
 }                                                               // }}}1
+function sentMessage(msg, outputArea)                           // {{{1
+{
+    text = "<div style=\"background-color:yellow;\">" + msg + "</div>";
+    document.getElementById(outputArea).innerHTML = text;
+}                                                               // }}}1
+function infoMessage(msg, outputArea)                           // {{{1
+{
+    document.getElementById(outputArea).innerHTML = text;
+}                                                               // }}}1
 
 createOutputArea("DBAntwort");
 createOutputArea("ServerZusammenfassung");
@@ -1092,9 +1101,10 @@ if (gamePage == "rbarmee") {
         copyText = visibleText(wholePage);
         if (copyText.search("U[0-9]+, ") == -1) {
             sendToHandler("send/text/armee", "dorftext", copyText, "DBAntwort");
+            sentMessage("Dorfdaten gesendet", "DBAntwort");
         } else {
-            text = "Keine Dorfdaten aus einer Hoehle gesendet"
-            document.getElementById("DBAntwort").innerHTML = text;
+            text = "Keine Dorfdaten aus einer Hoehle gesendet";
+            infoMessage(text, "DBAntwort");
         }
     }
 }
@@ -1111,7 +1121,7 @@ if (gamePage == "rbfturm1"
         sendToHandler("send/text/turm", "text", copyText, "DBAntwort");
     } else {
         text = "Keine Dorfdaten aus einer Hoehle gesendet"
-        document.getElementById("DBAntwort").innerHTML = text;
+        infoMessage(text, "DBAntwort");
     }
 }
 
@@ -2075,6 +2085,7 @@ if (gamePage == "rbarmee"
         || gamePage == "rbftop10"
         || gamePage == "rbtavernesold") {
     sendXMLData("send/data", xmlDataDoc, "ServerZusammenfassung")
+    sentMessage("Armeedaten gesendet", "ServerZusammenfassung");
 }
 
 // Ressourcenauswertung         {{{1
