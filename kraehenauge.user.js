@@ -1812,6 +1812,34 @@ if(gamePage == "rbtavernesold") { //    {{{2
 // Importierte Armeekarte       {{{1
 try {
 if( gamePage == "rbarmee" ) {
+    // Sichweite der Importkarte
+    sicht = 2;
+
+    // Importkartenschalter
+    var newDiv = document.createElement('div');
+    newDiv.style.width = 32*(2*sicht+1);
+    var newInput = document.createElement('input');
+    newInput.type = "checkbox";
+    newInput.checked = GM_getValue("importkarte", true);
+    newInput.name = "importkarte";
+    newInput.value = "importkarte";
+    newInput.id = "importschalter";
+    function changeKartenschalter () {
+        importschalter = document.getElementById("importschalter");
+        GM_setValue("importkarte", importschalter.checked);
+        if (importschalter.checked) {
+            kartenBereich.appendChild(iframe);
+        } else {
+            kartenBereich.removeChild(iframe);
+        }
+    }
+    newInput.addEventListener("click", changeKartenschalter);
+    newDiv.appendChild(newInput);
+    var textNode = document.createTextNode(" Importkarte");
+    newDiv.appendChild(textNode);
+    kartenBereich.appendChild(newDiv);
+
+    // Importkarte
     iframe = document.createElement('iframe');
     fields = splitPosition(currentPos);
     x = fields[3];
@@ -1820,13 +1848,15 @@ if( gamePage == "rbarmee" ) {
     if (typeof fields[2] != "undefined") {
         iframe.src += "/" + fields[2];
     }
-    sicht = 2;
     iframe.src += "/" + sicht;
     iframe.width = 32*(2*sicht+1);
     iframe.height = 32*(2*sicht+1);
     iframe.frameBorder = 0;
     iframe.scrolling = "no";
-    kartenBereich.appendChild(iframe);
+    if (GM_getValue("importkarte", true)) {
+        kartenBereich.appendChild(iframe);
+    }
+
 }
 } catch (e) {
     printError("Fehler bei der Importkarte: ", e);
