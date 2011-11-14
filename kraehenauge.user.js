@@ -2269,6 +2269,57 @@ if (gamePage == "rbzug") {
 }
 //                              }}}1
 
+// Einheitenlistensummen         {{{1
+try {
+if( gamePage == "rbminfo0" ) {
+    // Finde die Menschentabelle
+    var menschenTabelle = "";
+    var tabellen = document.getElementsByTagName("table");
+    for (var i=0; i < tabellen.length; i++) {
+        if (tabellen[i].getElementsByTagName("tr")[0]
+                .firstChild.firstChild.data == "Einheitenart") {
+            menschenTabelle = tabellen[i];
+            break;
+        }
+    }
+    var tabellenKern = menschenTabelle.getElementsByTagName("tr")[0].parentNode;
+    var summenZeile = document.createElement("tr");
+    tabellenKern.insertBefore(summenZeile, tabellenKern.childNodes[1]);
+    var zeilenZahl = tabellenKern.childNodes.length;
+    var spaltenZahl = tabellenKern.firstChild.childNodes.length;
+
+    // Zeile mit Summen vorbereiten
+    for (var i=0; i < spaltenZahl; i++) {
+        newTd = document.createElement("td");
+        if (i==0) {
+            newTd.colSpan = 2;
+        }
+        summenZeile.appendChild(newTd);
+    }
+    var textNode = document.createTextNode("Menschen gesamt");
+    summenZeile.childNodes[0].appendChild(textNode);
+
+    // jede Spalte Betrachten
+    for (var s = 1; s < spaltenZahl; s++) {
+        var spaltenSumme = 0;
+        for (var i = 2; i < zeilenZahl; i++) {
+            var zelle = tabellenKern.childNodes[i].childNodes[s+1];
+            var boldElems = zelle.getElementsByTagName("b")
+            if (boldElems.length > 0) {
+                var boldText = boldElems[0].firstChild.data;
+                spaltenSumme += parseInt(boldText, 10);
+            }
+        }
+        var textNode = document.createTextNode(spaltenSumme);
+        summenZeile.childNodes[s].appendChild(textNode);
+    }
+
+} // ende Ressourcenauswertung
+} catch (e) {
+    printError("Fehler in der Ressourcenauswertung: ", e);
+}
+//                              }}}1
+
 // debugausgabe {{{1
 if (debugOut != "") {
     gameInfo.appendChild(document.createTextNode(debugOut));
