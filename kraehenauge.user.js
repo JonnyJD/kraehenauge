@@ -7,7 +7,7 @@
 // @include        file://*/rbstart.php.html
 // @include        file://*/ajax_backend.php
 // @author         JonnyJD
-// @version        1.5.2
+// @version        1.5.3
 // ==/UserScript==      }}}1
 // Anmerkung: Opera versteht das @include nicht und laed immer!
 
@@ -268,7 +268,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
 var clientName = 'Kr\xE4henauge';
-var clientVersion = '1.5.2 [trunk]';
+var clientVersion = '1.5.3 [trunk]';
 var version = clientName + " " + clientVersion;
 var DEBUG = false;
 
@@ -2074,7 +2074,8 @@ if( gamePage == "rbftop10" ) {  // {{{2
 }
 //                              }}}1
 
-if (gamePage == "rbarmee"
+// XML-Daten senden             {{{1
+if (dataGathered && (gamePage == "rbarmee"
         || gamePage == "rbfturm1"
         || gamePage == "rbfturm2"
         || gamePage == "rbfturma"
@@ -2083,10 +2084,24 @@ if (gamePage == "rbarmee"
         || gamePage == "rbreiche"
         || gamePage == "rbnachr1"
         || gamePage == "rbftop10"
-        || gamePage == "rbtavernesold") {
+        || gamePage == "rbtavernesold")) {
+
+    // XML Daten senden
     sendXMLData("send/data", xmlDataDoc, "ServerZusammenfassung")
-    sentMessage("Armeedaten gesendet", "ServerZusammenfassung");
-}
+
+    // spezifische Sende-Nachricht anzeigen
+    if (gamePage == "rbarmee"
+            || gamePage == "rbfturm1"
+            || gamePage == "rbfturm2"
+            || gamePage == "rbfturma"
+            || gamePage == "rbfturms"
+            || gamePage == "rbspaehen1"
+            || gamePage == "rbtavernesold") {
+        sentMessage("Armeedaten gesendet", "ServerZusammenfassung");
+    } else { // rbreiche, rbnachr1, rbftop10
+        sentMessage("Reichsdaten gesendet", "ServerZusammenfassung");
+    }
+}       //                      }}}1
 
 // Ressourcenauswertung         {{{1
 try {
