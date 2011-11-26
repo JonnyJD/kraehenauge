@@ -840,6 +840,15 @@ function sendToHandler(handler, fieldName, content, answer)      // {{{1
     }
     sendDataWrapper(handler, type, data, responseFunction);
 }                                                               // }}}1
+function sentMessage(msg, outputArea)                           // {{{1
+{
+    text = "<div style=\"background-color:yellow;\">" + msg + "</div>";
+    document.getElementById(outputArea).innerHTML = text;
+}                                                               // }}}1
+function infoMessage(msg, outputArea)                           // {{{1
+{
+    document.getElementById(outputArea).innerHTML = text;
+}                                                               // }}}1
 
 createOutputArea("DBAntwort");
 createOutputArea("ServerZusammenfassung");
@@ -960,9 +969,10 @@ if (gamePage == "rbarmee") {
         copyText = visibleText(wholePage);
         if (copyText.search("U[0-9]+, ") == -1) {
             sendToHandler("send/text/armee", "dorftext", copyText, "DBAntwort");
+            sentMessage("Dorfdaten gesendet", "DBAntwort");
         } else {
-            text = "Keine Dorfdaten aus einer Hoehle gesendet"
-            document.getElementById("DBAntwort").innerHTML = text;
+            text = "Keine Dorfdaten aus einer Hoehle gesendet";
+            infoMessage(text, "DBAntwort");
         }
     }
 }
@@ -979,7 +989,7 @@ if (gamePage == "rbfturm1"
         sendToHandler("send/text/turm", "text", copyText, "DBAntwort");
     } else {
         text = "Keine Dorfdaten aus einer Hoehle gesendet"
-        document.getElementById("DBAntwort").innerHTML = text;
+        infoMessage(text, "DBAntwort");
     }
 }
 
@@ -1878,7 +1888,8 @@ if( gamePage == "rbftop10" ) {  // {{{2
 }
 //                              }}}1
 
-if (gamePage == "rbarmee"
+// XML-Daten senden             {{{1
+if (dataGathered && (gamePage == "rbarmee"
         || gamePage == "rbfturm1"
         || gamePage == "rbfturm2"
         || gamePage == "rbfturma"
@@ -1887,9 +1898,24 @@ if (gamePage == "rbarmee"
         || gamePage == "rbreiche"
         || gamePage == "rbnachr1"
         || gamePage == "rbftop10"
-        || gamePage == "rbtavernesold") {
+        || gamePage == "rbtavernesold")) {
+
+    // XML Daten senden
     sendXMLData("send/data", xmlDataDoc, "ServerZusammenfassung")
-}
+
+    // spezifische Sende-Nachricht anzeigen
+    if (gamePage == "rbarmee"
+            || gamePage == "rbfturm1"
+            || gamePage == "rbfturm2"
+            || gamePage == "rbfturma"
+            || gamePage == "rbfturms"
+            || gamePage == "rbspaehen1"
+            || gamePage == "rbtavernesold") {
+        sentMessage("Armeedaten gesendet", "ServerZusammenfassung");
+    } else { // rbreiche, rbnachr1, rbftop10
+        sentMessage("Reichsdaten gesendet", "ServerZusammenfassung");
+    }
+}       //                      }}}1
 
 // Ressourcenauswertung         {{{1
 try {
@@ -2069,6 +2095,57 @@ if (gamePage == "rbzug") {
 } // Ende Zugauswertung
 } catch (e) {
     printError("Fehler in der Zugauswertung: ", e);
+}
+//                              }}}1
+
+// Einheitenlistensummen         {{{1
+try {
+if( gamePage == "rbminfo0" ) {
+    // Finde die Menschentabelle
+    var menschenTabelle = "";
+    var tabellen = document.getElementsByTagName("table");
+    for (var i=0; i < tabellen.length; i++) {
+        if (tabellen[i].getElementsByTagName("tr")[0]
+                .firstChild.firstChild.data == "Einheitenart") {
+            menschenTabelle = tabellen[i];
+            break;
+        }
+    }
+    var tabellenKern = menschenTabelle.getElementsByTagName("tr")[0].parentNode;
+    var summenZeile = document.createElement("tr");
+    tabellenKern.insertBefore(summenZeile, tabellenKern.childNodes[1]);
+    var zeilenZahl = tabellenKern.childNodes.length;
+    var spaltenZahl = tabellenKern.firstChild.childNodes.length;
+
+    // Zeile mit Summen vorbereiten
+    for (var i=0; i < spaltenZahl; i++) {
+        newTd = document.createElement("td");
+        if (i==0) {
+            newTd.colSpan = 2;
+        }
+        summenZeile.appendChild(newTd);
+    }
+    var textNode = document.createTextNode("Menschen gesamt");
+    summenZeile.childNodes[0].appendChild(textNode);
+
+    // jede Spalte Betrachten
+    for (var s = 1; s < spaltenZahl; s++) {
+        var spaltenSumme = 0;
+        for (var i = 2; i < zeilenZahl; i++) {
+            var zelle = tabellenKern.childNodes[i].childNodes[s+1];
+            var boldElems = zelle.getElementsByTagName("b")
+            if (boldElems.length > 0) {
+                var boldText = boldElems[0].firstChild.data;
+                spaltenSumme += parseInt(boldText, 10);
+            }
+        }
+        var textNode = document.createTextNode(spaltenSumme);
+        summenZeile.childNodes[s].appendChild(textNode);
+    }
+
+} // ende Ressourcenauswertung
+} catch (e) {
+    printError("Fehler in der Ressourcenauswertung: ", e);
 }
 //                              }}}1
 
