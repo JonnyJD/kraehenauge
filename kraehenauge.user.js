@@ -297,7 +297,7 @@ var game = {
 // 32 = Raeuber
 // Trenner ist | (regExp ODER)
 var friendlyAllies = "(60|59|31|38)";
-var hostileAllies  = "(32|67)";
+var hostileAllies  = "(32)";
 
 // Einstellungen Ressourcenauswertung und Zugauswertung
 // Bei welcher anzahl verbleibender Tage welche Farbe benutzt wird:
