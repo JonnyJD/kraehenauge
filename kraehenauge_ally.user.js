@@ -592,14 +592,14 @@ for (var i = 0; i < links.length; i++) {
 }
 //                      }}}1
 // rbforum             {{{1
-var rbTag = document.createElement('img');
-rbTag.title = "RB-Forum";
-rbTag.src = "http://forum.ritterburgwelt.de/images/rbdesign/statusicon/forum_new.gif";
-rbTag.style.border = "1px solid red";
+var img = document.createElement('img');
+img.title = "RB-Forum";
+img.src = "http://forum.ritterburgwelt.de/images/rbdesign/statusicon/forum_new.gif";
+img.style.border = "1px solid red";
 var newLink = document.createElement('a');
 newLink.href = "http://forum.ritterburgwelt.de";
 newLink.target = "_blank";
-newLink.appendChild(rbTag);
+newLink.appendChild(img);
 appendExternalLink(newLink,sep=true);
 //                      }}}1
 }
