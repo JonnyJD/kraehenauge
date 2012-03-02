@@ -596,14 +596,14 @@ for (var i = 0; i < links.length; i++) {
 }
 //                      }}}1
 // kskforum             {{{1
-var kskTag = document.createElement('img');
-kskTag.title = "KSK-Forum";
-kskTag.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
-kskTag.style.border = "1px solid red";
+var img = document.createElement('img');
+img.title = "KSK-Forum";
+img.src = "http://www.ritterburgwelt.de/rb/held/allym60.gif";
+img.style.border = "1px solid red";
 var newLink = document.createElement('a');
 newLink.href = "http://ksk.JonnyJD.net/";
 newLink.target = "_blank";
-newLink.appendChild(kskTag);
+newLink.appendChild(img);
 appendExternalLink(newLink,sep=true);
 //                      }}}1
 }
