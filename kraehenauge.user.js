@@ -1063,6 +1063,12 @@ function sendXMLData(handler, doc, answer)                      // {{{1
         }
         function responseFunction(text) {
             document.getElementById(answer).innerHTML = text;
+            // request Importkarte when XMLdata was ack'd by the server
+            // should include these updates now
+            if (GM_getValue("importkarte", true)) {
+                kartenBereich.appendChild(iframe);
+            }
+
         }
         function responseFunction2(text) {
             document.getElementById("Fehlermeldungen").innerHTML = text;
@@ -1863,10 +1869,6 @@ if( gamePage == "rbarmee" ) {
     iframe.height = 32*(2*sicht+1);
     iframe.frameBorder = 0;
     iframe.scrolling = "no";
-    if (GM_getValue("importkarte", true)) {
-        kartenBereich.appendChild(iframe);
-    }
-
 }
 } catch (e) {
     printError("Fehler bei der Importkarte: ", e);
