@@ -7,7 +7,7 @@
 // @include        file://*/rbstart.php.html
 // @include        file://*/ajax_backend.php
 // @author         JonnyJD
-// @version        1.5
+// @version        1.5.1
 // ==/UserScript==      }}}1
 // Anmerkung: Opera versteht das @include nicht und laed immer!
 
@@ -268,7 +268,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
 var clientName = 'Kr\xE4henauge: TW-Edition';
-var clientVersion = '1.5';
+var clientVersion = '1.5.1';
 var version = clientName + " " + clientVersion;
 var DEBUG = false;
 
