@@ -18,11 +18,13 @@ echo
 echo "Bitte rufen sie die Datei 'rbstart.php.html' mit dem Browser auf"
 echo
 for testfile in *.html; do
-	echo $testfile " -> " $ziel
-	cp "$testfile" "$ziel"
-	echo "  (bitte 'rbstart.php.html' testen)  "
-	# warte auf Eingabe
-	read KEY
+	if [ "$testfile" != "`basename $ziel`" ]; then
+		echo $testfile " -> " $ziel
+		cp "$testfile" "$ziel"
+		echo "  (bitte 'rbstart.php.html' testen)  "
+		# warte auf Eingabe
+		read KEY
+	fi
 done
 echo "bitte auch 'regress/ajax_backend.php' testen"
 rm $ziel
