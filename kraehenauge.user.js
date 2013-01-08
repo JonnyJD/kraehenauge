@@ -12,12 +12,97 @@
 // ==/UserScript==      }}}1
 // Anmerkung: Opera versteht das @include nicht und laed immer!
 
-var operaBrowser = (typeof opera != "undefined");
+// RB-Spielseite
+if (document.title.indexOf("RB \xA9 - ") == 0) {
 
-// gemeinsam benutzte Funktionen        {{{1
+var clientName = 'Kr\xE4henauge';
+var clientVersion = '1.6 [trunk]';
+var version = clientName + " " + clientVersion;
+var DEBUG = false;
+// Opera kann Formulare auch so in Tabs oeffnen
+var leftLinksOnly = operaBrowser;
+
+// Einstellungen        {{{1
+// Armeesortierung und roter Hintergrund bei Feinden
+// 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
+// 59 = TW, 60 = KSK, 61 = UfR, 63 = BdS, 67 = RK, 70 = NW
+// 32 = Raeuber
+// Trenner ist | (regExp ODER)
+var friendlyAllies = "(60|59|31|38)";
+var hostileAllies  = "(32)";
+
+// Einstellungen Ressourcenauswertung und Zugauswertung
+// Bei welcher anzahl verbleibender Tage welche Farbe benutzt wird:
+tageRot = 5
+tageGelb = 15
+// 2 Zuege macht man taeglich mindestens
+zuegeRot = 10
+zuegeGelb = 30
+
+var game = {
+    standard: {
+        links: new Array("rbstart",
+                       // Neuigkeiten
+                       "|", "rbchronik1", "rbereignis", "rbnachr1", "rbquest",
+                       // Militaer
+                       "|", "rbfturma", "rbmonster", "rbminfo0",
+                       // Wirtschaft
+                       "|", "rbrinfo0", "rbrezept", "rbsanzeige2",
+                       // Diplomatie
+                       "|", "rbtop10", "rbreiche", "rbdiplo", "rbally1"),
+        hb: new Array({ mfeld: "294270", feld: "55" },
+                { mfeld: "292270", feld: "30" })
+    },
+    // der Spieler, der die AB und EB kontrolliert
+    ab: "rbspiel1728",
+}
+
+//                       }}}1
+}
+
 if (document.title.indexOf("RB \xA9 - ") == 0
             || document.location
             == "http://www.ritterburgwelt.de/rb/ajax_backend.php") {
+function createOutputArea(id)   //      {{{1
+{
+    var newDiv = document.createElement('div');
+    newDiv.align = "center";
+    if (noLinks) {
+        document.getElementsByTagName('body')[0].appendChild(newDiv);
+    } else {
+        var centerTable = document.getElementsByTagName('center')[0].firstChild;
+        var centerCell = centerTable.firstChild.childNodes[2];
+        centerCell.appendChild(newDiv);
+    }
+    var response = document.createElement('div');
+    response.id = id;
+    response.style.backgroundColor = "#AF874E";
+    response.style.width = "auto";
+    response.style.maxWidth = "600px";
+    response.style.marginTop = "5px";
+    newDiv.appendChild(response);
+    return response;
+}
+// }}}1
+var fehlerMeldungen = createOutputArea("Fehlermeldungen");
+fehlerMeldungen.style.backgroundColor = "red";
+function printError(message, e)                 // {{{1
+{
+    printWarning(message + e);
+    if (DEBUG) {
+        // Erzwinge Abbruch, aber auch Details in der Konsole
+        printWarning("Details in der Fehlerkonsole");
+        throw e;
+    }
+}                                               // }}}1
+function printWarning(message)                    // {{{1
+{
+    var output = document.getElementById("Fehlermeldungen");
+    output.appendChild(document.createTextNode(message));
+    output.appendChild(document.createElement("br"));
+}                                               // }}}1
+// Browser API                          {{{1
+    var operaBrowser = (typeof opera != "undefined");
 
     function sendDataWrapper(handler, type, data, responseFunction) // {{{2
     {
@@ -103,59 +188,12 @@ if (document.title.indexOf("RB \xA9 - ") == 0
         }
     }
     //                                          }}}2
-
-    function splitPosition(pos) {   // {{{2
-        /* fields: 0=alles 1=Q 2=level 3=X 4=Y */
-        var expr = /(Q)?(N|U[0-9]+)?,? ?([0-9]+),([0-9]+)/;
-        return expr.exec(pos);
-    }                               // }}}2
-
-}                               //      }}}1
+//      }}}1
+}
 
 // RB-Spielseite
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
-var clientName = 'Kr\xE4henauge';
-var clientVersion = '1.6 [trunk]';
-var version = clientName + " " + clientVersion;
-var DEBUG = false;
-
-// Einstellungen        {{{1
-var game = {
-    standard: {
-        links: new Array("rbstart",
-                       // Neuigkeiten
-                       "|", "rbchronik1", "rbereignis", "rbnachr1", "rbquest",
-                       // Militaer
-                       "|", "rbfturma", "rbmonster", "rbminfo0",
-                       // Wirtschaft
-                       "|", "rbrinfo0", "rbrezept", "rbsanzeige2",
-                       // Diplomatie
-                       "|", "rbtop10", "rbreiche", "rbdiplo", "rbally1"),
-        hb: new Array({ mfeld: "294270", feld: "55" },
-                { mfeld: "292270", feld: "30" })
-    },
-    // der Spieler, der die AB und EB kontrolliert
-    ab: "rbspiel1728",
-}
-
-// Einstellungen Armeesortierung
-// 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
-// 59 = TW, 60 = KSK, 61 = UfR, 63 = BdS, 67 = RK, 70 = NW
-// 32 = Raeuber
-// Trenner ist | (regExp ODER)
-var friendlyAllies = "(60|59|31|38)";
-var hostileAllies  = "(32)";
-
-// Einstellungen Ressourcenauswertung und Zugauswertung
-// Bei welcher anzahl verbleibender Tage welche Farbe benutzt wird:
-tageRot = 5
-tageGelb = 15
-// 2 Zuege macht man taeglich mindestens
-zuegeRot = 10
-zuegeGelb = 30
-
-//                       }}}1
 var pages = {        // {{{1
     rbstart:     {name: "Thronsaal",       pic: "start"},
     rbchronik1:  {name: "Chronik",         pic: "chronik"},
@@ -299,8 +337,6 @@ else if (pageTitle.indexOf('Allianz ') == 0)
 gamePage = getPageName();
 //                      }}}1
 
-// Opera kann Formulare auch so in Tabs oeffnen
-var leftLinksOnly = operaBrowser;
 // Opera Bug: lange Formulare funktionieren nicht nach replaceNode
 var noLinks = operaBrowser && (gamePage == "rbarmeegtr2"
                             || gamePage == "rbarmeegtr3"
@@ -349,6 +385,7 @@ if (!noLinks) {
     document.getElementById("zentrum").appendChild(oldCenter);
 //                                              }}}1
 }
+
 // Spiel-ID zu Debugzwecken unten ausgeben      {{{1
 var gameInfo = document.createElement('div');
 gameInfo.innerHTML = '<div><br/>' + gameId + ' - ' + gamePage + '</div>';
@@ -432,6 +469,7 @@ function appendExternalLink(link, sep)                       // {{{1
         createSeparation(leiste); createSeparation(leiste);
     }
 }                                                       // }}}1
+
 if (!noLinks) {
 // Hauptlinkleisten     {{{1
 if (game[gameId] && game[gameId].links) {
@@ -455,6 +493,12 @@ newLink.appendChild(img);
 appendExternalLink(newLink,sep=true);
 //                      }}}1
 }
+
+function splitPosition(pos) {   // {{{1
+    /* fields: 0=alles 1=Q 2=level 3=X 4=Y */
+    var expr = /(Q)?(N|U[0-9]+)?,? ?([0-9]+),([0-9]+)/;
+    return expr.exec(pos);
+}                               // }}}1
 
 // Armeedaten lesen und markieren (Erinnerung)          {{{1
 if( gamePage == "rbstart" ) {
@@ -721,28 +765,6 @@ appendExternalLink(newLink);
 //                              }}}1
 }
 
-function createOutputArea(id)   //      {{{1
-{
-    var newDiv = document.createElement('div');
-    newDiv.align = "center";
-    if (noLinks) {
-        document.getElementsByTagName('body')[0].appendChild(newDiv);
-    } else {
-        var centerTable = document.getElementsByTagName('center')[0].firstChild;
-        var centerCell = centerTable.firstChild.childNodes[2];
-        centerCell.appendChild(newDiv);
-    }
-    var response = document.createElement('div');
-    response.id = id;
-    response.style.backgroundColor = "#AF874E";
-    response.style.width = "auto";
-    response.style.maxWidth = "600px";
-    response.style.marginTop = "5px";
-    newDiv.appendChild(response);
-    return response;
-}
-// }}}1
-
 // Antwort des Scanners vom Server      {{{1
 var serverAntwort = createOutputArea("ServerAntwort");
 serverAntwort.style.fontFamily = "monospace";
@@ -824,26 +846,6 @@ function infoMessage(msg, outputArea)                           // {{{1
     document.getElementById(outputArea).innerHTML = text;
 }                                                               // }}}1
 
-createOutputArea("DBAntwort");
-createOutputArea("ServerZusammenfassung");
-var fehlerMeldungen = createOutputArea("Fehlermeldungen");
-fehlerMeldungen.style.backgroundColor = "red";
-
-function printError(message, e)                 // {{{1
-{
-    printWarning(message + e);
-    if (DEBUG) {
-        // Erzwinge Abbruch, aber auch Details in der Konsole
-        printWarning("Details in der Fehlerkonsole");
-        throw e;
-    }
-}                                               // }}}1
-function printWarning(message)                    // {{{1
-{
-    var output = document.getElementById("Fehlermeldungen");
-    output.appendChild(document.createTextNode(message));
-    output.appendChild(document.createElement("br"));
-}                                               // }}}1
 // zu sendendes xml-Dokument vorbereiten                        // {{{1
 var xmlDataDoc = document.implementation.createDocument("", "", null);
 // root-Element
@@ -947,6 +949,7 @@ function visibleText(htmlPage)                                  // {{{2
     return copyText;
 }                                               // }}}2
 
+createOutputArea("DBAntwort");
 
 if (gamePage == "rbarmee") {
 
@@ -1927,6 +1930,7 @@ if( gamePage == "rbftop10" ) {  // {{{2
 //                              }}}1
 
 // XML-Daten senden             {{{1
+createOutputArea("ServerZusammenfassung");
 if (dataGathered && (gamePage == "rbarmee"
         || gamePage == "rbfturm1"
         || gamePage == "rbfturm2"
@@ -2192,7 +2196,7 @@ if (debugOut != "") {
     gameInfo.appendChild(document.createTextNode(debugOut));
 }       //      }}}1
 
-}
+}       // end if RB-PAGE
 
 // Reichs-IDs vom Server                                {{{1
 if (document.location == "http://www.ritterburgwelt.de/rb/ajax_backend.php") {
