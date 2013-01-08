@@ -21,15 +21,26 @@ if (document.title.indexOf("RB \xA9 - ") == 0
     function sendDataWrapper(handler, type, data, responseFunction) // {{{2
     {
         var url = "http://kraehen.org/" + handler;
-        if (typeof opera != "undefined") {
-            var xmlhttp = new opera.XMLHttpRequest();
+        function __xhr_send(xmlhttp) {
+            xmlhttp.open('POST', url, true);
+            xmlhttp.withCredentials = true;     /* for http auth */
             xmlhttp.setRequestHeader("Content-type", type);
             xmlhttp.onload = function(){
                 responseFunction(this.responseText);
             }
-            xmlhttp.open('POST', url, true);
             xmlhttp.send(data);
-        } else {
+        }
+
+        if ("withCredentials" in new XMLHttpRequest()) {
+            /* CORS support in xhr */
+            __xhr_send(new XMLHttpRequest());
+        } else if (typeof opera != "undefined"
+                && typeof opera.XMLHttpRequest != "undefined") {
+            /* use userscript provided xhr (Opera 11) */
+            __xhr_send(new opera.XMLHttpRequest());
+        } else if (typeof GM_xmlhttpRequest != "undefined") {
+            /* use greasemonkey object
+             * doesn't work for many GM emulations */
             GM_xmlhttpRequest({
                 method: 'POST',
                 url:    url,
@@ -39,7 +50,11 @@ if (document.title.indexOf("RB \xA9 - ") == 0
                     responseFunction(responseDetails.responseText);
                 },
             })
+        } else {
+            printWarning("Browser unterst\xFCtzt keine Aktualisierung!");
+            return false;
         }
+        return true;
     }                                                               //}}}2
 
     if (typeof opera != "undefined" && typeof GM_log != "function") {
@@ -873,22 +888,36 @@ appendExternalLink(newLink);
 //                              }}}1
 }
 
+function createOutputArea(id)   //      {{{1
+{
+    var newDiv = document.createElement('div');
+    newDiv.align = "center";
+    if (noLinks) {
+        document.getElementsByTagName('body')[0].appendChild(newDiv);
+    } else {
+        var centerTable = document.getElementsByTagName('center')[0].firstChild;
+        var centerCell = centerTable.firstChild.childNodes[2];
+        centerCell.appendChild(newDiv);
+    }
+    var response = document.createElement('div');
+    response.id = id;
+    response.style.backgroundColor = "#AF874E";
+    response.style.width = "auto";
+    response.style.maxWidth = "600px";
+    response.style.marginTop = "5px";
+    newDiv.appendChild(response);
+    return response;
+}
+// }}}1
+
 // Antwort des Scanners vom Server      {{{1
-var newDiv = document.createElement('div');
-newDiv.align = "center";
-var centerTable = document.getElementsByTagName('center')[0].firstChild;
-var centerCell = centerTable.firstChild.childNodes[2];
-centerCell.appendChild(newDiv);
-var response = document.createElement('div');
-response.id = "ServerAntwort";
-response.style.fontFamily = "monospace";
-response.style.whiteSpace = "pre";
-response.style.backgroundColor = "black";
-response.style.color = "green";
-response.style.width = "auto";
-response.style.maxWidth = "600px";
-newDiv.appendChild(document.createElement("br"));
-newDiv.appendChild(response);
+var serverAntwort = createOutputArea("ServerAntwort");
+serverAntwort.style.fontFamily = "monospace";
+serverAntwort.style.whiteSpace = "pre";
+serverAntwort.style.backgroundColor = "black";
+serverAntwort.style.color = "green";
+serverAntwort.style.width = "auto";
+serverAntwort.style.maxWidth = "600px";
 
 function sendToScanner()        // {{{2
 {
@@ -898,7 +927,7 @@ function sendToScanner()        // {{{2
     function responseFunction(text) {
         document.getElementById("ServerAntwort").innerHTML = text;
     }
-    sendDataWrapper(handler, type, data, responseFunction);
+    return sendDataWrapper(handler, type, data, responseFunction);
 }                               // }}}2
 
 function saveToServer()        // {{{2
@@ -941,36 +970,16 @@ if (gamePage == "rbftop10"
 }
 //                                      }}}1
 
-function createOutputArea(id)   //      {{{1
-{
-    var newDiv = document.createElement('div');
-    newDiv.align = "center";
-    if (noLinks) {
-        document.getElementsByTagName('body')[0].appendChild(newDiv);
-    } else {
-        var centerTable = document.getElementsByTagName('center')[0].firstChild;
-        var centerCell = centerTable.firstChild.childNodes[2];
-        centerCell.appendChild(newDiv);
-    }
-    var response = document.createElement('div');
-    response.id = id;
-    response.style.backgroundColor = "#AF874E";
-    response.style.width = "auto";
-    response.style.maxWidth = "600px";
-    newDiv.appendChild(document.createElement("br"));
-    newDiv.appendChild(response);
-    return response;
-}
-// }}}1
-
 function sendToHandler(handler, fieldName, content, answer)      // {{{1
 {
     var type = "application/x-www-form-urlencoded";
     var data = a+pid+fieldName+'='+encodeURIComponent(content);
     function responseFunction(text) {
-        document.getElementById(answer).innerHTML = text;
+        answerDiv = document.getElementById(answer)
+        answerDiv.style.border = "1px solid #4e1d00";
+        answerDiv.innerHTML = text;
     }
-    sendDataWrapper(handler, type, data, responseFunction);
+    return sendDataWrapper(handler, type, data, responseFunction);
 }                                                               // }}}1
 function sentMessage(msg, outputArea)                           // {{{1
 {
@@ -984,7 +993,8 @@ function infoMessage(msg, outputArea)                           // {{{1
 
 createOutputArea("DBAntwort");
 createOutputArea("ServerZusammenfassung");
-createOutputArea("Fehlermeldungen");
+var fehlerMeldungen = createOutputArea("Fehlermeldungen");
+fehlerMeldungen.style.backgroundColor = "red";
 
 function printError(message, e)                 // {{{1
 {
@@ -1062,10 +1072,13 @@ function sendXMLData(handler, doc, answer)                      // {{{1
             var data =serializer.serializeToString(doc);
         }
         function responseFunction(text) {
-            document.getElementById(answer).innerHTML = text;
+            answerDiv = document.getElementById(answer)
+            answerDiv.style.border = "1px solid #4e1d00";
+            answerDiv.innerHTML = text;
             // request Importkarte when XMLdata was ack'd by the server
             // should include these updates now
-            if (GM_getValue("importkarte", true)) {
+            if (GM_getValue("importkarte", true)
+                    && typeof kartenBereich != "undefined") {
                 kartenBereich.appendChild(iframe);
             }
 
@@ -1073,10 +1086,11 @@ function sendXMLData(handler, doc, answer)                      // {{{1
         function responseFunction2(text) {
             document.getElementById("Fehlermeldungen").innerHTML = text;
         }
-        sendDataWrapper(handler, "text/xml", data, responseFunction)
+        return sendDataWrapper(handler, "text/xml", data, responseFunction);
         //sendDataWrapper("save?xml", "text/xml", data, responseFunction2)
     } else {
         printWarning("Es wurden keine zu sendenden Daten gefunden");
+        return false;
     }
 }                                                               // }}}1
 
@@ -1106,8 +1120,9 @@ if (gamePage == "rbarmee") {
     if (wholePage.indexOf("fliehen") == -1) {
         copyText = visibleText(wholePage);
         if (copyText.search("U[0-9]+, ") == -1) {
-            sendToHandler("send/text/armee", "dorftext", copyText, "DBAntwort");
-            sentMessage("Dorfdaten gesendet", "DBAntwort");
+            if (sendToHandler("send/text/armee", "dorftext", copyText, "DBAntwort")) {
+                sentMessage("Dorfdaten gesendet", "DBAntwort");
+            }
         } else {
             text = "Keine Dorfdaten aus einer Hoehle gesendet";
             infoMessage(text, "DBAntwort");
@@ -1124,7 +1139,9 @@ if (gamePage == "rbfturm1"
 
     copyText = visibleText(wholePage);
     if (copyText.search("U[0-9]+, ") == -1) {
-        sendToHandler("send/text/turm", "text", copyText, "DBAntwort");
+        if (sendToHandler("send/text/turm", "text", copyText, "DBAntwort")) {
+            sentMessage("Dorfdaten gesendet", "DBAntwort");
+        }
     } else {
         text = "Keine Dorfdaten aus einer Hoehle gesendet"
         infoMessage(text, "DBAntwort");
@@ -2089,19 +2106,20 @@ if (dataGathered && (gamePage == "rbarmee"
         || gamePage == "rbtavernesold")) {
 
     // XML Daten senden
-    sendXMLData("send/data", xmlDataDoc, "ServerZusammenfassung")
+    if (sendXMLData("send/data", xmlDataDoc, "ServerZusammenfassung")) {
 
-    // spezifische Sende-Nachricht anzeigen
-    if (gamePage == "rbarmee"
-            || gamePage == "rbfturm1"
-            || gamePage == "rbfturm2"
-            || gamePage == "rbfturma"
-            || gamePage == "rbfturms"
-            || gamePage == "rbspaehen1"
-            || gamePage == "rbtavernesold") {
-        sentMessage("Armeedaten gesendet", "ServerZusammenfassung");
-    } else { // rbreiche, rbnachr1, rbftop10
-        sentMessage("Reichsdaten gesendet", "ServerZusammenfassung");
+        // spezifische Sende-Nachricht anzeigen
+        if (gamePage == "rbarmee"
+                || gamePage == "rbfturm1"
+                || gamePage == "rbfturm2"
+                || gamePage == "rbfturma"
+                || gamePage == "rbfturms"
+                || gamePage == "rbspaehen1"
+                || gamePage == "rbtavernesold") {
+            sentMessage("Armeedaten gesendet", "ServerZusammenfassung");
+        } else { // rbreiche, rbnachr1, rbftop10
+            sentMessage("Reichsdaten gesendet", "ServerZusammenfassung");
+        }
     }
 }       //                      }}}1
 
@@ -2245,7 +2263,6 @@ if (gamePage == "rbzug") {
             // Diesmal ist der font noch in <i> tag
             gueterTabelle = fontTags[i].parentNode.nextSibling;
             if (!gueterTabelle) {
-                GM_log("extra div vor Guetertabelle");
                 // extra span wenn Runenforschung betrieben wird? 
                 gueterTabelle = fontTags[i].parentNode.parentNode.nextSibling;
             }
