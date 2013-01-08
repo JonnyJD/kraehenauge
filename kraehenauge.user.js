@@ -1,13 +1,14 @@
 // ==UserScript==       {{{1
 // @name           Kraehenauge
 // @namespace      http://kraehen.org
+// @icon           http://www.ritterburgwelt.de/rb/held/allym60.gif
 // @description    Dies ist das clientseitige KSK-Programm. Es unterstuetzt die Kraehen auf ihren Wegen in Alirion und gibt ihnen Ueberblick und schnelle Reaktionsmoeglichkeiten.
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
 // @include        http://www.ritterburgwelt.de/rb/ajax_backend.php
 // @include        file://*/rbstart.php.html
 // @include        file://*/ajax_backend.php
 // @author         JonnyJD
-// @version        1.5.3
+// @version        1.6
 // ==/UserScript==      }}}1
 // Anmerkung: Opera versteht das @include nicht und laed immer!
 
@@ -283,7 +284,7 @@ if (document.title.indexOf("RB \xA9 - ") == 0
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
 var clientName = 'Kr\xE4henauge';
-var clientVersion = '1.5.3 [trunk]';
+var clientVersion = '1.6 [trunk]';
 var version = clientName + " " + clientVersion;
 var DEBUG = false;
 
