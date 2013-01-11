@@ -67,27 +67,24 @@ var game = {
 if (document.title.indexOf("RB \xA9 - ") == 0
             || document.location
             == "http://www.ritterburgwelt.de/rb/ajax_backend.php") {
-function createOutputArea(id)   //      {{{1
+function createOutputArea(id)           // {{{1
 {
-    var newDiv = document.createElement('div');
-    newDiv.align = "center";
-    if (noLinks) {
-        document.getElementsByTagName('body')[0].appendChild(newDiv);
-    } else {
-        var centerTable = document.getElementsByTagName('center')[0].firstChild;
-        var centerCell = centerTable.firstChild.childNodes[2];
-        centerCell.appendChild(newDiv);
-    }
     var response = document.createElement('div');
     response.id = id;
     response.style.backgroundColor = "#AF874E";
     response.style.width = "auto";
     response.style.maxWidth = "600px";
     response.style.marginTop = "5px";
-    newDiv.appendChild(response);
+    var centerList = document.getElementsByTagName("center");
+    if (noLinks) {
+        /* without added linkLines */
+        centerList[0].appendChild(response);
+    } else {
+        centerList[1].appendChild(response);
+    }
     return response;
-}
-// }}}1
+}                                       // }}}1
+var noLinks = true; /* no linkLines yet, for createOutputArea */
 var fehlerMeldungen = createOutputArea("Fehlermeldungen");
 fehlerMeldungen.style.backgroundColor = "red";
 function printError(message, e)                 // {{{1
@@ -341,7 +338,7 @@ gamePage = getPageName();
 //                      }}}1
 
 // Opera Bug: lange Formulare funktionieren nicht nach replaceNode
-var noLinks = operaBrowser && (gamePage == "rbarmeegtr2"
+noLinks = operaBrowser && (gamePage == "rbarmeegtr2"
                             || gamePage == "rbarmeegtr3"
                             || gamePage == "rbfhandel1"
                             || gamePage == "rbspaehen" // nur die Seite davor
