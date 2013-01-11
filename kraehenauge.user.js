@@ -20,7 +20,11 @@ var clientVersion = '1.6 [trunk]';
 var version = clientName + " " + clientVersion;
 var DEBUG = false;
 // Opera kann Formulare auch so in Tabs oeffnen
-var leftLinksOnly = operaBrowser;
+if (typeof opera != "undefined") {
+    var leftLinksOnly = true;
+} else {
+    var leftLinksOnly = false;
+}
 
 // Einstellungen        {{{1
 // Armeesortierung und roter Hintergrund bei Feinden
@@ -179,7 +183,7 @@ function printWarning(message)                    // {{{1
             if (value !== null) {
                 return value;
             } else {
-                return defaultValue
+                return defaultValue;
             }
         }
 
