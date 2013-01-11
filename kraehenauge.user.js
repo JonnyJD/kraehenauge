@@ -222,7 +222,6 @@ var session = document.getElementsByName('name')[0].value;
 var gameId = document.getElementsByName('passw')[0].value;
 var a="agent="+encodeURIComponent(version)+"&";
 var pid="pid="+encodeURIComponent(gameId)+"&";
-var debugOut = "";
 //                      }}}1
 
 // Seitenerkennung      {{{1
@@ -2194,11 +2193,6 @@ if( gamePage == "rbminfo0" ) {
     printError("Fehler in der Ressourcenauswertung: ", e);
 }
 //                              }}}1
-
-// debugausgabe {{{1
-if (debugOut != "") {
-    gameInfo.appendChild(document.createTextNode(debugOut));
-}       //      }}}1
 
 }       // end if RB-PAGE
 
