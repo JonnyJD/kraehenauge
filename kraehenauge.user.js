@@ -7,6 +7,7 @@
 // @include        http://www.ritterburgwelt.de/rb/ajax_backend.php
 // @include        file://*/rbstart.php.html
 // @include        file://*/ajax_backend.php
+// @grant          none
 // @author         JonnyJD
 // @version        1.6
 // ==/UserScript==      }}}1
@@ -159,8 +160,10 @@ function printWarning(message)                    // {{{1
             if (GM_getValue(testVarName, 0)) {
                 // Wert korrekt zurueckgekommen
                 if (typeof GM_deleteValue == "function") {
-                    // Versuchen zu loeschen
                     GM_deleteValue(testVarName);
+                } else {
+                    /* create dummy */
+                    GM_deleteValue = function() {}; 
                 }
                 return false;
             } else {
@@ -171,21 +174,36 @@ function printWarning(message)                    // {{{1
 
     if (GM_api_incomplete()) {
         /* use localStorage */
-        GM_setValue = function(key, value) {
-            localStorage.setItem(key, value);
-        }
-
-        GM_getValue = function(key, defaultValue) {
-            value = localStorage.getItem(key);
-            if (value !== null) {
-                return value;
-            } else {
+        if (typeof localStorage != "undefined") {
+            GM_setValue = function(key, value) {
+                try {
+                    localStorage.setItem(key, value);
+                } catch (e) {
+                    /* possibly QuotaExceededError
+                     * couldn't even achieve this in private mode though
+                     */
+                    printWarning("Could not save: " + key);
+                }
+            }
+            GM_getValue = function(key, defaultValue) {
+                value = localStorage.getItem(key);
+                if (value !== null) {
+                    return value;
+                } else {
+                    return defaultValue
+                }
+            }
+            GM_deleteValue = function(key) {
+                localStorage.removeItem(key);
+            }
+        } else {
+            printWarning("Browser unterst\xFCtzt kein localstore");
+            /* dummies for silent failure */
+            GM_setValue = function() {};
+            GM_getValue = function(key, defaultValue) {
                 return defaultValue;
             }
-        }
-
-        GM_deleteValue = function(key) {
-            localStorage.removeItem(key);
+            GM_deleteValue = function() {};
         }
     }
     //                                          }}}2
