@@ -31,10 +31,10 @@ if (typeof opera != "undefined") {
 // Armeesortierung und roter Hintergrund bei Feinden
 // 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
 // 59 = TW, 60 = KSK, 61 = UfR, 63 = BdS, 67 = RK, 70 = NW
-// 32 = Raeuber
+// 32 = Raeuber, 6 = Daemonen
 // Trenner ist | (regExp ODER)
 var friendlyAllies = "(60|59|31|38)";
-var hostileAllies  = "(32)";
+var hostileAllies  = "(32|6)";
 
 // Einstellungen Ressourcenauswertung und Zugauswertung
 // Bei welcher anzahl verbleibender Tage welche Farbe benutzt wird:
