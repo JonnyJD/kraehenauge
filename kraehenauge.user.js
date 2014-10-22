@@ -7,6 +7,7 @@
 // @include        http://www.ritterburgwelt.de/rb/ajax_backend.php
 // @include        file://*/rbstart.php.html
 // @include        file://*/ajax_backend.php
+// @include        http://kraehen.org/rbstart.php.html
 // @grant          none
 // @author         JonnyJD
 // @version        1.6
@@ -1828,34 +1829,33 @@ if( gamePage == "rbreiche" ) {  // {{{2
 
     var trEntries = document.getElementsByTagName("tr");
     for( var i = 0; i < trEntries.length; i++ ) {
-        if (trEntries[i].id.search(/zeile_[0-9]+_tabelle_/) == 0) {
-            var cells = trEntries[i].getElementsByTagName("td");
-            reich = new reichObjekt();
+        var cells = trEntries[i].getElementsByTagName("td");
+        reich = new reichObjekt();
 
-            bTags = cells[0].getElementsByTagName("b")
-            reich.rittername = bTags[0].firstChild.data;
-            var imgEntries = cells[0].getElementsByTagName("img");
-            reich.getAlly(imgEntries, bTags);
-            iTags = cells[0].getElementsByTagName("i")
-            if (iTags.length > 0) {
-                reich.status = iTags[0].firstChild.data;
-            } else {
-                reich.status = null;
-            }
-            reich.name = cells[1].firstChild.data.replace(/^\s*/,"");
-            reich.level = cells[2].firstChild.data.replace(/^\s*/,"");
-            reich.last_turn = cells[4].firstChild.data.replace(/^\s*/,"");
-            var inputs = trEntries[i].getElementsByTagName("input");
-            for (var j = 0; j < inputs.length; j++) {
-                if (inputs[j].name == "sid2") {
-                    reich.r_id = inputs[j].value;
-                    break;
-                }
-            }
-
-            // "fertiges" Reich hinzufuegen
-            reich.add();
+        bTags = cells[0].getElementsByTagName("b")
+        if (bTags.length == 0) { continue; }
+        reich.rittername = bTags[0].firstChild.data;
+        var imgEntries = cells[1].getElementsByTagName("img");
+        reich.getAlly(imgEntries, bTags);
+        iTags = cells[0].getElementsByTagName("i")
+        if (iTags.length > 0) {
+            reich.status = iTags[0].firstChild.data;
+        } else {
+            reich.status = null;
         }
+        reich.name = cells[2].firstChild.data.replace(/^\s*/,"");
+        reich.level = cells[3].firstChild.data.replace(/^\s*/,"");
+        reich.last_turn = cells[5].firstChild.data.replace(/^\s*/,"");
+        var inputs = trEntries[i].getElementsByTagName("input");
+        for (var j = 0; j < inputs.length; j++) {
+            if (inputs[j].name == "sid2") {
+                reich.r_id = inputs[j].value;
+                break;
+            }
+        }
+
+        // "fertiges" Reich hinzufuegen
+        reich.add();
     }
 
     addDataSection(reicheElem);
