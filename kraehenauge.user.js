@@ -42,8 +42,8 @@ var hostileAllies  = "(32|6)";
 tageRot = 5
 tageGelb = 15
 // 2 Zuege macht man taeglich mindestens
-zuegeRot = 10
-zuegeGelb = 30
+zuegeRot = 1099
+zuegeGelb = 3099
 
 var game = {
     standard: {
@@ -1994,39 +1994,21 @@ if( gamePage == "rbrinfo0" ) {
     //                                  }}}2
     // Zaehle die Doerfer               {{{2
     var doerfer = 0;
-    while (gueterTabelle.getElementsByTagName("tr")[0]
-            .childNodes[doerfer+1].innerHTML.indexOf("Dorf") >= 0) {
+    var trElements = gueterTabelle.getElementsByTagName("tr");
+    while (trElements[0].childNodes[doerfer+1].innerHTML.indexOf("Dorf") >= 0) {
         doerfer++;
     }
     var posten = 0;
-    while (gueterTabelle.getElementsByTagName("tr")[0]
-            .childNodes[doerfer+posten+1].innerHTML.indexOf("Aussenp.") >= 0) {
+    while (trElements[0].childNodes[doerfer+posten+1]
+            .innerHTML.indexOf("Aussenp.") >= 0) {
         posten++;
     }
     var gesamt = doerfer + posten + 1;
+    var restTageZeile = trElements[0];
     //                                  }}}2
-    // Zeile mit verbleibenden Tagen pro Dorf vorbereiten       {{{2
-    var restTageZeile = document.createElement("tr");
-    gueterTabelle.getElementsByTagName("tr")[0].parentNode.insertBefore(
-            restTageZeile, gueterTabelle.getElementsByTagName("tr")[1]);
-    for (var i=0; i < gueterTabelle.getElementsByTagName("tr")[0]
-            .childNodes.length; i++) {
-        restTageZeile.appendChild(document.createElement("td"));
-    }
-    var textNode = document.createTextNode("Tage verbleibend");
-    restTageZeile.childNodes[0].appendChild(textNode);
-    //                                                          }}}2
     // Funktion fuer die Ausgabe und Formatierung       {{{2
-    function zellenInfo(info, tage, zelle)  
+    function faerbeZelle(tage, zelle)  
     {
-        if (zelle.childNodes >= 0) {
-            zelle.appendChild(document.createElement("br"));
-        }
-        var divTag = document.createElement("div");
-        divTag.style.textAlign = "right";
-        divTag.style.fontStyle = "italic";
-        divTag.appendChild(document.createTextNode(info));
-        zelle.appendChild(divTag);
         if (tage <= tageRot) {
             zelle.style.backgroundColor = "red";
         } else if (tage <= tageGelb) {
@@ -2037,38 +2019,33 @@ if( gamePage == "rbrinfo0" ) {
     // jedes Dorf Betrachten                            {{{2
     for (var d = 1; d <= doerfer; d++) {
         restTageDorf = 99999;
-        zuegeImDorf = gueterTabelle.getElementsByTagName("tr")[0]
-            .childNodes[d].childNodes[8].nodeValue;
+        zuegeImDorf = trElements[0].childNodes[d].childNodes[8].nodeValue;
         // jedes Gut betrachten
         for (var i = 2; i < 25; i++) {
-            var zelle = gueterTabelle.getElementsByTagName("tr")[i]
-                .childNodes[d];
+            var zelle = trElements[i].childNodes[d];
             var zellenText = zelle.firstChild;
             if (zellenText.firstChild) {
-                var werte = zellenText.firstChild.nodeValue.split("(");
-                var anzahl = werte[0];
-                var veraenderung = werte[1].replace(")","");
+                var werte = zellenText.firstChild.firstChild
+                    .nodeValue.split("(");
+                var anzahl = werte[0].replace(".","");
+                var veraenderung = werte[1].replace(")","").replace(".","");
                 if (veraenderung < 0) {
                     var restZuege = Math.floor(anzahl / Math.abs(veraenderung));
                     var restTage = Math.floor(restZuege / zuegeImDorf);
                     if (restTage < restTageDorf) { restTageDorf = restTage; }
-                    var info = restZuege + " | " + restTage;
-                    zellenInfo(info, restTage, zelle);
+                    faerbeZelle(restTage, zelle);
                 }	
-                zelle.style.verticalAlign = "top";
             }
         }
         // verbleibende Tage fuer das Dorf
-        if (restTageDorf == 99999) { restTageDorf = String.fromCharCode(8734); }
-        zelle = gueterTabelle.getElementsByTagName("tr")[1].childNodes[d];
-        zellenInfo(restTageDorf, restTageDorf, zelle);
+        zelle = trElements[1].childNodes[d];
+        faerbeZelle(restTageDorf, zelle);
     }
     //                                                  }}}2
     // fuer jedes Gut die Summenspalte betrachten       {{{2
     var restTageReich = 99999;
     for (var i = 2; i < 25; i++) {
-        var zelle = gueterTabelle.getElementsByTagName("tr")[i]
-            .childNodes[gesamt];
+        var zelle = trElements[i].childNodes[gesamt];
         var zellenText = zelle.firstChild;
         if (zellenText.firstChild) {
             if (zellenText.childNodes[0].firstChild) {
