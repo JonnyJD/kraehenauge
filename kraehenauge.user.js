@@ -42,8 +42,8 @@ var hostileAllies  = "(32|6)";
 tageRot = 5
 tageGelb = 15
 // 2 Zuege macht man taeglich mindestens
-zuegeRot = 1099
-zuegeGelb = 3099
+zuegeRot = 10
+zuegeGelb = 30
 
 var game = {
     standard: {
