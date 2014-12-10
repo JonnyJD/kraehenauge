@@ -931,7 +931,7 @@ function sendXMLData(handler, doc, answer)                      // {{{1
             answerDiv.innerHTML = text;
             // request Importkarte when XMLdata was ack'd by the server
             // should include these updates now
-            if (GM_getValue("importkarte", true)
+            if (GM_getValue("importkarte", "true") == "true"
                     && typeof kartenBereich != "undefined") {
                 kartenBereich.appendChild(iframe);
             }
@@ -1708,7 +1708,7 @@ if( gamePage == "rbarmee" ) {
     newDiv.style.width = 32*(2*sicht+1);
     var newInput = document.createElement('input');
     newInput.type = "checkbox";
-    newInput.checked = GM_getValue("importkarte", true);
+    newInput.checked = GM_getValue("importkarte", "true") == "true";
     newInput.name = "importkarte";
     newInput.value = "importkarte";
     newInput.id = "importschalter";
