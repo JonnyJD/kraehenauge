@@ -18,7 +18,7 @@
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
 var clientName = 'Kr\xE4henauge: ALLYTMP-Edition';
-var clientVersion = '1.5 [trunk]';
+var clientVersion = '1.5';
 var version = clientName + " " + clientVersion;
 var DEBUG = false;
 // Opera kann Formulare auch so in Tabs oeffnen
