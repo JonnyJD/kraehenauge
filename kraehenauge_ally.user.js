@@ -7,6 +7,8 @@
 // @include        http://www.ritterburgwelt.de/rb/ajax_backend.php
 // @include        file://*/rbstart.php.html
 // @include        file://*/ajax_backend.php
+// @include        http://kraehen.org/rbstart.php.html
+// @grant          none
 // @author         JonnyJD
 // @version        1.5
 // ==/UserScript==      }}}1
@@ -30,16 +32,12 @@ if (typeof opera != "undefined") {
 // Armeesortierung und roter Hintergrund bei Feinden
 // 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
 // 59 = TW, 60 = KSK, 61 = UfR, 63 = BdS, 67 = RK, 70 = NW
-// 32 = Raeuber
+// 32 = Raeuber, 6 = Daemonen
 // Trenner ist | (regExp ODER)
 var friendlyAllies = "(60|59|31|38)";
-var hostileAllies  = "(32)";
+var hostileAllies  = "(32|6)";
 
-// Einstellungen Ressourcenauswertung und Zugauswertung
-// Bei welcher anzahl verbleibender Tage welche Farbe benutzt wird:
-tageRot = 5
-tageGelb = 15
-// 2 Zuege macht man taeglich mindestens
+// Einstellungen Zugauswertung
 zuegeRot = 10
 zuegeGelb = 30
 
@@ -155,8 +153,10 @@ function printWarning(message)                    // {{{1
             if (GM_getValue(testVarName, 0)) {
                 // Wert korrekt zurueckgekommen
                 if (typeof GM_deleteValue == "function") {
-                    // Versuchen zu loeschen
                     GM_deleteValue(testVarName);
+                } else {
+                    /* create dummy */
+                    GM_deleteValue = function() {}; 
                 }
                 return false;
             } else {
@@ -167,21 +167,36 @@ function printWarning(message)                    // {{{1
 
     if (GM_api_incomplete()) {
         /* use localStorage */
-        GM_setValue = function(key, value) {
-            localStorage.setItem(key, value);
-        }
-
-        GM_getValue = function(key, defaultValue) {
-            value = localStorage.getItem(key);
-            if (value !== null) {
-                return value;
-            } else {
+        if (typeof localStorage != "undefined") {
+            GM_setValue = function(key, value) {
+                try {
+                    localStorage.setItem(key, value);
+                } catch (e) {
+                    /* possibly QuotaExceededError
+                     * couldn't even achieve this in private mode though
+                     */
+                    printWarning("Could not save: " + key);
+                }
+            }
+            GM_getValue = function(key, defaultValue) {
+                value = localStorage.getItem(key);
+                if (value !== null) {
+                    return value;
+                } else {
+                    return defaultValue
+                }
+            }
+            GM_deleteValue = function(key) {
+                localStorage.removeItem(key);
+            }
+        } else {
+            printWarning("Browser unterst\xFCtzt kein localstore");
+            /* dummies for silent failure */
+            GM_setValue = function() {};
+            GM_getValue = function(key, defaultValue) {
                 return defaultValue;
             }
-        }
-
-        GM_deleteValue = function(key) {
-            localStorage.removeItem(key);
+            GM_deleteValue = function() {};
         }
     }
     //                                          }}}2
@@ -211,7 +226,6 @@ var pages = {        // {{{1
                      // }}}1
 // Kernvariablen        {{{1
 var wholePage = document.getElementsByTagName('html')[0].innerHTML;
-var session = document.getElementsByName('name')[0].value;
 var gameId = document.getElementsByName('passw')[0].value;
 var a="agent="+encodeURIComponent(version)+"&";
 var pid="pid="+encodeURIComponent(gameId)+"&";
@@ -403,10 +417,6 @@ function createFormLink(bereich, page, linkImages, target)       // {{{1
     linkForm.method = "post";
     var newInput = document.createElement('input');
     newInput.type = "hidden";
-    newInput.name = "name"; newInput.value = session;
-    linkForm.appendChild(newInput);
-    newInput = document.createElement('input');
-    newInput.type = "hidden";
     newInput.name = "passw"; newInput.value = gameId;
     linkForm.appendChild(newInput);
     newInput = document.createElement('input');
@@ -547,7 +557,14 @@ if( gamePage == "rbstart" ) {
         // Armeedaten einlesen
         if (armeeZeilen[i].childNodes[1]) {
             var armeeForm = armeeZeilen[i].childNodes[1].firstChild;
-            var armeeImg = armeeForm.getElementsByTagName("input")[4];
+            var armeeInputs = armeeForm.getElementsByTagName("input");
+            var armeeImg;
+            for (var j = 0; j < armeeInputs.length; j++) {
+                if (armeeInputs[j].type == "image") {
+                    armeeImg = armeeInputs[j];
+                    break;
+                }
+            }
             GM_setValue(gameId+".armee"+(i+1-tote),
                     armeeImg.name.match(/\[(.*)\]/)[1]);
             GM_setValue(gameId+".armee"+(i+1-tote)+".src",
@@ -950,8 +967,6 @@ if (gamePage == "rbarmee") {
             printWarning("Kartenausschnitt nicht gefunden.");
         } else {
             i++; // Wir suchen die darauffolgende Zelle
-            // speichere Kartenbereich, fuer Import-Karte
-            kartenBereich = tdEntries[i].parentNode;
             // lese die Kartenfelder
             var imgEntries = tdEntries[i].getElementsByTagName("img");
             terrain = new Array();
@@ -1286,7 +1301,13 @@ if( gamePage == "rbarmee"
             if (!match) { break; }
             var form = inputs[i].parentNode.parentNode
                 .parentNode.parentNode.parentNode;
-            var id = form.childNodes[3].value;
+            var id;
+            for (var j = 0; j < form.childNodes.length; j++) {
+                if (form.childNodes[j].name == "armee") {
+                    id = form.childNodes[j].value;
+                    break;
+                }
+            }
             var outerTD = form.parentNode;
             var name = outerTD.previousSibling.childNodes[0].firstChild.data;
             if (name != "Held:") {
@@ -1384,7 +1405,13 @@ if( gamePage == "rbarmee"
                 if (!match) { break; }
                 var form = inputs[i].parentNode.parentNode
                     .parentNode.parentNode.parentNode;
-                var id = form.childNodes[4].value;
+                var id;
+                for (var j = 0; j < form.childNodes.length; j++) {
+                    if (form.childNodes[j].name == "armee") {
+                        id = form.childNodes[j].value;
+                        break;
+                    }
+                }
                 var outerTD = form.parentNode;
                 var name = outerTD.previousSibling.firstChild.data;
                 var armee = new armeeObjekt(id, match[1], name);
@@ -1629,34 +1656,33 @@ if( gamePage == "rbreiche" ) {  // {{{2
 
     var trEntries = document.getElementsByTagName("tr");
     for( var i = 0; i < trEntries.length; i++ ) {
-        if (trEntries[i].id.search(/zeile_[0-9]+_tabelle_/) == 0) {
-            var cells = trEntries[i].getElementsByTagName("td");
-            reich = new reichObjekt();
+        var cells = trEntries[i].getElementsByTagName("td");
+        reich = new reichObjekt();
 
-            bTags = cells[0].getElementsByTagName("b")
-            reich.rittername = bTags[0].firstChild.data;
-            var imgEntries = cells[0].getElementsByTagName("img");
-            reich.getAlly(imgEntries, bTags);
-            iTags = cells[0].getElementsByTagName("i")
-            if (iTags.length > 0) {
-                reich.status = iTags[0].firstChild.data;
-            } else {
-                reich.status = null;
-            }
-            reich.name = cells[1].firstChild.data.replace(/^\s*/,"");
-            reich.level = cells[2].firstChild.data.replace(/^\s*/,"");
-            reich.last_turn = cells[4].firstChild.data.replace(/^\s*/,"");
-            var inputs = trEntries[i].getElementsByTagName("input");
-            for (var j = 0; j < inputs.length; j++) {
-                if (inputs[j].name == "sid2") {
-                    reich.r_id = inputs[j].value;
-                    break;
-                }
-            }
-
-            // "fertiges" Reich hinzufuegen
-            reich.add();
+        bTags = cells[0].getElementsByTagName("b")
+        if (bTags.length == 0) { continue; }
+        reich.rittername = bTags[0].firstChild.data;
+        var imgEntries = cells[1].getElementsByTagName("img");
+        reich.getAlly(imgEntries, bTags);
+        iTags = cells[0].getElementsByTagName("i")
+        if (iTags.length > 0) {
+            reich.status = iTags[0].firstChild.data;
+        } else {
+            reich.status = null;
         }
+        reich.name = cells[2].firstChild.data.replace(/^\s*/,"");
+        reich.level = cells[3].firstChild.data.replace(/^\s*/,"");
+        reich.last_turn = cells[5].firstChild.data.replace(/^\s*/,"");
+        var inputs = trEntries[i].getElementsByTagName("input");
+        for (var j = 0; j < inputs.length; j++) {
+            if (inputs[j].name == "sid2") {
+                reich.r_id = inputs[j].value;
+                break;
+            }
+        }
+
+        // "fertiges" Reich hinzufuegen
+        reich.add();
     }
 
     addDataSection(reicheElem);
@@ -1778,131 +1804,6 @@ if (dataGathered && (gamePage == "rbarmee"
         }
     }
 }       //                      }}}1
-
-// Ressourcenauswertung         {{{1
-try {
-if( gamePage == "rbrinfo0" ) {
-    // Finde die Warentabelle           {{{2
-    var gueterTabelle = "";
-    var tabellen = document.getElementsByTagName("table");
-    for (var i=0; i < tabellen.length; i++) {
-        if (tabellen[i].getElementsByTagName("tr")[0]
-                .firstChild.firstChild.data == "Gut") {
-            gueterTabelle = tabellen[i];
-            break;
-        }
-    }
-    //                                  }}}2
-    // Zaehle die Doerfer               {{{2
-    var doerfer = 0;
-    while (gueterTabelle.getElementsByTagName("tr")[0]
-            .childNodes[doerfer+1].innerHTML.indexOf("Dorf") >= 0) {
-        doerfer++;
-    }
-    var posten = 0;
-    while (gueterTabelle.getElementsByTagName("tr")[0]
-            .childNodes[doerfer+posten+1].innerHTML.indexOf("Aussenp.") >= 0) {
-        posten++;
-    }
-    var gesamt = doerfer + posten + 1;
-    //                                  }}}2
-    // Zeile mit verbleibenden Tagen pro Dorf vorbereiten       {{{2
-    var restTageZeile = document.createElement("tr");
-    gueterTabelle.getElementsByTagName("tr")[0].parentNode.insertBefore(
-            restTageZeile, gueterTabelle.getElementsByTagName("tr")[1]);
-    for (var i=0; i < gueterTabelle.getElementsByTagName("tr")[0]
-            .childNodes.length; i++) {
-        restTageZeile.appendChild(document.createElement("td"));
-    }
-    var textNode = document.createTextNode("Tage verbleibend");
-    restTageZeile.childNodes[0].appendChild(textNode);
-    //                                                          }}}2
-    // Funktion fuer die Ausgabe und Formatierung       {{{2
-    function zellenInfo(info, tage, zelle)  
-    {
-        if (zelle.childNodes >= 0) {
-            zelle.appendChild(document.createElement("br"));
-        }
-        var divTag = document.createElement("div");
-        divTag.style.textAlign = "right";
-        divTag.style.fontStyle = "italic";
-        divTag.appendChild(document.createTextNode(info));
-        zelle.appendChild(divTag);
-        if (tage <= tageRot) {
-            zelle.style.backgroundColor = "red";
-        } else if (tage <= tageGelb) {
-            zelle.style.backgroundColor = "yellow";
-        }
-    }
-    //                                                  }}}2
-    // jedes Dorf Betrachten                            {{{2
-    for (var d = 1; d <= doerfer; d++) {
-        restTageDorf = 99999;
-        zuegeImDorf = gueterTabelle.getElementsByTagName("tr")[0]
-            .childNodes[d].childNodes[8].nodeValue;
-        // jedes Gut betrachten
-        for (var i = 2; i < 25; i++) {
-            var zelle = gueterTabelle.getElementsByTagName("tr")[i]
-                .childNodes[d];
-            var zellenText = zelle.firstChild;
-            if (zellenText.firstChild) {
-                var werte = zellenText.firstChild.nodeValue.split("(");
-                var anzahl = werte[0];
-                var veraenderung = werte[1].replace(")","");
-                if (veraenderung < 0) {
-                    var restZuege = Math.floor(anzahl / Math.abs(veraenderung));
-                    var restTage = Math.floor(restZuege / zuegeImDorf);
-                    if (restTage < restTageDorf) { restTageDorf = restTage; }
-                    var info = restZuege + " | " + restTage;
-                    zellenInfo(info, restTage, zelle);
-                }	
-                zelle.style.verticalAlign = "top";
-            }
-        }
-        // verbleibende Tage fuer das Dorf
-        if (restTageDorf == 99999) { restTageDorf = String.fromCharCode(8734); }
-        zelle = gueterTabelle.getElementsByTagName("tr")[1].childNodes[d];
-        zellenInfo(restTageDorf, restTageDorf, zelle);
-    }
-    //                                                  }}}2
-    // fuer jedes Gut die Summenspalte betrachten       {{{2
-    var restTageReich = 99999;
-    for (var i = 2; i < 25; i++) {
-        var zelle = gueterTabelle.getElementsByTagName("tr")[i]
-            .childNodes[gesamt];
-        var zellenText = zelle.firstChild;
-        if (zellenText.firstChild) {
-            if (zellenText.childNodes[0].firstChild) {
-                // Summe in bold tag
-                var anzahl = zellenText.childNodes[0].firstChild.nodeValue;
-                var veraenderung = zellenText.childNodes[1].nodeValue;
-                veraenderung = veraenderung.replace(/\((.*)\)/,"$1");
-            } else {
-                // Die Null ist nicht in bold
-                expr = /([0-9]+)\s\((-?[0-9]+)\)/;
-                vals = expr.exec(zellenText.childNodes[0].nodeValue);
-                var anzahl = vals[1];
-                var veraenderung = vals[2];
-            }
-            if (veraenderung < 0) {
-                var restTage = Math.floor(anzahl / Math.abs(veraenderung));
-                if (restTage < restTageReich) { restTageReich = restTage; }
-                zellenInfo(restTage, restTage, zelle);
-            }
-            zelle.style.verticalAlign = "top";
-        }
-    }
-    // verbleibende Tage fuer das gesamte Reich
-    if (restTageReich == 99999) { restTageReich = String.fromCharCode(8734); }
-    zelle = restTageZeile.childNodes[gesamt];
-    zellenInfo(restTageReich, restTageReich, zelle);
-    //                                                  }}}2
-
-} // ende Ressourcenauswertung
-} catch (e) {
-    printError("Fehler in der Ressourcenauswertung: ", e);
-}
-//                              }}}1
 
 // Zugauswertung                {{{1
 try {
