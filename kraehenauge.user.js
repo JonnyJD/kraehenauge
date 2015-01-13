@@ -234,7 +234,6 @@ var pages = {        // {{{1
                      // }}}1
 // Kernvariablen        {{{1
 var wholePage = document.getElementsByTagName('html')[0].innerHTML;
-var session = document.getElementsByName('name')[0].value;
 var gameId = document.getElementsByName('passw')[0].value;
 var a="agent="+encodeURIComponent(version)+"&";
 var pid="pid="+encodeURIComponent(gameId)+"&";
@@ -425,10 +424,6 @@ function createFormLink(bereich, page, linkImages, target)       // {{{1
     }
     linkForm.method = "post";
     var newInput = document.createElement('input');
-    newInput.type = "hidden";
-    newInput.name = "name"; newInput.value = session;
-    linkForm.appendChild(newInput);
-    newInput = document.createElement('input');
     newInput.type = "hidden";
     newInput.name = "passw"; newInput.value = gameId;
     linkForm.appendChild(newInput);
