@@ -1542,7 +1542,13 @@ if( gamePage == "rbarmee"
                 if (!match) { break; }
                 var form = inputs[i].parentNode.parentNode
                     .parentNode.parentNode.parentNode;
-                var id = form.childNodes[4].value;
+                var id;
+                for (var j = 0; j < form.childNodes.length; j++) {
+                    if (form.childNodes[j].name == "armee") {
+                        id = form.childNodes[j].value;
+                        break;
+                    }
+                }
                 var outerTD = form.parentNode;
                 var name = outerTD.previousSibling.firstChild.data;
                 var armee = new armeeObjekt(id, match[1], name);
