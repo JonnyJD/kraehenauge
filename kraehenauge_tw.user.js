@@ -1,35 +1,127 @@
 // ==UserScript==       {{{1
 // @name           Kraehenauge: TW
 // @namespace      http://kraehen.org
+// @icon           http://www.ritterburgwelt.de/rb/held/allym60.gif
 // @description    Dies ist das clientseitige KSK-Programm. Es unterstuetzt die Kraehen und ihre Verbuendeten auf ihren Wegen in Alirion und gibt ihnen Ueberblick und schnelle Reaktionsmoeglichkeiten.
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
 // @include        http://www.ritterburgwelt.de/rb/ajax_backend.php
 // @include        file://*/rbstart.php.html
 // @include        file://*/ajax_backend.php
+// @include        http://kraehen.org/rbstart.php.html
+// @grant          none
 // @author         JonnyJD
-// @version        1.5.1
+// @version        1.6
 // ==/UserScript==      }}}1
 // Anmerkung: Opera versteht das @include nicht und laed immer!
 
-var operaBrowser = (typeof opera != "undefined");
+// RB-Spielseite
+if (document.title.indexOf("RB \xA9 - ") == 0) {
 
-// gemeinsam benutzte Funktionen        {{{1
+var clientName = 'Kr\xE4henauge: TW-Edition';
+var clientVersion = '1.6 [trunk]';
+var version = clientName + " " + clientVersion;
+var DEBUG = false;
+// Opera kann Formulare auch so in Tabs oeffnen
+if (typeof opera != "undefined") {
+    var leftLinksOnly = true;
+} else {
+    var leftLinksOnly = false;
+}
+
+// Einstellungen        {{{1
+// Armeesortierung und roter Hintergrund bei Feinden
+// 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
+// 59 = TW, 60 = KSK, 61 = UfR, 63 = BdS, 67 = RK, 70 = NW
+// 32 = Raeuber, 6 = Daemonen
+// Trenner ist | (regExp ODER)
+var friendlyAllies = "(60|59|31|38)";
+var hostileAllies  = "(32|6)";
+
+// Einstellungen Zugauswertung
+zuegeRot = 10
+zuegeGelb = 30
+
+var game = {
+    standard: {
+        links: new Array("rbstart",
+                       // Neuigkeiten
+                       "|", "rbchronik1", "rbereignis", "rbnachr1", "rbquest",
+                       // Militaer
+                       "|", "rbfturma", "rbmonster", "rbminfo0",
+                       // Wirtschaft
+                       "|", "rbrinfo0", "rbrezept", "rbsanzeige2",
+                       // Diplomatie
+                       "|", "rbtop10", "rbreiche", "rbdiplo", "rbally1")
+    }
+}
+
+//                       }}}1
+}
+
 if (document.title.indexOf("RB \xA9 - ") == 0
             || document.location
             == "http://www.ritterburgwelt.de/rb/ajax_backend.php") {
+function createOutputArea(id)           // {{{1
+{
+    var response = document.createElement('div');
+    response.id = id;
+    response.style.backgroundColor = "#AF874E";
+    response.style.width = "auto";
+    response.style.maxWidth = "600px";
+    response.style.marginTop = "5px";
+    var centerList = document.getElementsByTagName("center");
+    if (noLinks) {
+        /* without added linkLines */
+        centerList[0].appendChild(response);
+    } else {
+        centerList[1].appendChild(response);
+    }
+    return response;
+}                                       // }}}1
+var noLinks = true; /* no linkLines yet, for createOutputArea */
+var fehlerMeldungen = createOutputArea("Fehlermeldungen");
+fehlerMeldungen.style.backgroundColor = "red";
+function printError(message, e)                 // {{{1
+{
+    printWarning(message + e);
+    if (DEBUG) {
+        // Erzwinge Abbruch, aber auch Details in der Konsole
+        printWarning("Details in der Fehlerkonsole");
+        throw e;
+    }
+}                                               // }}}1
+function printWarning(message)                    // {{{1
+{
+    var output = document.getElementById("Fehlermeldungen");
+    output.appendChild(document.createTextNode(message));
+    output.appendChild(document.createElement("br"));
+}                                               // }}}1
+// Browser API                          {{{1
+    var operaBrowser = (typeof opera != "undefined");
 
     function sendDataWrapper(handler, type, data, responseFunction) // {{{2
     {
         var url = "http://kraehen.org/tw/" + handler;
-        if (typeof opera != "undefined") {
-            var xmlhttp = new opera.XMLHttpRequest();
+        function __xhr_send(xmlhttp) {
+            xmlhttp.open('POST', url, true);
+            xmlhttp.withCredentials = true;     /* for http auth */
             xmlhttp.setRequestHeader("Content-type", type);
             xmlhttp.onload = function(){
                 responseFunction(this.responseText);
             }
-            xmlhttp.open('POST', url, true);
             xmlhttp.send(data);
-        } else {
+        }
+
+        if ("withCredentials" in new XMLHttpRequest()) {
+            /* CORS support in xhr */
+            __xhr_send(new XMLHttpRequest());
+        } else if (typeof opera != "undefined"
+                && typeof opera.XMLHttpRequest != "undefined") {
+            /* use userscript provided xhr (Opera 11) */
+            __xhr_send(new opera.XMLHttpRequest());
+        } else if (typeof GM_xmlhttpRequest != "undefined") {
+            /* use greasemonkey object
+             * doesn't work for many GM emulations */
             GM_xmlhttpRequest({
                 method: 'POST',
                 url:    url,
@@ -39,7 +131,11 @@ if (document.title.indexOf("RB \xA9 - ") == 0
                     responseFunction(responseDetails.responseText);
                 },
             })
+        } else {
+            printWarning("Browser unterst\xFCtzt keine Aktualisierung!");
+            return false;
         }
+        return true;
     }                                                               //}}}2
 
     if (typeof opera != "undefined" && typeof GM_log != "function") {
@@ -57,8 +153,10 @@ if (document.title.indexOf("RB \xA9 - ") == 0
             if (GM_getValue(testVarName, 0)) {
                 // Wert korrekt zurueckgekommen
                 if (typeof GM_deleteValue == "function") {
-                    // Versuchen zu loeschen
                     GM_deleteValue(testVarName);
+                } else {
+                    /* create dummy */
+                    GM_deleteValue = function() {}; 
                 }
                 return false;
             } else {
@@ -68,242 +166,46 @@ if (document.title.indexOf("RB \xA9 - ") == 0
     }
 
     if (GM_api_incomplete()) {
-        /* folgende Fkt. entnommen aus
-         * http://www.howtocreate.co.uk/operaStuff/userjs/aagmfunctions.js
-         * version 1.3.1
-         */
-        GM_setValue = function( cookieName, cookieValue, lifeTime ) {
-            if( !cookieName ) {
-                return;
-            }
-            if( lifeTime == "delete" ) {
-                lifeTime = -10;
-            } else {
-                lifeTime = 31536000;
-            }
-            document.cookie = escape( cookieName )
-                + "=" + escape( getRecoverableString( cookieValue ) )
-                + ";expires=" + ( new Date( ( new Date() ).getTime()
-                            + ( 1000 * lifeTime ) ) ).toGMTString()
-                + ";path=/";
-        }
-
-        GM_getValue = function( cookieName, oDefault ) {
-            var cookieJar = document.cookie.split( "; " );
-            for( var x = 0; x < cookieJar.length; x++ ) {
-                var oneCookie = cookieJar[x].split( "=" );
-                if( oneCookie[0] == escape( cookieName ) ) {
-                    try {
-                        eval('var footm = '+unescape( oneCookie[1] ));
-                    } catch(e) {
-                        return oDefault;
-                    }
-                    return footm;
+        /* use localStorage */
+        if (typeof localStorage != "undefined") {
+            GM_setValue = function(key, value) {
+                try {
+                    localStorage.setItem(key, value);
+                } catch (e) {
+                    /* possibly QuotaExceededError
+                     * couldn't even achieve this in private mode though
+                     */
+                    printWarning("Could not save: " + key);
                 }
             }
-            return oDefault;
-
+            GM_getValue = function(key, defaultValue) {
+                value = localStorage.getItem(key);
+                if (value !== null) {
+                    return value;
+                } else {
+                    return defaultValue
+                }
+            }
+            GM_deleteValue = function(key) {
+                localStorage.removeItem(key);
+            }
+        } else {
+            printWarning("Browser unterst\xFCtzt kein localstore");
+            /* dummies for silent failure */
+            GM_setValue = function() {};
+            GM_getValue = function(key, defaultValue) {
+                return defaultValue;
+            }
+            GM_deleteValue = function() {};
         }
-
-        // nur der Vollstaendigkeit halber, wird nicht benoetigt
-        GM_deleteValue = function( oKey ) {
-            GM_setValue( oKey, '', 'delete' );
-        }
-
-        // wird von GM_setValue benoetigt
-        getRecoverableString = function(oVar,notFirst) {
-            var oType = typeof(oVar);
-            if( ( oType == 'null' ) || ( oType == 'object' && !oVar ) ) {
-                //most browsers say that the typeof for null is 'object',
-                //but unlike a real object,
-                //it will not have any overall value
-                return 'null';
-            }
-            if( oType == 'undefined' ) { return 'window.uDfXZ0_d'; }
-            if( oType == 'object' ) {
-                //Safari throws errors when comparing
-                //non-objects with window/document/etc
-                if( oVar == window ) { return 'window'; }
-                if( oVar == document ) { return 'document'; }
-                if( oVar == document.body ) { return 'document.body'; }
-                if( oVar == document.documentElement )
-                    { return 'document.documentElement'; }
-            }
-            if( oVar.nodeType && ( oVar.childNodes || oVar.ownerElement ) )
-                { return '{error:\'DOM node\'}'; }
-            if( !notFirst ) {
-                Object.prototype.toRecoverableString = function (oBn) {
-                    if( this.tempLockIgnoreMe )
-                        { return '{\'LoopBack\'}'; }
-                    this.tempLockIgnoreMe = true;
-                    var retVal = '{', sepChar = '', j;
-                    for( var i in this ) {
-                        if( i == 'toRecoverableString'
-                                || i == 'tempLockIgnoreMe'
-                                || i == 'prototype'
-                                || i == 'constructor' )
-                            { continue; }
-                        if( oBn && ( i == 'index' || i == 'input'
-                                    || i == 'length'
-                                    || i == 'toRecoverableObString' ) )
-                            { continue; }
-                        j = this[i];
-                        if( !i.match(basicObPropNameValStr) ) {
-                            //for some reason, you cannot use unescape
-                            //when defining peoperty names inline
-                            for( var x = 0; x < cleanStrFromAr.length; x++ ) {
-                                i =i.replace(cleanStrFromAr[x],cleanStrToAr[x]);
-                            }
-                            i = '\''+i+'\'';
-                        } else if( window.ActiveXObject
-                                && navigator.userAgent.indexOf('Mac') + 1
-                                && !navigator.__ice_version
-                                && window.ScriptEngine
-                                && ScriptEngine() == 'JScript'
-                                && i.match(/^\d+$/) ) {
-                            //IE mac does not allow numerical property names
-                            //to be used unless they are quoted
-                            i = '\''+i+'\'';
-                        }
-                        retVal += sepChar+i+':'+getRecoverableString(j,true);
-                        sepChar = ',';
-                    }
-                    retVal += '}';
-                    this.tempLockIgnoreMe = false;
-                    return retVal;
-                };
-                Array.prototype.toRecoverableObString =
-                    Object.prototype.toRecoverableString;
-                Array.prototype.toRecoverableString = function () {
-                    if( this.tempLock ) { return '[\'LoopBack\']'; }
-                    if( !this.length ) {
-                        var oCountProp = 0;
-                        for( var i in this ) {
-                            if( i != 'toRecoverableString'
-                                    && i != 'toRecoverableObString'
-                                    && i != 'tempLockIgnoreMe'
-                                    && i != 'prototype'
-                                    && i != 'constructor'
-                                    && i != 'index'
-                                    && i != 'input'
-                                    && i != 'length' )
-                            { oCountProp++; }
-                        }
-                        if( oCountProp )
-                            { return this.toRecoverableObString(true); }
-                    }
-                    this.tempLock = true;
-                    var retVal = '[';
-                    for( var i = 0; i < this.length; i++ ) {
-                        retVal += (i?',':'')+getRecoverableString(this[i],true);
-                    }
-                    retVal += ']';
-                    delete this.tempLock;
-                    return retVal;
-                };
-                Boolean.prototype.toRecoverableString = function () {
-                    return ''+this+'';
-                };
-                Date.prototype.toRecoverableString = function () {
-                    return 'new Date('+this.getTime()+')';
-                };
-                Function.prototype.toRecoverableString = function () {
-                    return this.toString().replace(/^\s+|\s+$/g,'').replace(/^function\s*\w*\([^\)]*\)\s*\{\s*\[native\s+code\]\s*\}$/i,'function () {[\'native code\'];}');
-                };
-                Number.prototype.toRecoverableString = function () {
-                        if( isNaN(this) ) { return 'Number.NaN'; }
-                        if( this == Number.POSITIVE_INFINITY )
-                            { return 'Number.POSITIVE_INFINITY'; }
-                        if( this == Number.NEGATIVE_INFINITY )
-                            { return 'Number.NEGATIVE_INFINITY'; }
-                        return ''+this+'';
-                };
-                RegExp.prototype.toRecoverableString = function () {
-                        return '\/'+this.source+'\/'+(this.global?'g':'')+(this.ignoreCase?'i':'');
-                };
-                String.prototype.toRecoverableString = function () {
-                        var oTmp = escape(this);
-                        if( oTmp == this ) { return '\''+this+'\''; }
-                        return 'unescape(\''+oTmp+'\')';
-                };
-            }
-            if( !oVar.toRecoverableString )
-                { return '{error:\'internal object\'}'; }
-            var oTmp = oVar.toRecoverableString();
-            if( !notFirst ) {
-                    //prevent it from changing for...in loops
-                    //that the page may be using
-                    delete Object.prototype.toRecoverableString;
-                    delete Array.prototype.toRecoverableObString;
-                    delete Array.prototype.toRecoverableString;
-                    delete Boolean.prototype.toRecoverableString;
-                    delete Date.prototype.toRecoverableString;
-                    delete Function.prototype.toRecoverableString;
-                    delete Number.prototype.toRecoverableString;
-                    delete RegExp.prototype.toRecoverableString;
-                    delete String.prototype.toRecoverableString;
-            }
-            return oTmp;
-        }
-
-        var basicObPropNameValStr = /^\w+$/
-        var cleanStrFromAr = new Array(/\\/g,/'/g,/"/g,/\r/g,/\n/g,/\f/g,/\t/g,
-                                new RegExp('-'+'->','g'),
-                                new RegExp('<!-'+'-','g'),/\//g)
-        var cleanStrToAr = new Array('\\\\','\\\'','\\\"','\\r','\\n','\\f',
-                            '\\t','-\'+\'->','<!-\'+\'-','\\\/');
-
     }
     //                                          }}}2
-
-    function splitPosition(pos) {   // {{{2
-        /* fields: 0=alles 1=Q 2=level 3=X 4=Y */
-        var expr = /(Q)?(N|U[0-9]+)?,? ?([0-9]+),([0-9]+)/;
-        return expr.exec(pos);
-    }                               // }}}2
-
-}                               //      }}}1
+//      }}}1
+}
 
 // RB-Spielseite
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
-var clientName = 'Kr\xE4henauge: TW-Edition';
-var clientVersion = '1.5.1';
-var version = clientName + " " + clientVersion;
-var DEBUG = false;
-
-// Einstellungen        {{{1
-var game = {
-    standard: {
-        links: new Array("rbstart",
-                       // Neuigkeiten
-                       "|", "rbchronik1", "rbereignis", "rbnachr1", "rbquest",
-                       // Militaer
-                       "|", "rbfturma", "rbmonster", "rbminfo0",
-                       // Wirtschaft
-                       "|", "rbrinfo0", "rbrezept", "rbsanzeige2",
-                       // Diplomatie
-                       "|", "rbtop10", "rbreiche", "rbdiplo", "rbally1")
-    }
-}
-
-// Einstellungen Armeesortierung
-// 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
-// 59 = TW, 60 = KSK, 61 = UfR, 63 = BdS, 67 = RK, 70 = NW
-// 32 = Raeuber
-// Trenner ist | (regExp ODER)
-var friendlyAllies = "(60|59|31|38)";
-var hostileAllies  = "(32)";
-
-// Einstellungen Ressourcenauswertung und Zugauswertung
-// Bei welcher anzahl verbleibender Tage welche Farbe benutzt wird:
-tageRot = 5
-tageGelb = 15
-// 2 Zuege macht man taeglich mindestens
-zuegeRot = 10
-zuegeGelb = 30
-
-//                       }}}1
 var pages = {        // {{{1
     rbstart:     {name: "Thronsaal",       pic: "start"},
     rbchronik1:  {name: "Chronik",         pic: "chronik"},
@@ -324,11 +226,9 @@ var pages = {        // {{{1
                      // }}}1
 // Kernvariablen        {{{1
 var wholePage = document.getElementsByTagName('html')[0].innerHTML;
-var session = document.getElementsByName('name')[0].value;
 var gameId = document.getElementsByName('passw')[0].value;
 var a="agent="+encodeURIComponent(version)+"&";
 var pid="pid="+encodeURIComponent(gameId)+"&";
-var debugOut = "";
 //                      }}}1
 
 // Seitenerkennung      {{{1
@@ -447,10 +347,8 @@ else if (pageTitle.indexOf('Allianz ') == 0)
 gamePage = getPageName();
 //                      }}}1
 
-// Opera kann Formulare auch so in Tabs oeffnen
-var leftLinksOnly = operaBrowser;
 // Opera Bug: lange Formulare funktionieren nicht nach replaceNode
-var noLinks = operaBrowser && (gamePage == "rbarmeegtr2"
+noLinks = operaBrowser && (gamePage == "rbarmeegtr2"
                             || gamePage == "rbarmeegtr3"
                             || gamePage == "rbfhandel1"
                             || gamePage == "rbspaehen" // nur die Seite davor
@@ -497,6 +395,7 @@ if (!noLinks) {
     document.getElementById("zentrum").appendChild(oldCenter);
 //                                              }}}1
 }
+
 // Spiel-ID zu Debugzwecken unten ausgeben      {{{1
 var gameInfo = document.createElement('div');
 gameInfo.innerHTML = '<div><br/>' + gameId + ' - ' + gamePage + '</div>';
@@ -517,10 +416,6 @@ function createFormLink(bereich, page, linkImages, target)       // {{{1
     }
     linkForm.method = "post";
     var newInput = document.createElement('input');
-    newInput.type = "hidden";
-    newInput.name = "name"; newInput.value = session;
-    linkForm.appendChild(newInput);
-    newInput = document.createElement('input');
     newInput.type = "hidden";
     newInput.name = "passw"; newInput.value = gameId;
     linkForm.appendChild(newInput);
@@ -580,6 +475,7 @@ function appendExternalLink(link, sep)                       // {{{1
         createSeparation(leiste); createSeparation(leiste);
     }
 }                                                       // }}}1
+
 if (!noLinks) {
 // Hauptlinkleisten     {{{1
 if (game[gameId] && game[gameId].links) {
@@ -603,6 +499,12 @@ newLink.appendChild(img);
 appendExternalLink(newLink,sep=true);
 //                      }}}1
 }
+
+function splitPosition(pos) {   // {{{1
+    /* fields: 0=alles 1=Q 2=level 3=X 4=Y */
+    var expr = /(Q)?(N|U[0-9]+)?,? ?([0-9]+),([0-9]+)/;
+    return expr.exec(pos);
+}                               // }}}1
 
 // Armeedaten lesen und markieren (Erinnerung)          {{{1
 if( gamePage == "rbstart" ) {
@@ -655,7 +557,14 @@ if( gamePage == "rbstart" ) {
         // Armeedaten einlesen
         if (armeeZeilen[i].childNodes[1]) {
             var armeeForm = armeeZeilen[i].childNodes[1].firstChild;
-            var armeeImg = armeeForm.getElementsByTagName("input")[4];
+            var armeeInputs = armeeForm.getElementsByTagName("input");
+            var armeeImg;
+            for (var j = 0; j < armeeInputs.length; j++) {
+                if (armeeInputs[j].type == "image") {
+                    armeeImg = armeeInputs[j];
+                    break;
+                }
+            }
             GM_setValue(gameId+".armee"+(i+1-tote),
                     armeeImg.name.match(/\[(.*)\]/)[1]);
             GM_setValue(gameId+".armee"+(i+1-tote)+".src",
@@ -810,21 +719,13 @@ createSeparation(4);
 }
 
 // Antwort des Scanners vom Server      {{{1
-var newDiv = document.createElement('div');
-newDiv.align = "center";
-var centerTable = document.getElementsByTagName('center')[0].firstChild;
-var centerCell = centerTable.firstChild.childNodes[2];
-centerCell.appendChild(newDiv);
-var response = document.createElement('div');
-response.id = "ServerAntwort";
-response.style.fontFamily = "monospace";
-response.style.whiteSpace = "pre";
-response.style.backgroundColor = "black";
-response.style.color = "green";
-response.style.width = "auto";
-response.style.maxWidth = "600px";
-newDiv.appendChild(document.createElement("br"));
-newDiv.appendChild(response);
+var serverAntwort = createOutputArea("ServerAntwort");
+serverAntwort.style.fontFamily = "monospace";
+serverAntwort.style.whiteSpace = "pre";
+serverAntwort.style.backgroundColor = "black";
+serverAntwort.style.color = "green";
+serverAntwort.style.width = "auto";
+serverAntwort.style.maxWidth = "600px";
 
 function sendToScanner()        // {{{2
 {
@@ -834,7 +735,7 @@ function sendToScanner()        // {{{2
     function responseFunction(text) {
         document.getElementById("ServerAntwort").innerHTML = text;
     }
-    sendDataWrapper(handler, type, data, responseFunction);
+    return sendDataWrapper(handler, type, data, responseFunction);
 }                               // }}}2
 
 if (gamePage == "rbftop10"
@@ -844,36 +745,16 @@ if (gamePage == "rbftop10"
 }
 //                                      }}}1
 
-function createOutputArea(id)   //      {{{1
-{
-    var newDiv = document.createElement('div');
-    newDiv.align = "center";
-    if (noLinks) {
-        document.getElementsByTagName('body')[0].appendChild(newDiv);
-    } else {
-        var centerTable = document.getElementsByTagName('center')[0].firstChild;
-        var centerCell = centerTable.firstChild.childNodes[2];
-        centerCell.appendChild(newDiv);
-    }
-    var response = document.createElement('div');
-    response.id = id;
-    response.style.backgroundColor = "#AF874E";
-    response.style.width = "auto";
-    response.style.maxWidth = "600px";
-    newDiv.appendChild(document.createElement("br"));
-    newDiv.appendChild(response);
-    return response;
-}
-// }}}1
-
 function sendToHandler(handler, fieldName, content, answer)      // {{{1
 {
     var type = "application/x-www-form-urlencoded";
     var data = a+pid+fieldName+'='+encodeURIComponent(content);
     function responseFunction(text) {
-        document.getElementById(answer).innerHTML = text;
+        answerDiv = document.getElementById(answer)
+        answerDiv.style.border = "1px solid #4e1d00";
+        answerDiv.innerHTML = text;
     }
-    sendDataWrapper(handler, type, data, responseFunction);
+    return sendDataWrapper(handler, type, data, responseFunction);
 }                                                               // }}}1
 function sentMessage(msg, outputArea)                           // {{{1
 {
@@ -885,25 +766,6 @@ function infoMessage(msg, outputArea)                           // {{{1
     document.getElementById(outputArea).innerHTML = text;
 }                                                               // }}}1
 
-createOutputArea("DBAntwort");
-createOutputArea("ServerZusammenfassung");
-createOutputArea("Fehlermeldungen");
-
-function printError(message, e)                 // {{{1
-{
-    printWarning(message + e);
-    if (DEBUG) {
-        // Erzwinge Abbruch, aber auch Details in der Konsole
-        printWarning("Details in der Fehlerkonsole");
-        throw e;
-    }
-}                                               // }}}1
-function printWarning(message)                    // {{{1
-{
-    var output = document.getElementById("Fehlermeldungen");
-    output.appendChild(document.createTextNode(message));
-    output.appendChild(document.createElement("br"));
-}                                               // }}}1
 // zu sendendes xml-Dokument vorbereiten                        // {{{1
 var xmlDataDoc = document.implementation.createDocument("", "", null);
 // root-Element
@@ -965,10 +827,13 @@ function sendXMLData(handler, doc, answer)                      // {{{1
             var data =serializer.serializeToString(doc);
         }
         function responseFunction(text) {
-            document.getElementById(answer).innerHTML = text;
+            answerDiv = document.getElementById(answer)
+            answerDiv.style.border = "1px solid #4e1d00";
+            answerDiv.innerHTML = text;
             // request Importkarte when XMLdata was ack'd by the server
             // should include these updates now
-            if (GM_getValue("importkarte", true)) {
+            if (GM_getValue("importkarte", "true") == "true"
+                    && typeof kartenBereich != "undefined") {
                 kartenBereich.appendChild(iframe);
             }
 
@@ -976,10 +841,11 @@ function sendXMLData(handler, doc, answer)                      // {{{1
         function responseFunction2(text) {
             document.getElementById("Fehlermeldungen").innerHTML = text;
         }
-        sendDataWrapper(handler, "text/xml", data, responseFunction)
+        return sendDataWrapper(handler, "text/xml", data, responseFunction);
         //sendDataWrapper("save?xml", "text/xml", data, responseFunction2)
     } else {
         printWarning("Es wurden keine zu sendenden Daten gefunden");
+        return false;
     }
 }                                                               // }}}1
 
@@ -1003,14 +869,16 @@ function visibleText(htmlPage)                                  // {{{2
     return copyText;
 }                                               // }}}2
 
+createOutputArea("DBAntwort");
 
 if (gamePage == "rbarmee") {
 
     if (wholePage.indexOf("fliehen") == -1) {
         copyText = visibleText(wholePage);
         if (copyText.search("U[0-9]+, ") == -1) {
-            sendToHandler("send/text/armee", "dorftext", copyText, "DBAntwort");
-            sentMessage("Dorfdaten gesendet", "DBAntwort");
+            if (sendToHandler("send/text/armee", "dorftext", copyText, "DBAntwort")) {
+                sentMessage("Dorfdaten gesendet", "DBAntwort");
+            }
         } else {
             text = "Keine Dorfdaten aus einer Hoehle gesendet";
             infoMessage(text, "DBAntwort");
@@ -1027,7 +895,9 @@ if (gamePage == "rbfturm1"
 
     copyText = visibleText(wholePage);
     if (copyText.search("U[0-9]+, ") == -1) {
-        sendToHandler("send/text/turm", "text", copyText, "DBAntwort");
+        if (sendToHandler("send/text/turm", "text", copyText, "DBAntwort")) {
+            sentMessage("Dorfdaten gesendet", "DBAntwort");
+        }
     } else {
         text = "Keine Dorfdaten aus einer Hoehle gesendet"
         infoMessage(text, "DBAntwort");
@@ -1467,7 +1337,13 @@ if( gamePage == "rbarmee"
             if (!match) { break; }
             var form = inputs[i].parentNode.parentNode
                 .parentNode.parentNode.parentNode;
-            var id = form.childNodes[3].value;
+            var id;
+            for (var j = 0; j < form.childNodes.length; j++) {
+                if (form.childNodes[j].name == "armee") {
+                    id = form.childNodes[j].value;
+                    break;
+                }
+            }
             var outerTD = form.parentNode;
             var name = outerTD.previousSibling.childNodes[0].firstChild.data;
             if (name != "Held:") {
@@ -1565,7 +1441,13 @@ if( gamePage == "rbarmee"
                 if (!match) { break; }
                 var form = inputs[i].parentNode.parentNode
                     .parentNode.parentNode.parentNode;
-                var id = form.childNodes[4].value;
+                var id;
+                for (var j = 0; j < form.childNodes.length; j++) {
+                    if (form.childNodes[j].name == "armee") {
+                        id = form.childNodes[j].value;
+                        break;
+                    }
+                }
                 var outerTD = form.parentNode;
                 var name = outerTD.previousSibling.firstChild.data;
                 var armee = new armeeObjekt(id, match[1], name);
@@ -1739,7 +1621,7 @@ if( gamePage == "rbarmee" ) {
     newDiv.style.width = 32*(2*sicht+1);
     var newInput = document.createElement('input');
     newInput.type = "checkbox";
-    newInput.checked = GM_getValue("importkarte", true);
+    newInput.checked = GM_getValue("importkarte", "true") == "true";
     newInput.name = "importkarte";
     newInput.value = "importkarte";
     newInput.id = "importschalter";
@@ -1860,34 +1742,33 @@ if( gamePage == "rbreiche" ) {  // {{{2
 
     var trEntries = document.getElementsByTagName("tr");
     for( var i = 0; i < trEntries.length; i++ ) {
-        if (trEntries[i].id.search(/zeile_[0-9]+_tabelle_/) == 0) {
-            var cells = trEntries[i].getElementsByTagName("td");
-            reich = new reichObjekt();
+        var cells = trEntries[i].getElementsByTagName("td");
+        reich = new reichObjekt();
 
-            bTags = cells[0].getElementsByTagName("b")
-            reich.rittername = bTags[0].firstChild.data;
-            var imgEntries = cells[0].getElementsByTagName("img");
-            reich.getAlly(imgEntries, bTags);
-            iTags = cells[0].getElementsByTagName("i")
-            if (iTags.length > 0) {
-                reich.status = iTags[0].firstChild.data;
-            } else {
-                reich.status = null;
-            }
-            reich.name = cells[1].firstChild.data.replace(/^\s*/,"");
-            reich.level = cells[2].firstChild.data.replace(/^\s*/,"");
-            reich.last_turn = cells[4].firstChild.data.replace(/^\s*/,"");
-            var inputs = trEntries[i].getElementsByTagName("input");
-            for (var j = 0; j < inputs.length; j++) {
-                if (inputs[j].name == "sid2") {
-                    reich.r_id = inputs[j].value;
-                    break;
-                }
-            }
-
-            // "fertiges" Reich hinzufuegen
-            reich.add();
+        bTags = cells[0].getElementsByTagName("b")
+        if (bTags.length == 0) { continue; }
+        reich.rittername = bTags[0].firstChild.data;
+        var imgEntries = cells[1].getElementsByTagName("img");
+        reich.getAlly(imgEntries, bTags);
+        iTags = cells[0].getElementsByTagName("i")
+        if (iTags.length > 0) {
+            reich.status = iTags[0].firstChild.data;
+        } else {
+            reich.status = null;
         }
+        reich.name = cells[2].firstChild.data.replace(/^\s*/,"");
+        reich.level = cells[3].firstChild.data.replace(/^\s*/,"");
+        reich.last_turn = cells[5].firstChild.data.replace(/^\s*/,"");
+        var inputs = trEntries[i].getElementsByTagName("input");
+        for (var j = 0; j < inputs.length; j++) {
+            if (inputs[j].name == "sid2") {
+                reich.r_id = inputs[j].value;
+                break;
+            }
+        }
+
+        // "fertiges" Reich hinzufuegen
+        reich.add();
     }
 
     addDataSection(reicheElem);
@@ -1980,6 +1861,7 @@ if( gamePage == "rbftop10" ) {  // {{{2
 //                              }}}1
 
 // XML-Daten senden             {{{1
+createOutputArea("ServerZusammenfassung");
 if (dataGathered && (gamePage == "rbarmee"
         || gamePage == "rbfturm1"
         || gamePage == "rbfturm2"
@@ -1992,146 +1874,22 @@ if (dataGathered && (gamePage == "rbarmee"
         || gamePage == "rbtavernesold")) {
 
     // XML Daten senden
-    sendXMLData("send/data", xmlDataDoc, "ServerZusammenfassung")
+    if (sendXMLData("send/data", xmlDataDoc, "ServerZusammenfassung")) {
 
-    // spezifische Sende-Nachricht anzeigen
-    if (gamePage == "rbarmee"
-            || gamePage == "rbfturm1"
-            || gamePage == "rbfturm2"
-            || gamePage == "rbfturma"
-            || gamePage == "rbfturms"
-            || gamePage == "rbspaehen1"
-            || gamePage == "rbtavernesold") {
-        sentMessage("Armeedaten gesendet", "ServerZusammenfassung");
-    } else { // rbreiche, rbnachr1, rbftop10
-        sentMessage("Reichsdaten gesendet", "ServerZusammenfassung");
+        // spezifische Sende-Nachricht anzeigen
+        if (gamePage == "rbarmee"
+                || gamePage == "rbfturm1"
+                || gamePage == "rbfturm2"
+                || gamePage == "rbfturma"
+                || gamePage == "rbfturms"
+                || gamePage == "rbspaehen1"
+                || gamePage == "rbtavernesold") {
+            sentMessage("Armeedaten gesendet", "ServerZusammenfassung");
+        } else { // rbreiche, rbnachr1, rbftop10
+            sentMessage("Reichsdaten gesendet", "ServerZusammenfassung");
+        }
     }
 }       //                      }}}1
-
-// Ressourcenauswertung         {{{1
-try {
-if( gamePage == "rbrinfo0" ) {
-    // Finde die Warentabelle           {{{2
-    var gueterTabelle = "";
-    var tabellen = document.getElementsByTagName("table");
-    for (var i=0; i < tabellen.length; i++) {
-        if (tabellen[i].getElementsByTagName("tr")[0]
-                .firstChild.firstChild.data == "Gut") {
-            gueterTabelle = tabellen[i];
-            break;
-        }
-    }
-    //                                  }}}2
-    // Zaehle die Doerfer               {{{2
-    var doerfer = 0;
-    while (gueterTabelle.getElementsByTagName("tr")[0]
-            .childNodes[doerfer+1].innerHTML.indexOf("Dorf") >= 0) {
-        doerfer++;
-    }
-    var posten = 0;
-    while (gueterTabelle.getElementsByTagName("tr")[0]
-            .childNodes[doerfer+posten+1].innerHTML.indexOf("Aussenp.") >= 0) {
-        posten++;
-    }
-    var gesamt = doerfer + posten + 1;
-    //                                  }}}2
-    // Zeile mit verbleibenden Tagen pro Dorf vorbereiten       {{{2
-    var restTageZeile = document.createElement("tr");
-    gueterTabelle.getElementsByTagName("tr")[0].parentNode.insertBefore(
-            restTageZeile, gueterTabelle.getElementsByTagName("tr")[1]);
-    for (var i=0; i < gueterTabelle.getElementsByTagName("tr")[0]
-            .childNodes.length; i++) {
-        restTageZeile.appendChild(document.createElement("td"));
-    }
-    var textNode = document.createTextNode("Tage verbleibend");
-    restTageZeile.childNodes[0].appendChild(textNode);
-    //                                                          }}}2
-    // Funktion fuer die Ausgabe und Formatierung       {{{2
-    function zellenInfo(info, tage, zelle)  
-    {
-        if (zelle.childNodes >= 0) {
-            zelle.appendChild(document.createElement("br"));
-        }
-        var divTag = document.createElement("div");
-        divTag.style.textAlign = "right";
-        divTag.style.fontStyle = "italic";
-        divTag.appendChild(document.createTextNode(info));
-        zelle.appendChild(divTag);
-        if (tage <= tageRot) {
-            zelle.style.backgroundColor = "red";
-        } else if (tage <= tageGelb) {
-            zelle.style.backgroundColor = "yellow";
-        }
-    }
-    //                                                  }}}2
-    // jedes Dorf Betrachten                            {{{2
-    for (var d = 1; d <= doerfer; d++) {
-        restTageDorf = 99999;
-        zuegeImDorf = gueterTabelle.getElementsByTagName("tr")[0]
-            .childNodes[d].childNodes[8].nodeValue;
-        // jedes Gut betrachten
-        for (var i = 2; i < 25; i++) {
-            var zelle = gueterTabelle.getElementsByTagName("tr")[i]
-                .childNodes[d];
-            var zellenText = zelle.firstChild;
-            if (zellenText.firstChild) {
-                var werte = zellenText.firstChild.nodeValue.split("(");
-                var anzahl = werte[0];
-                var veraenderung = werte[1].replace(")","");
-                if (veraenderung < 0) {
-                    var restZuege = Math.floor(anzahl / Math.abs(veraenderung));
-                    var restTage = Math.floor(restZuege / zuegeImDorf);
-                    if (restTage < restTageDorf) { restTageDorf = restTage; }
-                    var info = restZuege + " | " + restTage;
-                    zellenInfo(info, restTage, zelle);
-                }	
-                zelle.style.verticalAlign = "top";
-            }
-        }
-        // verbleibende Tage fuer das Dorf
-        if (restTageDorf == 99999) { restTageDorf = String.fromCharCode(8734); }
-        zelle = gueterTabelle.getElementsByTagName("tr")[1].childNodes[d];
-        zellenInfo(restTageDorf, restTageDorf, zelle);
-    }
-    //                                                  }}}2
-    // fuer jedes Gut die Summenspalte betrachten       {{{2
-    var restTageReich = 99999;
-    for (var i = 2; i < 25; i++) {
-        var zelle = gueterTabelle.getElementsByTagName("tr")[i]
-            .childNodes[gesamt];
-        var zellenText = zelle.firstChild;
-        if (zellenText.firstChild) {
-            if (zellenText.childNodes[0].firstChild) {
-                // Summe in bold tag
-                var anzahl = zellenText.childNodes[0].firstChild.nodeValue;
-                var veraenderung = zellenText.childNodes[1].nodeValue;
-                veraenderung = veraenderung.replace(/\((.*)\)/,"$1");
-            } else {
-                // Die Null ist nicht in bold
-                expr = /([0-9]+)\s\((-?[0-9]+)\)/;
-                vals = expr.exec(zellenText.childNodes[0].nodeValue);
-                var anzahl = vals[1];
-                var veraenderung = vals[2];
-            }
-            if (veraenderung < 0) {
-                var restTage = Math.floor(anzahl / Math.abs(veraenderung));
-                if (restTage < restTageReich) { restTageReich = restTage; }
-                zellenInfo(restTage, restTage, zelle);
-            }
-            zelle.style.verticalAlign = "top";
-        }
-    }
-    // verbleibende Tage fuer das gesamte Reich
-    if (restTageReich == 99999) { restTageReich = String.fromCharCode(8734); }
-    zelle = restTageZeile.childNodes[gesamt];
-    zellenInfo(restTageReich, restTageReich, zelle);
-    //                                                  }}}2
-
-} // ende Ressourcenauswertung
-} catch (e) {
-    printError("Fehler in der Ressourcenauswertung: ", e);
-}
-//                              }}}1
 
 // Zugauswertung                {{{1
 try {
@@ -2148,7 +1906,6 @@ if (gamePage == "rbzug") {
             // Diesmal ist der font noch in <i> tag
             gueterTabelle = fontTags[i].parentNode.nextSibling;
             if (!gueterTabelle) {
-                GM_log("extra div vor Guetertabelle");
                 // extra span wenn Runenforschung betrieben wird? 
                 gueterTabelle = fontTags[i].parentNode.parentNode.nextSibling;
             }
@@ -2240,12 +1997,7 @@ if( gamePage == "rbminfo0" ) {
 }
 //                              }}}1
 
-// debugausgabe {{{1
-if (debugOut != "") {
-    gameInfo.appendChild(document.createTextNode(debugOut));
-}       //      }}}1
-
-}
+}       // end if RB-PAGE
 
 // Reichs-IDs vom Server                                {{{1
 if (document.location == "http://www.ritterburgwelt.de/rb/ajax_backend.php") {
