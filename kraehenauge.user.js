@@ -565,7 +565,14 @@ if( gamePage == "rbstart" ) {
         // Armeedaten einlesen
         if (armeeZeilen[i].childNodes[1]) {
             var armeeForm = armeeZeilen[i].childNodes[1].firstChild;
-            var armeeImg = armeeForm.getElementsByTagName("input")[4];
+            var armeeInputs = armeeForm.getElementsByTagName("input");
+            var armeeImg;
+            for (var j = 0; j < armeeInputs.length; j++) {
+                if (armeeInputs[j].type == "image") {
+                    armeeImg = armeeInputs[j];
+                    break;
+                }
+            }
             GM_setValue(gameId+".armee"+(i+1-tote),
                     armeeImg.name.match(/\[(.*)\]/)[1]);
             GM_setValue(gameId+".armee"+(i+1-tote)+".src",
