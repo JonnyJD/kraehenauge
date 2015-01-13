@@ -37,11 +37,7 @@ if (typeof opera != "undefined") {
 var friendlyAllies = "(60|59|31|38)";
 var hostileAllies  = "(32|6)";
 
-// Einstellungen Ressourcenauswertung und Zugauswertung
-// Bei welcher anzahl verbleibender Tage welche Farbe benutzt wird:
-tageRot = 5
-tageGelb = 15
-// 2 Zuege macht man taeglich mindestens
+// Einstellungen Zugauswertung
 zuegeRot = 10
 zuegeGelb = 30
 
@@ -1991,108 +1987,6 @@ if (dataGathered && (gamePage == "rbarmee"
         }
     }
 }       //                      }}}1
-
-// Ressourcenauswertung         {{{1
-try {
-if( gamePage == "rbrinfo0" ) {
-    // Finde die Warentabelle           {{{2
-    var gueterTabelle = "";
-    var tabellen = document.getElementsByTagName("table");
-    for (var i=0; i < tabellen.length; i++) {
-        if (tabellen[i].getElementsByTagName("tr")[0]
-                .firstChild.firstChild.data == "Gut") {
-            gueterTabelle = tabellen[i];
-            break;
-        }
-    }
-    //                                  }}}2
-    // Zaehle die Doerfer               {{{2
-    var doerfer = 0;
-    var trElements = gueterTabelle.getElementsByTagName("tr");
-    while (trElements[0].childNodes[doerfer+1].innerHTML.indexOf("Dorf") >= 0) {
-        doerfer++;
-    }
-    var posten = 0;
-    while (trElements[0].childNodes[doerfer+posten+1]
-            .innerHTML.indexOf("Aussenp.") >= 0) {
-        posten++;
-    }
-    var gesamt = doerfer + posten + 1;
-    var restTageZeile = trElements[0];
-    //                                  }}}2
-    // Funktion fuer die Ausgabe und Formatierung       {{{2
-    function faerbeZelle(tage, zelle)  
-    {
-        if (tage <= tageRot) {
-            zelle.style.backgroundColor = "red";
-        } else if (tage <= tageGelb) {
-            zelle.style.backgroundColor = "yellow";
-        }
-    }
-    //                                                  }}}2
-    // jedes Dorf Betrachten                            {{{2
-    for (var d = 1; d <= doerfer; d++) {
-        restTageDorf = 99999;
-        zuegeImDorf = trElements[0].childNodes[d].childNodes[8].nodeValue;
-        // jedes Gut betrachten
-        for (var i = 2; i < 25; i++) {
-            var zelle = trElements[i].childNodes[d];
-            var zellenText = zelle.firstChild;
-            if (zellenText.firstChild) {
-                var werte = zellenText.firstChild.firstChild
-                    .nodeValue.split("(");
-                var anzahl = werte[0].replace(".","");
-                var veraenderung = werte[1].replace(")","").replace(".","");
-                if (veraenderung < 0) {
-                    var restZuege = Math.floor(anzahl / Math.abs(veraenderung));
-                    var restTage = Math.floor(restZuege / zuegeImDorf);
-                    if (restTage < restTageDorf) { restTageDorf = restTage; }
-                    faerbeZelle(restTage, zelle);
-                }	
-            }
-        }
-        // verbleibende Tage fuer das Dorf
-        zelle = trElements[1].childNodes[d];
-        faerbeZelle(restTageDorf, zelle);
-    }
-    //                                                  }}}2
-    // fuer jedes Gut die Summenspalte betrachten       {{{2
-    var restTageReich = 99999;
-    for (var i = 2; i < 25; i++) {
-        var zelle = trElements[i].childNodes[gesamt];
-        var zellenText = zelle.firstChild;
-        if (zellenText.firstChild) {
-            if (zellenText.childNodes[0].firstChild) {
-                // Summe in bold tag
-                var anzahl = zellenText.childNodes[0].firstChild.nodeValue;
-                var veraenderung = zellenText.childNodes[1].nodeValue;
-                veraenderung = veraenderung.replace(/\((.*)\)/,"$1");
-            } else {
-                // Die Null ist nicht in bold
-                expr = /([0-9]+)\s\((-?[0-9]+)\)/;
-                vals = expr.exec(zellenText.childNodes[0].nodeValue);
-                var anzahl = vals[1];
-                var veraenderung = vals[2];
-            }
-            if (veraenderung < 0) {
-                var restTage = Math.floor(anzahl / Math.abs(veraenderung));
-                if (restTage < restTageReich) { restTageReich = restTage; }
-                zellenInfo(restTage, restTage, zelle);
-            }
-            zelle.style.verticalAlign = "top";
-        }
-    }
-    // verbleibende Tage fuer das gesamte Reich
-    if (restTageReich == 99999) { restTageReich = String.fromCharCode(8734); }
-    zelle = restTageZeile.childNodes[gesamt];
-    zellenInfo(restTageReich, restTageReich, zelle);
-    //                                                  }}}2
-
-} // ende Ressourcenauswertung
-} catch (e) {
-    printError("Fehler in der Ressourcenauswertung: ", e);
-}
-//                              }}}1
 
 // Zugauswertung                {{{1
 try {
