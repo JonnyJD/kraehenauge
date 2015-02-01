@@ -1946,7 +1946,7 @@ if( gamePage == "rbftop10" ) {  // {{{2
             bTags = row.childNodes[1].getElementsByTagName("b");
             reich.rittername = bTags[0].firstChild.data;
             imgs = row.childNodes[1].getElementsByTagName("img");
-            reich.getAlly(imgs, bTags);
+            reich.getAlly(imgs, bTags, null);   // keine andere Art von a_tag
 
             reich.add();
         }
