@@ -2120,4 +2120,7 @@ if (document.location == "http://www.ritterburgwelt.de/rb/ajax_backend.php") {
     }
 }                                               //      }}}1
 
+var puffer = createOutputArea("Puffer");
+puffer.style.marginTop = "10px";
+
 /* vim:set shiftwidth=4 expandtab smarttab foldmethod=marker: */
