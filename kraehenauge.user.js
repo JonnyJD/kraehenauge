@@ -1819,7 +1819,7 @@ function addReich()
     dataGathered = true;
 }
 
-function reichGetAlly(imgEntries, bTag) {
+function reichGetAlly(imgEntries, bTag, a_tag) {
         if (imgEntries.length > 0) {
             exp = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
                     "([0-9]+).gif","");
@@ -1829,6 +1829,8 @@ function reichGetAlly(imgEntries, bTag) {
             }
         } else if (bTags.length >= 2) {
             this.a_tag = bTags[1].firstChild.data.match(/\[(.*)\]/)[1];
+        } else if (a_tag !== null && a_tag[0] == "[") {
+            this.a_tag = a_tag.substr(1,a_tag.length - 2);
         } else {
             this.a_id = null;
         }
@@ -1846,7 +1848,8 @@ if( gamePage == "rbreiche" ) {  // {{{2
         if (bTags.length == 0) { continue; }
         reich.rittername = bTags[0].firstChild.data;
         var imgEntries = cells[1].getElementsByTagName("img");
-        reich.getAlly(imgEntries, bTags);
+        ally_tag = bTags[0].parentNode.nextSibling.firstChild.data
+        reich.getAlly(imgEntries, bTags, ally_tag);
         iTags = cells[0].getElementsByTagName("i")
         if (iTags.length > 0) {
             reich.status = iTags[0].firstChild.data;
@@ -1885,7 +1888,7 @@ if( gamePage == "rbnachr1" ) {  // {{{2
                 var bTags = item.getElementsByTagName("b");
                 reich.rittername = bTags[0].firstChild.data;
                 var imgs = item.getElementsByTagName("img");
-                reich.getAlly(imgs, bTags);
+                reich.getAlly(imgs, bTags, null); // no other tag -> null
             }
             if (item.firstChild.data == "Reich ") {
                 reich.name = item.childNodes[1].firstChild.firstChild.data;
