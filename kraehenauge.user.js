@@ -4,6 +4,7 @@
 // @icon           http://www.ritterburgwelt.de/rb/held/allym60.gif
 // @description    Dies ist das clientseitige KSK-Programm. Es unterstuetzt die Kraehen auf ihren Wegen in Alirion und gibt ihnen Ueberblick und schnelle Reaktionsmoeglichkeiten.
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
+// @include        http://www.ritterburgwelt.de/rb/rblogin.php
 // @include        http://www.ritterburgwelt.de/rb/ajax_backend.php
 // @include        file://*/rbstart.php.html
 // @include        file://*/ajax_backend.php
@@ -2097,6 +2098,9 @@ if( gamePage == "rbminfo0" ) {
 }
 //                              }}}1
 
+var puffer = createOutputArea("Puffer");
+puffer.style.marginTop = "10px";
+
 }       // end if RB-PAGE
 
 // Reichs-IDs vom Server                                {{{1
@@ -2119,8 +2123,5 @@ if (document.location == "http://www.ritterburgwelt.de/rb/ajax_backend.php") {
         sendDataWrapper("send/response", "text/xml", xml, responseFunction)
     }
 }                                               //      }}}1
-
-var puffer = createOutputArea("Puffer");
-puffer.style.marginTop = "10px";
 
 /* vim:set shiftwidth=4 expandtab smarttab foldmethod=marker: */
