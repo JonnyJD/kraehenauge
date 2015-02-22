@@ -11,7 +11,7 @@
 // @include        http://kraehen.org/rbstart.php.html
 // @grant          none
 // @author         JonnyJD
-// @version        1.6
+// @version        1.6.1
 // ==/UserScript==      }}}1
 // Anmerkung: Opera versteht das @include nicht und laed immer!
 
