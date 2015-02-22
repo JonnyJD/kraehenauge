@@ -33,9 +33,11 @@ if (typeof opera != "undefined") {
 // Armeesortierung und roter Hintergrund bei Feinden
 // 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
 // 59 = TW, 60 = KSK, 61 = UfR, 63 = BdS, 67 = RK, 70 = NW
+// 75 = RdP, 77 = EW, 80 = BrO
 // 32 = Raeuber, 6 = Daemonen
 // Trenner ist | (regExp ODER)
-var friendlyAllies = "(60|59|31|38)";
+//var friendlyAllies = "(17|60|59|31|38)";
+var friendlyAllies = "(17|60|59|31|38|18|77|75|80)";
 var hostileAllies  = "(32|6)";
 
 // Einstellungen Zugauswertung
