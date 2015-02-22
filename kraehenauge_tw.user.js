@@ -4,6 +4,7 @@
 // @icon           http://www.ritterburgwelt.de/rb/held/allym60.gif
 // @description    Dies ist das clientseitige KSK-Programm. Es unterstuetzt die Kraehen und ihre Verbuendeten auf ihren Wegen in Alirion und gibt ihnen Ueberblick und schnelle Reaktionsmoeglichkeiten.
 // @include        http://www.ritterburgwelt.de/rb/rbstart.php
+// @include        http://www.ritterburgwelt.de/rb/rblogin.php
 // @include        http://www.ritterburgwelt.de/rb/ajax_backend.php
 // @include        file://*/rbstart.php.html
 // @include        file://*/ajax_backend.php
@@ -32,9 +33,11 @@ if (typeof opera != "undefined") {
 // Armeesortierung und roter Hintergrund bei Feinden
 // 17 = SL, 18 = ZDE, 31 = DR, 38 = P, 43 = d13K, 55 = KdS
 // 59 = TW, 60 = KSK, 61 = UfR, 63 = BdS, 67 = RK, 70 = NW
+// 75 = RdP, 77 = EW, 80 = BrO
 // 32 = Raeuber, 6 = Daemonen
 // Trenner ist | (regExp ODER)
-var friendlyAllies = "(60|59|31|38)";
+//var friendlyAllies = "(17|60|59|31|38)";
+var friendlyAllies = "(17|60|59|31|38|18|77|75|80)";
 var hostileAllies  = "(32|6)";
 
 // Einstellungen Zugauswertung
@@ -1722,7 +1725,7 @@ function addReich()
     dataGathered = true;
 }
 
-function reichGetAlly(imgEntries, bTag) {
+function reichGetAlly(imgEntries, bTag, a_tag) {
         if (imgEntries.length > 0) {
             exp = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
                     "([0-9]+).gif","");
@@ -1732,6 +1735,8 @@ function reichGetAlly(imgEntries, bTag) {
             }
         } else if (bTags.length >= 2) {
             this.a_tag = bTags[1].firstChild.data.match(/\[(.*)\]/)[1];
+        } else if (a_tag !== null && a_tag[0] == "[") {
+            this.a_tag = a_tag.substr(1,a_tag.length - 2);
         } else {
             this.a_id = null;
         }
@@ -1749,7 +1754,8 @@ if( gamePage == "rbreiche" ) {  // {{{2
         if (bTags.length == 0) { continue; }
         reich.rittername = bTags[0].firstChild.data;
         var imgEntries = cells[1].getElementsByTagName("img");
-        reich.getAlly(imgEntries, bTags);
+        ally_tag = bTags[0].parentNode.nextSibling.firstChild.data
+        reich.getAlly(imgEntries, bTags, ally_tag);
         iTags = cells[0].getElementsByTagName("i")
         if (iTags.length > 0) {
             reich.status = iTags[0].firstChild.data;
@@ -1788,7 +1794,7 @@ if( gamePage == "rbnachr1" ) {  // {{{2
                 var bTags = item.getElementsByTagName("b");
                 reich.rittername = bTags[0].firstChild.data;
                 var imgs = item.getElementsByTagName("img");
-                reich.getAlly(imgs, bTags);
+                reich.getAlly(imgs, bTags, null); // no other tag -> null
             }
             if (item.firstChild.data == "Reich ") {
                 reich.name = item.childNodes[1].firstChild.firstChild.data;
@@ -1846,7 +1852,7 @@ if( gamePage == "rbftop10" ) {  // {{{2
             bTags = row.childNodes[1].getElementsByTagName("b");
             reich.rittername = bTags[0].firstChild.data;
             imgs = row.childNodes[1].getElementsByTagName("img");
-            reich.getAlly(imgs, bTags);
+            reich.getAlly(imgs, bTags, null);   // keine andere Art von a_tag
 
             reich.add();
         }
@@ -1996,6 +2002,9 @@ if( gamePage == "rbminfo0" ) {
     printError("Fehler in der Ressourcenauswertung: ", e);
 }
 //                              }}}1
+
+var puffer = createOutputArea("Puffer");
+puffer.style.marginTop = "10px";
 
 }       // end if RB-PAGE
 
