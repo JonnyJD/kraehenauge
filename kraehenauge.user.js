@@ -1204,20 +1204,20 @@ function isShip(imgEntry)    // {{{2
         return false;
     }
 }                                       // }}}2
-function isOwn(input)    // {{{2
+function isOwn(elem)    // {{{2
 // Ist keine eigene Armee, Dorf oder Aussenposten
 {
-    var box = input.parentNode.parentNode;
+    var box = elem.parentNode.parentNode;
     if (box.innerHTML.indexOf("Menschentransfer")	!= -1) {
         return true;
     } else {
         return false;
     }
 }                                       // }}}2
-function isArmee(input)    // {{{2
+function isArmee(elem)    // {{{2
 // Ist kein Dorf oder Aussenposten
 {
-    var box = input.parentNode.parentNode;
+    var box = elem.parentNode.parentNode;
     if (box.innerHTML.indexOf("Dorf")		        != -1
         || box.innerHTML.indexOf("Aussenposten")	!= -1
        ) {
@@ -1226,26 +1226,26 @@ function isArmee(input)    // {{{2
         return true;
     }
 }                                       // }}}2
-function isArmeeHandle(input)        // {{{2
+function isArmeeHandle(elem)        // {{{2
 // Das Heldenbild der Armee, womit die Armee eindeutig ist
 {
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held/"
             + "(h[^/.]+|[0-9]+|e_[^/.]+|transport[^/.]*)","");
-    var match = pattern.exec(input.style.backgroundImage);
-    if (match && isArmee(input)) {
+    var match = pattern.exec(elem.style.backgroundImage);
+    if (match && isArmee(elem)) {
         return match;
     } else {
         return false;
     }
 }                                       // }}}2
-function isAllyArmee(input, allies)    // {{{2
+function isAllyArmee(elem, allies)    // {{{2
 // Das Allianztag einer der Allianzen in allies
 {
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
         allies+".gif","");
-    match = pattern.exec(input.style.backgroundImage);
-    var box = input.parentNode.parentNode;
-    if (match && isArmee(input) && !isOwn(input)
+    match = pattern.exec(elem.style.backgroundImage);
+    var box = elem.parentNode.parentNode;
+    if (match && isArmee(elem) && !isOwn(elem)
             && box.innerHTML.indexOf("Held:")   == -1
             && box.innerHTML.indexOf("Bei:")    == -1
        ) {
@@ -1257,6 +1257,8 @@ function isAllyArmee(input, allies)    // {{{2
 }                                       // }}}2
 function getShip(imgEntry)            // {{{2
 {
+    // TODO
+    return null;
     var thisTable = imgEntry.parentNode.parentNode.parentNode.parentNode;
     var nextTR = thisTable.parentNode.parentNode.nextSibling;
     if (nextTR && nextTR.firstChild.nextSibling
@@ -1431,7 +1433,7 @@ if( gamePage == "rbarmee"
     // Armeeaktualisierung      {{{2
     var armeenElem = xmlDataDoc.createElement("armeen");
 
-    // eigene Armeen in Armeesicht (Bilder als input-img name=Armee)    {{{3
+    // eigene Armeen in Armeesicht (input-submit/background-image)    {{{3
     var inputs = document.getElementsByTagName("input");
     function ownArmiesInArmyView()
     {
@@ -1534,12 +1536,12 @@ if( gamePage == "rbarmee"
     }                                                           //      }}}3
     ownArmiesInArmyView();
 
-    // eigene Armeen in Turmsicht (Bilder input-img name=ok)   {{{3
+    // eigene Armeen in Turmsicht (Bilder input-submit name=ok)   {{{3
     var inputs = document.getElementsByTagName("input");
     function ownArmiesInTower()
     {
         for( var i = 0; i < inputs.length; i++ ) {
-            if (inputs[i].type == "image" && inputs[i].name == "ok") {
+            if (inputs[i].type == "submit" && inputs[i].name == "ok") {
                 var match = isArmeeHandle(inputs[i]);
                 if (!match) { break; }
                 var form = inputs[i].parentNode.parentNode
@@ -1566,19 +1568,18 @@ if( gamePage == "rbarmee"
     }                                                   // }}}3
     ownArmiesInTower();
 
-    // fremde Armeen (normale img)              {{{3
-    var imgEntries = document.getElementsByTagName("img");
+    // fremde Armeen (normale div)              {{{3
+    var divEntries = document.getElementsByTagName("div");
     function foreignArmies ()
     {
-    for( var i = 0; i < imgEntries.length; i++ ) {
-        var match = isArmeeHandle(imgEntries[i]);
+    for( var i = 0; i < divEntries.length; i++ ) {
+        var match = isArmeeHandle(divEntries[i]);
         if (match) {
             var img = match[1];
             if (gamePage == "rbarmee") {
                 // Position aus der Landschaftsaktualisierung
                 var pos = currentPos; // von aktueller Armee
-                var outerTD = imgEntries[i].parentNode.parentNode
-                    .parentNode.parentNode.parentNode;
+                var outerTD = divEntries[i].parentNode.parentNode;
                 var name = outerTD.previousSibling.firstChild.firstChild.data;
                 if(name != "Bei:") {
                     /* "Bei:" -> Kapitaen des Schiffs auf dem man ist
@@ -1610,8 +1611,7 @@ if( gamePage == "rbarmee"
                 }
             } else {
                 // in einer Turmsicht
-                var outerTD = imgEntries[i].parentNode.parentNode
-                    .parentNode.parentNode.parentNode;
+                var outerTD = divEntries[i].parentNode.parentNode;
                 var id = outerTD.nextSibling.childNodes[0].value;
                 var name = outerTD.previousSibling.firstChild.data;
                 var armee = new armeeObjekt(id, img, name);
