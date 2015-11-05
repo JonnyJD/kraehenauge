@@ -1134,22 +1134,24 @@ if (gamePage == "rbfturm1"
         || gamePage == "rbfturms") {
     // Karte suchen
     // = erstes Auftreten eines Kartenbildes im Code
-    var imgEntries = document.getElementsByTagName("img");
+    var divEntries = document.getElementsByTagName("div");
     i = 0;
-    while (i < imgEntries.length
-            && imgEntries[i].src.indexOf('/bild/karte/') == -1) { i++; }
-    if (i == imgEntries.length) {
+    while (i < divEntries.length
+            && divEntries[i].style.backgroundImage
+            .indexOf('/bild/karte/') == -1) { i++; }
+    if (i == divEntries.length) {
         printWarning("Karte konnte nicht gefunden werden.");
     } else {
-        var tableNode = imgEntries[i].parentNode.parentNode.parentNode;
+        var tableNode = divEntries[i].parentNode.parentNode.parentNode;
 
         // Terrain auslesen
-        var imgEntries = tableNode.getElementsByTagName("img");
+        var divEntries = tableNode.getElementsByTagName("div");
         terrain = new Array();
-        for (var i=0; i < imgEntries.length; i++) {
-            if (imgEntries[i].src.indexOf("buttons") == -1) {
+        for (var i=0; i < divEntries.length; i++) {
+            if (divEntries[i].style.backgroundImage.indexOf("buttons") == -1) {
                 // Alles was kein Button ist, ist hier ein Feld
-                var num = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/,'$1');
+                var num = divEntries[i].style.backgroundImage
+                    .replace(/.*\/([^\/]*)\.gif.*/,'$1');
                 terrain.push(num);
             }
         }
