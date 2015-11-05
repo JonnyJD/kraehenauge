@@ -1824,15 +1824,15 @@ function addReich()
     dataGathered = true;
 }
 
-function reichGetAlly(imgEntries, bTag, a_tag) {
-        if (imgEntries.length > 0) {
-            exp = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
-                    "([0-9]+).gif","");
-            match = imgEntries[0].src.match(exp);
-            if (match) {
-                this.a_id = match[1];
-            }
-        } else if (bTags.length >= 2) {
+function reichGetAlly(a_cell, bTag, a_tag) {
+        var exp = new RegExp("http://www.ritterburgwelt.de/rb/held//allym" +
+                "([0-9]+).gif","");
+        var match = a_cell.style.backgroundImage.match(exp);
+        if (match) {
+            this.a_id = match[1];
+            return;
+        }
+        if (bTags.length >= 2) {
             this.a_tag = bTags[1].firstChild.data.match(/\[(.*)\]/)[1];
         } else if (a_tag !== null && a_tag[0] == "[") {
             this.a_tag = a_tag.substr(1,a_tag.length - 2);
@@ -1847,14 +1847,17 @@ if( gamePage == "rbreiche" ) {  // {{{2
     var trEntries = document.getElementsByTagName("tr");
     for( var i = 0; i < trEntries.length; i++ ) {
         var cells = trEntries[i].getElementsByTagName("td");
-        reich = new reichObjekt();
+        var reich = new reichObjekt();
 
         bTags = cells[0].getElementsByTagName("b")
         if (bTags.length == 0) { continue; }
         reich.rittername = bTags[0].firstChild.data;
-        var imgEntries = cells[1].getElementsByTagName("img");
-        ally_tag = bTags[0].parentNode.nextSibling.firstChild.data
-        reich.getAlly(imgEntries, bTags, ally_tag);
+        if (cells[1].firstChild !== null) {
+            var ally_tag = cells[1].firstChild.data;
+        } else {
+            ally_tag = null;
+        }
+        reich.getAlly(cells[1], bTags, ally_tag);
         iTags = cells[0].getElementsByTagName("i")
         if (iTags.length > 0) {
             reich.status = iTags[0].firstChild.data;
