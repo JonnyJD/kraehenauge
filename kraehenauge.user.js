@@ -19,7 +19,7 @@
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
 var clientName = 'Kr\xE4henauge';
-var clientVersion = '1.6.1 [trunk]';
+var clientVersion = '1.6.1 [trunk r' + '$Rev$ '.split(" ")[1] + ']';
 var version = clientName + " " + clientVersion;
 var DEBUG = false;
 // Opera kann Formulare auch so in Tabs oeffnen
