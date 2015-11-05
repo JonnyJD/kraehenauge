@@ -1824,10 +1824,10 @@ function addReich()
     dataGathered = true;
 }
 
-function reichGetAlly(a_cell, bTag, a_tag) {
+function reichGetAlly(a_elem, bTag, a_tag) {
         var exp = new RegExp("http://www.ritterburgwelt.de/rb/held//allym" +
                 "([0-9]+).gif","");
-        var match = a_cell.style.backgroundImage.match(exp);
+        var match = a_elem.style.backgroundImage.match(exp);
         if (match) {
             this.a_id = match[1];
             return;
@@ -1895,8 +1895,13 @@ if( gamePage == "rbnachr1" ) {  // {{{2
             if (item.firstChild.data == "Herrscher ") {
                 var bTags = item.getElementsByTagName("b");
                 reich.rittername = bTags[0].firstChild.data;
-                var imgs = item.getElementsByTagName("img");
-                reich.getAlly(imgs, bTags, null); // no other tag -> null
+                var divs = item.getElementsByTagName("div");
+                if (divs.length > 0) {
+                    var a_elem = divs[0];
+                } else {
+                    var a_elem = item;
+                }
+                reich.getAlly(a_elem, bTags, null); // no other tag -> null
             }
             if (item.firstChild.data == "Reich ") {
                 reich.name = item.childNodes[1].firstChild.firstChild.data;
@@ -1953,8 +1958,13 @@ if( gamePage == "rbftop10" ) {  // {{{2
                 .match(/([0-9]+)\./)[1];
             bTags = row.childNodes[1].getElementsByTagName("b");
             reich.rittername = bTags[0].firstChild.data;
-            imgs = row.childNodes[1].getElementsByTagName("img");
-            reich.getAlly(imgs, bTags, null);   // keine andere Art von a_tag
+            var divs = row.childNodes[1].getElementsByTagName("div");
+            if (divs.length > 0) {
+                var a_elem = divs[0];
+            } else {
+                var a_elem = row.childNodes[1];
+            }
+            reich.getAlly(a_elem, bTags, null);   // keine andere Art von a_tag
 
             reich.add();
         }
