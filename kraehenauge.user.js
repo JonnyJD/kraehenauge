@@ -942,8 +942,8 @@ function sendXMLData(handler, doc, answer)                      // {{{1
         function responseFunction2(text) {
             document.getElementById("Fehlermeldungen").innerHTML = text;
         }
+        //sendDataWrapper("save?xml", "text/xml", data, responseFunction2);
         return sendDataWrapper(handler, "text/xml", data, responseFunction);
-        //sendDataWrapper("save?xml", "text/xml", data, responseFunction2)
     } else {
         printWarning("Es wurden keine zu sendenden Daten gefunden");
         return false;
@@ -1073,21 +1073,23 @@ function listTerrain(terrain, floor, x, y, width, center)   //      {{{2
 if (gamePage == "rbarmee") {
     // Kartenmittelpunkt suchen
     // = erstes Auftreten eines Kartenbildes im Code
-    var imgEntries = document.getElementsByTagName("img");
+    var divEntries = document.getElementsByTagName("div");
     i = 0;
-    while (i < imgEntries.length
-            && imgEntries[i].src.indexOf('/bild/karte/') == -1) { i++; }
-    if (i == imgEntries.length) {
+    while (i < divEntries.length
+            && divEntries[i].style.backgroundImage.indexOf(
+                '/bild/karte/') == -1) { i++; }
+    if (i == divEntries.length) {
         printWarning("Kartenmitte konnte nicht ermittelt werden.");
     } else {
         // Koordinaten des Mittelpunkts
-        var tdNode = imgEntries[i].parentNode.nextSibling;
+        var tdNode = divEntries[i].parentNode.nextSibling;
         text = tdNode.childNodes[1].firstChild.nodeValue;
         fields = splitPosition(text);
         var floor = fields[2];
         var x = parseInt(fields[3], 10); var y = parseInt(fields[4], 10);
         if (floor == undefined) { var floor = "N"; }
-        var terrain = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
+        var terrain = divEntries[i].style.backgroundImage.replace(/.*\/([^\/]*)\.gif.*/, '$1');
+        alert(terrain);
         var name = tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1');
         addTerrain(floor, x, y, terrain, name);
 
@@ -1201,20 +1203,20 @@ function isShip(imgEntry)    // {{{2
         return false;
     }
 }                                       // }}}2
-function isOwn(imgEntry)    // {{{2
+function isOwn(input)    // {{{2
 // Ist keine eigene Armee, Dorf oder Aussenposten
 {
-    var box = imgEntry.parentNode.parentNode;
+    var box = input.parentNode.parentNode;
     if (box.innerHTML.indexOf("Menschentransfer")	!= -1) {
         return true;
     } else {
         return false;
     }
 }                                       // }}}2
-function isArmee(imgEntry)    // {{{2
+function isArmee(input)    // {{{2
 // Ist kein Dorf oder Aussenposten
 {
-    var box = imgEntry.parentNode.parentNode;
+    var box = input.parentNode.parentNode;
     if (box.innerHTML.indexOf("Dorf")		        != -1
         || box.innerHTML.indexOf("Aussenposten")	!= -1
        ) {
@@ -1223,26 +1225,26 @@ function isArmee(imgEntry)    // {{{2
         return true;
     }
 }                                       // }}}2
-function isArmeeHandle(imgEntry)        // {{{2
+function isArmeeHandle(input)        // {{{2
 // Das Heldenbild der Armee, womit die Armee eindeutig ist
 {
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held/"
             + "(h[^/.]+|[0-9]+|e_[^/.]+|transport[^/.]*)","");
-    var match = pattern.exec(imgEntry.src);
-    if (match && isArmee(imgEntry)) {
+    var match = pattern.exec(input.style.backgroundImage);
+    if (match && isArmee(input)) {
         return match;
     } else {
         return false;
     }
 }                                       // }}}2
-function isAllyArmee(imgEntry, allies)    // {{{2
+function isAllyArmee(input, allies)    // {{{2
 // Das Allianztag einer der Allianzen in allies
 {
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
         allies+".gif","");
-    match = pattern.exec(imgEntry.src);
-    var box = imgEntry.parentNode.parentNode;
-    if (match && isArmee(imgEntry) && !isOwn(imgEntry)
+    match = pattern.exec(input.style.backgroundImage);
+    var box = input.parentNode.parentNode;
+    if (match && isArmee(input) && !isOwn(input)
             && box.innerHTML.indexOf("Held:")   == -1
             && box.innerHTML.indexOf("Bei:")    == -1
        ) {
@@ -1433,11 +1435,10 @@ if( gamePage == "rbarmee"
     function ownArmiesInArmyView()
     {
     for( var i = 0; i < inputs.length; i++ ) {
-        if (inputs[i].type == "image" && inputs[i].name == "Armee") {
+        if (inputs[i].type == "submit" && inputs[i].name == "Armee") {
             var match = isArmeeHandle(inputs[i]);
             if (!match) { break; }
-            var form = inputs[i].parentNode.parentNode
-                .parentNode.parentNode.parentNode;
+            var form = inputs[i].parentNode.parentNode;
             var id;
             for (var j = 0; j < form.childNodes.length; j++) {
                 if (form.childNodes[j].name == "armee") {
@@ -1466,14 +1467,14 @@ if( gamePage == "rbarmee"
                 // hier ist ein Leerzeichen im HTML-code vor dem Armeenamen
                     .replace(/^\s+/,'');
                 var armee = new armeeObjekt(id, match[1], name);
-                var statTD = outerTD.nextSibling.nextSibling.nextSibling;
+                var statTD = outerTD.nextSibling.nextSibling;
                 var bp = statTD.childNodes[2].firstChild.data.split(" ")[0];
                 armee.bp = bp.split("/")[0];
                 armee.maxBP = bp.split("/")[1];
                 var ap = statTD.childNodes[4].data.split(" ")[0];
                 armee.ap = ap.split("/")[0];
                 armee.maxAP = ap.split("/")[1];
-                var bewImg = form.nextSibling.src;
+                var bewImg = form.nextSibling.style.backgroundImage;
                 if (bewImg.indexOf("bew4.gif") == -1) {
                     // laufender Held
                     var unitTD = outerTD.parentNode.nextSibling.childNodes[2];
