@@ -1544,8 +1544,7 @@ if( gamePage == "rbarmee"
             if (inputs[i].type == "submit" && inputs[i].name == "ok") {
                 var match = isArmeeHandle(inputs[i]);
                 if (!match) { break; }
-                var form = inputs[i].parentNode.parentNode
-                    .parentNode.parentNode.parentNode;
+                var form = inputs[i].parentNode.parentNode;
                 var id;
                 for (var j = 0; j < form.childNodes.length; j++) {
                     if (form.childNodes[j].name == "armee") {
