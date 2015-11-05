@@ -572,10 +572,8 @@ if( gamePage == "rbstart" ) {
                     break;
                 }
             }
-            var form = armeeSubmit.parentNode.parentNode;
-            var armeeName = form.parentNode.previousSibling.firstChild.data
-                .match(/(.*):/)[1].trim();
-            GM_setValue(gameId+".armee"+(i+1-tote), armeeName);
+            GM_setValue(gameId+".armee"+(i+1-tote),
+                    armeeSubmit.name.match(/\[(.*)\]/)[1]);
             GM_setValue(gameId+".armee"+(i+1-tote)+".src",
                     armeeSubmit.style.backgroundImage.match(
                         /([^\/]*)\.gif/)[1]);
@@ -609,8 +607,8 @@ if( gamePage == "rbstart" ) {
     // Anmerkung: im DOM hat die Tabelle immer ein tbody tag
     var dorfZeilen = dorfTabelle.firstChild.childNodes;
     for (var i = 0; i < dorfZeilen.length; i++) {
-        var dorfName = dorfZeilen[i].firstChild.firstChild.data.trim();
-        GM_setValue(gameId+".dorf"+(i+1), dorfName);
+        var dorfImg = dorfZeilen[i].getElementsByTagName("input")[0];
+        GM_setValue(gameId+".dorf"+(i+1), dorfImg.name.match(/\[(.*)\]/)[1]);
         GM_setValue(gameId+".doerfer", i+1);
     }
 } // Ende Dorfdaten einlesen
@@ -1091,7 +1089,6 @@ if (gamePage == "rbarmee") {
         var x = parseInt(fields[3], 10); var y = parseInt(fields[4], 10);
         if (floor == undefined) { var floor = "N"; }
         var terrain = divEntries[i].style.backgroundImage.replace(/.*\/([^\/]*)\.gif.*/, '$1');
-        alert(terrain);
         var name = tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1');
         addTerrain(floor, x, y, terrain, name);
 
@@ -1568,6 +1565,7 @@ if( gamePage == "rbarmee"
     ownArmiesInTower();
 
     // fremde Armeen (normale img)              {{{3
+    var imgEntries = document.getElementsByTagName("img");
     function foreignArmies ()
     {
     for( var i = 0; i < imgEntries.length; i++ ) {
