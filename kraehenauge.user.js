@@ -2035,6 +2035,7 @@ if (gamePage == "rbzug") {
     // Titelzeile               {{{2
     newTD = document.createElement("td");
     newText = document.createTextNode("Z\xFCge");
+    newTD.align = "right";
     newTD.appendChild(newText);
     gueterZeilen[0].appendChild(newTD);
     //                          }}}2
@@ -2044,8 +2045,10 @@ if (gamePage == "rbzug") {
         var diff = gueterZeilen[gut].childNodes[2].firstChild.data;
         var danach = gueterZeilen[gut].childNodes[3].firstChild.data;
         if (diff < 0) {
+            danach = danach.replace(".","");
             var restZuege = Math.floor(danach / Math.abs(diff))
             var newTD = document.createElement("td");
+            newTD.align = "right";
             newTD.appendChild(document.createTextNode(restZuege));
             if (restZuege <= zuegeGelb) newTD.style.backgroundColor = "yellow";
             if (restZuege <= zuegeRot) newTD.style.backgroundColor = "red";
@@ -2053,6 +2056,7 @@ if (gamePage == "rbzug") {
         } else {
             var infinite = document.createTextNode(String.fromCharCode(8734));
             var newTD = document.createElement("td");
+            newTD.align = "right";
             newTD.appendChild(infinite);
             gueterZeilen[gut].appendChild(newTD);
         }
