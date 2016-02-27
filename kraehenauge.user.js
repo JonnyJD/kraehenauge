@@ -1480,8 +1480,10 @@ if( gamePage == "rbarmee"
                 var bewImg = form.nextSibling.style.backgroundImage;
                 if (bewImg.indexOf("bew4.gif") == -1) {
                     // laufender Held
-                    var unitTD = outerTD.parentNode.nextSibling.childNodes[2];
-                    var terrainTR = outerTD.parentNode.nextSibling.nextSibling;
+                    var unitTD = outerTD.parentNode.nextSibling.nextSibling
+                                                            .childNodes[2];
+                    var terrainTR = outerTD.parentNode
+                                        .nextSibling.nextSibling.nextSibling;
                     if (unitTD.firstChild.data.split(" ")[1] != "Soldaten") {
                         // Ist Fahrgast in einem Transporter
                         var unitTD = outerTD.parentNode.nextSibling
