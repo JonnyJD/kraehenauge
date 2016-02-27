@@ -561,17 +561,18 @@ if( gamePage == "rbstart" ) {
         if (armeeZeilen[i].childNodes[1]) {
             var armeeForm = armeeZeilen[i].childNodes[1].firstChild;
             var armeeInputs = armeeForm.getElementsByTagName("input");
-            var armeeImg;
+            var armeeSubmit;
             for (var j = 0; j < armeeInputs.length; j++) {
-                if (armeeInputs[j].type == "image") {
-                    armeeImg = armeeInputs[j];
+                if (armeeInputs[j].type == "submit") {
+                    armeeSubmit = armeeInputs[j];
                     break;
                 }
             }
             GM_setValue(gameId+".armee"+(i+1-tote),
-                    armeeImg.name.match(/\[(.*)\]/)[1]);
+                    armeeSubmit.name.match(/\[(.*)\]/)[1]);
             GM_setValue(gameId+".armee"+(i+1-tote)+".src",
-                    armeeImg.src.match(/([^\/]*)\.gif/)[1]);
+                    armeeSubmit.style.backgroundImage.match(
+                        /([^\/]*)\.gif/)[1]);
             GM_setValue(gameId+".armeen", i+1-tote);
         } else {
             // tote Armeen haben eine Zeile ohne Linkformular
