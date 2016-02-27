@@ -19,7 +19,7 @@
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
 var clientName = 'Kr\xE4henauge: TW-Edition';
-var clientVersion = '1.6.1';
+var clientVersion = '1.6.1 [trunk r' + '$Rev$ '.split(" ")[1] + ']';
 var version = clientName + " " + clientVersion;
 var DEBUG = false;
 // Opera kann Formulare auch so in Tabs oeffnen
@@ -844,8 +844,8 @@ function sendXMLData(handler, doc, answer)                      // {{{1
         function responseFunction2(text) {
             document.getElementById("Fehlermeldungen").innerHTML = text;
         }
+        //sendDataWrapper("save?xml", "text/xml", data, responseFunction2);
         return sendDataWrapper(handler, "text/xml", data, responseFunction);
-        //sendDataWrapper("save?xml", "text/xml", data, responseFunction2)
     } else {
         printWarning("Es wurden keine zu sendenden Daten gefunden");
         return false;
@@ -975,21 +975,22 @@ function listTerrain(terrain, floor, x, y, width, center)   //      {{{2
 if (gamePage == "rbarmee") {
     // Kartenmittelpunkt suchen
     // = erstes Auftreten eines Kartenbildes im Code
-    var imgEntries = document.getElementsByTagName("img");
+    var divEntries = document.getElementsByTagName("div");
     i = 0;
-    while (i < imgEntries.length
-            && imgEntries[i].src.indexOf('/bild/karte/') == -1) { i++; }
-    if (i == imgEntries.length) {
+    while (i < divEntries.length
+            && divEntries[i].style.backgroundImage.indexOf(
+                '/bild/karte/') == -1) { i++; }
+    if (i == divEntries.length) {
         printWarning("Kartenmitte konnte nicht ermittelt werden.");
     } else {
         // Koordinaten des Mittelpunkts
-        var tdNode = imgEntries[i].parentNode.nextSibling;
+        var tdNode = divEntries[i].parentNode.nextSibling;
         text = tdNode.childNodes[1].firstChild.nodeValue;
         fields = splitPosition(text);
         var floor = fields[2];
         var x = parseInt(fields[3], 10); var y = parseInt(fields[4], 10);
         if (floor == undefined) { var floor = "N"; }
-        var terrain = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/, '$1');
+        var terrain = divEntries[i].style.backgroundImage.replace(/.*\/([^\/]*)\.gif.*/, '$1');
         var name = tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1');
         addTerrain(floor, x, y, terrain, name);
 
@@ -1035,22 +1036,24 @@ if (gamePage == "rbfturm1"
         || gamePage == "rbfturms") {
     // Karte suchen
     // = erstes Auftreten eines Kartenbildes im Code
-    var imgEntries = document.getElementsByTagName("img");
+    var divEntries = document.getElementsByTagName("div");
     i = 0;
-    while (i < imgEntries.length
-            && imgEntries[i].src.indexOf('/bild/karte/') == -1) { i++; }
-    if (i == imgEntries.length) {
+    while (i < divEntries.length
+            && divEntries[i].style.backgroundImage
+            .indexOf('/bild/karte/') == -1) { i++; }
+    if (i == divEntries.length) {
         printWarning("Karte konnte nicht gefunden werden.");
     } else {
-        var tableNode = imgEntries[i].parentNode.parentNode.parentNode;
+        var tableNode = divEntries[i].parentNode.parentNode.parentNode;
 
         // Terrain auslesen
-        var imgEntries = tableNode.getElementsByTagName("img");
+        var divEntries = tableNode.getElementsByTagName("div");
         terrain = new Array();
-        for (var i=0; i < imgEntries.length; i++) {
-            if (imgEntries[i].src.indexOf("buttons") == -1) {
+        for (var i=0; i < divEntries.length; i++) {
+            if (divEntries[i].style.backgroundImage.indexOf("buttons") == -1) {
                 // Alles was kein Button ist, ist hier ein Feld
-                var num = imgEntries[i].src.replace(/.*\/([^\/]*)\.gif/,'$1');
+                var num = divEntries[i].style.backgroundImage
+                    .replace(/.*\/([^\/]*)\.gif.*/,'$1');
                 terrain.push(num);
             }
         }
@@ -1103,20 +1106,20 @@ function isShip(imgEntry)    // {{{2
         return false;
     }
 }                                       // }}}2
-function isOwn(imgEntry)    // {{{2
+function isOwn(elem)    // {{{2
 // Ist keine eigene Armee, Dorf oder Aussenposten
 {
-    var box = imgEntry.parentNode.parentNode;
+    var box = elem.parentNode.parentNode;
     if (box.innerHTML.indexOf("Menschentransfer")	!= -1) {
         return true;
     } else {
         return false;
     }
 }                                       // }}}2
-function isArmee(imgEntry)    // {{{2
+function isArmee(elem)    // {{{2
 // Ist kein Dorf oder Aussenposten
 {
-    var box = imgEntry.parentNode.parentNode;
+    var box = elem.parentNode.parentNode;
     if (box.innerHTML.indexOf("Dorf")		        != -1
         || box.innerHTML.indexOf("Aussenposten")	!= -1
        ) {
@@ -1125,26 +1128,26 @@ function isArmee(imgEntry)    // {{{2
         return true;
     }
 }                                       // }}}2
-function isArmeeHandle(imgEntry)        // {{{2
+function isArmeeHandle(elem)        // {{{2
 // Das Heldenbild der Armee, womit die Armee eindeutig ist
 {
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held/"
             + "(h[^/.]+|[0-9]+|e_[^/.]+|transport[^/.]*)","");
-    var match = pattern.exec(imgEntry.src);
-    if (match && isArmee(imgEntry)) {
+    var match = pattern.exec(elem.style.backgroundImage);
+    if (match && isArmee(elem)) {
         return match;
     } else {
         return false;
     }
 }                                       // }}}2
-function isAllyArmee(imgEntry, allies)    // {{{2
+function isAllyArmee(elem, allies)    // {{{2
 // Das Allianztag einer der Allianzen in allies
 {
     var pattern = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
         allies+".gif","");
-    match = pattern.exec(imgEntry.src);
-    var box = imgEntry.parentNode.parentNode;
-    if (match && isArmee(imgEntry) && !isOwn(imgEntry)
+    match = pattern.exec(elem.style.backgroundImage);
+    var box = elem.parentNode.parentNode;
+    if (match && isArmee(elem) && !isOwn(elem)
             && box.innerHTML.indexOf("Held:")   == -1
             && box.innerHTML.indexOf("Bei:")    == -1
        ) {
@@ -1156,6 +1159,8 @@ function isAllyArmee(imgEntry, allies)    // {{{2
 }                                       // }}}2
 function getShip(imgEntry)            // {{{2
 {
+    // TODO
+    return null;
     var thisTable = imgEntry.parentNode.parentNode.parentNode.parentNode;
     var nextTR = thisTable.parentNode.parentNode.nextSibling;
     if (nextTR && nextTR.firstChild.nextSibling
@@ -1330,16 +1335,15 @@ if( gamePage == "rbarmee"
     // Armeeaktualisierung      {{{2
     var armeenElem = xmlDataDoc.createElement("armeen");
 
-    // eigene Armeen in Armeesicht (Bilder als input-img name=Armee)    {{{3
+    // eigene Armeen in Armeesicht (input-submit/background-image)    {{{3
     var inputs = document.getElementsByTagName("input");
     function ownArmiesInArmyView()
     {
     for( var i = 0; i < inputs.length; i++ ) {
-        if (inputs[i].type == "image" && inputs[i].name == "Armee") {
+        if (inputs[i].type == "submit" && inputs[i].name == "Armee") {
             var match = isArmeeHandle(inputs[i]);
             if (!match) { break; }
-            var form = inputs[i].parentNode.parentNode
-                .parentNode.parentNode.parentNode;
+            var form = inputs[i].parentNode.parentNode;
             var id;
             for (var j = 0; j < form.childNodes.length; j++) {
                 if (form.childNodes[j].name == "armee") {
@@ -1368,18 +1372,20 @@ if( gamePage == "rbarmee"
                 // hier ist ein Leerzeichen im HTML-code vor dem Armeenamen
                     .replace(/^\s+/,'');
                 var armee = new armeeObjekt(id, match[1], name);
-                var statTD = outerTD.nextSibling.nextSibling.nextSibling;
+                var statTD = outerTD.nextSibling.nextSibling;
                 var bp = statTD.childNodes[2].firstChild.data.split(" ")[0];
                 armee.bp = bp.split("/")[0];
                 armee.maxBP = bp.split("/")[1];
                 var ap = statTD.childNodes[4].data.split(" ")[0];
                 armee.ap = ap.split("/")[0];
                 armee.maxAP = ap.split("/")[1];
-                var bewImg = form.nextSibling.src;
+                var bewImg = form.nextSibling.style.backgroundImage;
                 if (bewImg.indexOf("bew4.gif") == -1) {
                     // laufender Held
-                    var unitTD = outerTD.parentNode.nextSibling.childNodes[2];
-                    var terrainTR = outerTD.parentNode.nextSibling.nextSibling;
+                    var unitTD = outerTD.parentNode.nextSibling.nextSibling
+                                                            .childNodes[2];
+                    var terrainTR = outerTD.parentNode
+                                        .nextSibling.nextSibling.nextSibling;
                     if (unitTD.firstChild.data.split(" ")[1] != "Soldaten") {
                         // Ist Fahrgast in einem Transporter
                         var unitTD = outerTD.parentNode.nextSibling
@@ -1434,16 +1440,15 @@ if( gamePage == "rbarmee"
     }                                                           //      }}}3
     ownArmiesInArmyView();
 
-    // eigene Armeen in Turmsicht (Bilder input-img name=ok)   {{{3
+    // eigene Armeen in Turmsicht (Bilder input-submit name=ok)   {{{3
     var inputs = document.getElementsByTagName("input");
     function ownArmiesInTower()
     {
         for( var i = 0; i < inputs.length; i++ ) {
-            if (inputs[i].type == "image" && inputs[i].name == "ok") {
+            if (inputs[i].type == "submit" && inputs[i].name == "ok") {
                 var match = isArmeeHandle(inputs[i]);
                 if (!match) { break; }
-                var form = inputs[i].parentNode.parentNode
-                    .parentNode.parentNode.parentNode;
+                var form = inputs[i].parentNode.parentNode;
                 var id;
                 for (var j = 0; j < form.childNodes.length; j++) {
                     if (form.childNodes[j].name == "armee") {
@@ -1466,19 +1471,18 @@ if( gamePage == "rbarmee"
     }                                                   // }}}3
     ownArmiesInTower();
 
-    // fremde Armeen (normale img)              {{{3
-    var imgEntries = document.getElementsByTagName("img");
+    // fremde Armeen (normale div)              {{{3
+    var divEntries = document.getElementsByTagName("div");
     function foreignArmies ()
     {
-    for( var i = 0; i < imgEntries.length; i++ ) {
-        var match = isArmeeHandle(imgEntries[i]);
+    for( var i = 0; i < divEntries.length; i++ ) {
+        var match = isArmeeHandle(divEntries[i]);
         if (match) {
             var img = match[1];
             if (gamePage == "rbarmee") {
                 // Position aus der Landschaftsaktualisierung
                 var pos = currentPos; // von aktueller Armee
-                var outerTD = imgEntries[i].parentNode.parentNode
-                    .parentNode.parentNode.parentNode;
+                var outerTD = divEntries[i].parentNode.parentNode;
                 var name = outerTD.previousSibling.firstChild.firstChild.data;
                 if(name != "Bei:") {
                     /* "Bei:" -> Kapitaen des Schiffs auf dem man ist
@@ -1510,8 +1514,7 @@ if( gamePage == "rbarmee"
                 }
             } else {
                 // in einer Turmsicht
-                var outerTD = imgEntries[i].parentNode.parentNode
-                    .parentNode.parentNode.parentNode;
+                var outerTD = divEntries[i].parentNode.parentNode;
                 var id = outerTD.nextSibling.childNodes[0].value;
                 var name = outerTD.previousSibling.firstChild.data;
                 var armee = new armeeObjekt(id, img, name);
@@ -1725,15 +1728,15 @@ function addReich()
     dataGathered = true;
 }
 
-function reichGetAlly(imgEntries, bTag, a_tag) {
-        if (imgEntries.length > 0) {
-            exp = new RegExp("http://www.ritterburgwelt.de/rb/held//allym"+
-                    "([0-9]+).gif","");
-            match = imgEntries[0].src.match(exp);
-            if (match) {
-                this.a_id = match[1];
-            }
-        } else if (bTags.length >= 2) {
+function reichGetAlly(a_elem, bTag, a_tag) {
+        var exp = new RegExp("http://www.ritterburgwelt.de/rb/held//allym" +
+                "([0-9]+).gif","");
+        var match = a_elem.style.backgroundImage.match(exp);
+        if (match) {
+            this.a_id = match[1];
+            return;
+        }
+        if (bTags.length >= 2) {
             this.a_tag = bTags[1].firstChild.data.match(/\[(.*)\]/)[1];
         } else if (a_tag !== null && a_tag[0] == "[") {
             this.a_tag = a_tag.substr(1,a_tag.length - 2);
@@ -1748,14 +1751,17 @@ if( gamePage == "rbreiche" ) {  // {{{2
     var trEntries = document.getElementsByTagName("tr");
     for( var i = 0; i < trEntries.length; i++ ) {
         var cells = trEntries[i].getElementsByTagName("td");
-        reich = new reichObjekt();
+        var reich = new reichObjekt();
 
         bTags = cells[0].getElementsByTagName("b")
         if (bTags.length == 0) { continue; }
         reich.rittername = bTags[0].firstChild.data;
-        var imgEntries = cells[1].getElementsByTagName("img");
-        ally_tag = bTags[0].parentNode.nextSibling.firstChild.data
-        reich.getAlly(imgEntries, bTags, ally_tag);
+        if (cells[1].firstChild !== null) {
+            var ally_tag = cells[1].firstChild.data;
+        } else {
+            ally_tag = null;
+        }
+        reich.getAlly(cells[1], bTags, ally_tag);
         iTags = cells[0].getElementsByTagName("i")
         if (iTags.length > 0) {
             reich.status = iTags[0].firstChild.data;
@@ -1793,8 +1799,13 @@ if( gamePage == "rbnachr1" ) {  // {{{2
             if (item.firstChild.data == "Herrscher ") {
                 var bTags = item.getElementsByTagName("b");
                 reich.rittername = bTags[0].firstChild.data;
-                var imgs = item.getElementsByTagName("img");
-                reich.getAlly(imgs, bTags, null); // no other tag -> null
+                var divs = item.getElementsByTagName("div");
+                if (divs.length > 0) {
+                    var a_elem = divs[0];
+                } else {
+                    var a_elem = item;
+                }
+                reich.getAlly(a_elem, bTags, null); // no other tag -> null
             }
             if (item.firstChild.data == "Reich ") {
                 reich.name = item.childNodes[1].firstChild.firstChild.data;
@@ -1851,8 +1862,13 @@ if( gamePage == "rbftop10" ) {  // {{{2
                 .match(/([0-9]+)\./)[1];
             bTags = row.childNodes[1].getElementsByTagName("b");
             reich.rittername = bTags[0].firstChild.data;
-            imgs = row.childNodes[1].getElementsByTagName("img");
-            reich.getAlly(imgs, bTags, null);   // keine andere Art von a_tag
+            var divs = row.childNodes[1].getElementsByTagName("div");
+            if (divs.length > 0) {
+                var a_elem = divs[0];
+            } else {
+                var a_elem = row.childNodes[1];
+            }
+            reich.getAlly(a_elem, bTags, null);   // keine andere Art von a_tag
 
             reich.add();
         }
@@ -1923,6 +1939,7 @@ if (gamePage == "rbzug") {
     // Titelzeile               {{{2
     newTD = document.createElement("td");
     newText = document.createTextNode("Z\xFCge");
+    newTD.align = "right";
     newTD.appendChild(newText);
     gueterZeilen[0].appendChild(newTD);
     //                          }}}2
@@ -1932,8 +1949,10 @@ if (gamePage == "rbzug") {
         var diff = gueterZeilen[gut].childNodes[2].firstChild.data;
         var danach = gueterZeilen[gut].childNodes[3].firstChild.data;
         if (diff < 0) {
+            danach = danach.replace(".","");
             var restZuege = Math.floor(danach / Math.abs(diff))
             var newTD = document.createElement("td");
+            newTD.align = "right";
             newTD.appendChild(document.createTextNode(restZuege));
             if (restZuege <= zuegeGelb) newTD.style.backgroundColor = "yellow";
             if (restZuege <= zuegeRot) newTD.style.backgroundColor = "red";
@@ -1941,6 +1960,7 @@ if (gamePage == "rbzug") {
         } else {
             var infinite = document.createTextNode(String.fromCharCode(8734));
             var newTD = document.createElement("td");
+            newTD.align = "right";
             newTD.appendChild(infinite);
             gueterZeilen[gut].appendChild(newTD);
         }
