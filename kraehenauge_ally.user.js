@@ -958,7 +958,7 @@ if (gamePage == "rbarmee") {
         var x = parseInt(fields[3], 10); var y = parseInt(fields[4], 10);
         if (floor == undefined) { var floor = "N"; }
         var terrain = divEntries[i].style.backgroundImage.replace(/.*\/([^\/]*)\.gif.*/, '$1');
-        var name = tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1');
+        var name = tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1').trim();
         addTerrain(floor, x, y, terrain, name);
 
 
@@ -973,19 +973,17 @@ if (gamePage == "rbarmee") {
         } else {
             i++; // Wir suchen die darauffolgende Zelle
             // lese die Kartenfelder
-            var imgEntries = tdEntries[i].getElementsByTagName("img");
-            terrain = new Array();
-            for (var i=0; i < imgEntries.length; i++) {
-                if (imgEntries[i].src.indexOf("buttons") == -1) {
-                    // Alles was kein Button ist, ist hier ein Feld
-                    var num = imgEntries[i].src
-                        .replace(/.*\/([^\/]*)\.gif/,'$1');
-                    terrain.push(num);
+            jQuery.each(jQuery(".Feld"), function (index, value) {
+                var koords = value.getAttribute("data-koordinate").split("/");
+                var x = parseInt(koords[0], 10);
+                var y = parseInt(koords[1], 10);
+                if (value.getAttribute("data-feldgrafik")) {
+                    var terrain = value.getAttribute("data-feldgrafik")
+                                                                .split(".")[0];
+                    var name = value.getAttribute("data-feldart");
+                    addTerrain(floor, x, y, terrain, name);
                 }
-            }
-            var width = Math.sqrt(terrain.length);
-            // x, y sind schon gesendete Zentrumskoordinaten -> true
-            listTerrain(terrain, floor, x, y, width, true);
+            });
 
             addDataSection(felderElem);
         }
