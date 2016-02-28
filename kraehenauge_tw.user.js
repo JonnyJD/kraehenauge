@@ -956,31 +956,39 @@ if (gamePage == "rbarmee") {
     if (i == divEntries.length) {
         printWarning("Kartenmitte konnte nicht ermittelt werden.");
     } else {
-        // Koordinaten des Mittelpunkts
-        var tdNode = divEntries[i].parentNode.nextSibling;
-        text = tdNode.childNodes[1].firstChild.nodeValue;
-        fields = splitPosition(text);
-        var floor = fields[2];
-        var x = parseInt(fields[3], 10); var y = parseInt(fields[4], 10);
-        if (floor == undefined) { var floor = "N"; }
-        var terrain = divEntries[i].style.backgroundImage.replace(/.*\/([^\/]*)\.gif.*/, '$1');
-        var name = tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1').trim();
-        addTerrain(floor, x, y, terrain, name);
-
-
         // Kartenausschnitt finden
         // gekennzeichnet durch "<td width=20>&nbpsp;></td><td valign=top>"
         // valign=top ist leider Standard, Suche nach width=20
         var tdEntries = document.getElementsByTagName("td");
-        var i=0;
-        while (i < tdEntries.length && tdEntries[i].width != 20) { i++; }
-        if (i == tdEntries.length) {
+        var j=0;
+        while (j < tdEntries.length && tdEntries[j].width != 20) { j++; }
+        if (j == tdEntries.length) {
             printWarning("Kartenausschnitt nicht gefunden.");
         } else {
-            i++; // Wir suchen die darauffolgende Zelle
+            j++; // Wir suchen die darauffolgende Zelle
             // speichere Kartenbereich, fuer Import-Karte
-            kartenBereich = tdEntries[i].parentNode;
-            // lese die Kartenfelder
+            kartenBereich = tdEntries[j].parentNode;
+        }
+
+        // Koordinaten des Mittelpunkts
+        var tdNode = divEntries[i].parentNode.nextSibling;
+        text = tdNode.childNodes[1].firstChild.nodeValue;
+        console.log(text);
+        if (text.indexOf("unbekannt") != -1) {
+            printWarning("Du weissst nicht wo du bist.");
+        } else {
+            fields = splitPosition(text);
+            var floor = fields[2];
+            var x = parseInt(fields[3], 10); var y = parseInt(fields[4], 10);
+            if (floor == undefined) { var floor = "N"; }
+            var terrain = divEntries[i].style.backgroundImage
+                                    .replace(/.*\/([^\/]*)\.gif.*/, '$1');
+            var name = tdNode.firstChild.nodeValue
+                                    .replace(/(.*) :/, '$1').trim();
+            // Feld auf dem man steht
+            addTerrain(floor, x, y, terrain, name);
+
+            // lese die Kartenfelder in der Minikarte
             jQuery.each(jQuery(".Feld"), function (index, value) {
                 var koords = value.getAttribute("data-koordinate").split("/");
                 var x = parseInt(koords[0], 10);
@@ -1131,7 +1139,7 @@ function addArmee()
         armeeElem.setAttribute("h_id", this.id);
     }
     var posElem = xmlDataDoc.createElement("position");
-    if (this.pos !== null) {
+    if (this.pos !== null && this.pos.indexOf("unbekannt") == -1) {
         fields = splitPosition(this.pos);
         if (typeof fields[2] == "undefined") {
             level = "N";
@@ -1142,7 +1150,8 @@ function addArmee()
         // spaeter noch Tempel moeglich
         posElem.appendChild(xmlDataDoc.createTextNode("taverne"));
     }
-    if (this.pos === null || fields[1] != "Q") {
+    if (this.pos === null ||
+            (this.pos.indexOf("unbekannt") == -1 && fields[1] != "Q")) {
         if (this.pos != null) {
             posElem.setAttribute("level", level);
             posElem.setAttribute("x", fields[3]);
@@ -1586,20 +1595,25 @@ if( gamePage == "rbarmee" ) {
     newDiv.appendChild(textNode);
     kartenBereich.appendChild(newDiv);
 
-    // Importkarte
-    iframe = document.createElement('iframe');
-    fields = splitPosition(currentPos);
-    x = fields[3];
-    y = fields[4];
-    iframe.src = "http://kraehen.org/tw/import/karte/" + x + "." + y;
-    if (typeof fields[2] != "undefined") {
-        iframe.src += "/" + fields[2];
+    if (currentPos.indexOf("unbekannt") == -1) {
+        // Importkarte
+        iframe = document.createElement('iframe');
+        fields = splitPosition(currentPos);
+        x = fields[3];
+        y = fields[4];
+        iframe.src = "http://kraehen.org/tw/import/karte/" + x + "." + y;
+        if (typeof fields[2] != "undefined") {
+            iframe.src += "/" + fields[2];
+        }
+        iframe.src += "/" + sicht;
+        iframe.frameBorder = 0;
+        iframe.width = 32*(2*sicht+1);
+        iframe.height = 32*(2*sicht+1);
+        iframe.scrolling = "no";
+    } else {
+        // show empty div
+        iframe = document.createElement('div');
     }
-    iframe.src += "/" + sicht;
-    iframe.width = 32*(2*sicht+1);
-    iframe.height = 32*(2*sicht+1);
-    iframe.frameBorder = 0;
-    iframe.scrolling = "no";
 }
 } catch (e) {
     printError("Fehler bei der Importkarte: ", e);
