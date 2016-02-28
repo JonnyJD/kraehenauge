@@ -864,7 +864,7 @@ function sentMessage(msg, outputArea)                           // {{{1
 }                                                               // }}}1
 function infoMessage(msg, outputArea)                           // {{{1
 {
-    document.getElementById(outputArea).innerHTML = text;
+    document.getElementById(outputArea).innerHTML = msg;
 }                                                               // }}}1
 
 // zu sendendes xml-Dokument vorbereiten                        // {{{1
@@ -996,9 +996,12 @@ if (gamePage == "rbfturm1"
 
     copyText = visibleText(wholePage);
     if (copyText.search("U[0-9]+, ") == -1) {
+        /*
         if (sendToHandler("send/text/turm", "text", copyText, "DBAntwort")) {
             sentMessage("Dorfdaten gesendet", "DBAntwort");
         }
+        */
+        infoMessage("Turmsicht muss neu implementiert werden..", "DBAntwort");
     } else {
         text = "Keine Dorfdaten aus einer Hoehle gesendet"
         infoMessage(text, "DBAntwort");
