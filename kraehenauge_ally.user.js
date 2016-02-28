@@ -740,7 +740,7 @@ function sentMessage(msg, outputArea)                           // {{{1
 }                                                               // }}}1
 function infoMessage(msg, outputArea)                           // {{{1
 {
-    document.getElementById(outputArea).innerHTML = text;
+    document.getElementById(outputArea).innerHTML = msg;
 }                                                               // }}}1
 
 // zu sendendes xml-Dokument vorbereiten                        // {{{1
@@ -856,21 +856,10 @@ if (gamePage == "rbarmee") {
     }
 }
 
-if (gamePage == "rbfturm1"
-    || gamePage == "rbfturm2"
-    || gamePage == "rbfturma"
-    || gamePage == "rbfturms"
-    || gamePage == "rbspaehen1"
-    || gamePage == "rbfhandelb") {
-
+if (gamePage == "rbfhandelb") {
     copyText = visibleText(wholePage);
-    if (copyText.search("U[0-9]+, ") == -1) {
-        if (sendToHandler("send/text/turm", "text", copyText, "DBAntwort")) {
-            sentMessage("Dorfdaten gesendet", "DBAntwort");
-        }
-    } else {
-        text = "Keine Dorfdaten aus einer Hoehle gesendet"
-        infoMessage(text, "DBAntwort");
+    if (sendToHandler("send/text/turm", "text", copyText, "DBAntwort")) {
+        sentMessage("Dorfdaten gesendet", "DBAntwort");
     }
 }
 
@@ -903,40 +892,23 @@ function addTerrain(floor, x, y, terrain, name)         // {{{2
     }
     felderElem.appendChild(feldElem);
     dataGathered = true;
+    return feldElem;
 }                                                       // }}}2
-function listTerrain(terrain, floor, x, y, width, center)   //      {{{2
+function addDorf(feldElem, level, name, besitzer)       // {{{2
 {
-    if (!center) {
-        // Zentrum aus linker oberer Ecke berechnen
-        var xval = x + Math.floor(width/2);
-        var yval = y + Math.floor(width/2);
-    } else {
-        // das Zentrum wurde gegeben
-        var xval = x;
-        var yval = y;
-    }
-    for (var i=0; i < terrain.length; i++) {
-        x = xval + (i % width ) - Math.floor(width / 2);
-        if (width == 3) {
-            if (i < 3)             { y = yval - 1; }
-            else if (i < 6)        { y = yval;     }
-            else                   { y = yval + 1; };
-        } else {    // width == 5, Weitsichtturm, Entdecker ?
-            if (i < 5)             { y = yval - 2; }
-            else if (i < 10)       { y = yval - 1; }
-            else if (i < 15)       { y = yval;     }
-            else if (i < 20)       { y = yval + 1; }
-            else                   { y = yval + 2; };
-        }
-        if (!center || x != xval || y != yval) {
-            // Das Zentrum braucht nicht doppelt uebertragen werden
-            // wenn es schon vorher bekannt war
-            // (Wurde schon zusammen mit dem Namen und Untertyp gesendet)
-            addTerrain(floor, x, y, terrain[i]);
-        }
-
-    }
-}                                                               //      }}}2
+    var dorfElem = xmlDataDoc.createElement("dorf");
+    dorfElem.setAttribute("level", level);
+    dorfElem.setAttribute("name", name);
+    dorfElem.setAttribute("besitzer", besitzer);
+    feldElem.appendChild(dorfElem);
+    return dorfElem;
+}                                                       //      }}}2
+function addAlly(dorfElem, name)        // {{{2
+{
+    var allyElem = xmlDataDoc.createElement("allianz");
+    allyElem.setAttribute("name", name);
+    dorfElem.appendChild(allyElem);
+}                                       //      }}}2
 
 // Erfassung in der Armee               {{{2
 if (gamePage == "rbarmee") {
@@ -997,61 +969,30 @@ if (gamePage == "rbfturm1"
         || gamePage == "rbfturma"
         || gamePage == "rbspaehen1"
         || gamePage == "rbfturms") {
-    // Karte suchen
-    // = erstes Auftreten eines Kartenbildes im Code
-    var divEntries = document.getElementsByTagName("div");
-    i = 0;
-    while (i < divEntries.length
-            && divEntries[i].style.backgroundImage
-            .indexOf('/bild/karte/') == -1) { i++; }
-    if (i == divEntries.length) {
-        printWarning("Karte konnte nicht gefunden werden.");
-    } else {
-        var tableNode = divEntries[i].parentNode.parentNode.parentNode;
 
-        // Terrain auslesen
-        var divEntries = tableNode.getElementsByTagName("div");
-        terrain = new Array();
-        for (var i=0; i < divEntries.length; i++) {
-            if (divEntries[i].style.backgroundImage.indexOf("buttons") == -1) {
-                // Alles was kein Button ist, ist hier ein Feld
-                var num = divEntries[i].style.backgroundImage
-                    .replace(/.*\/([^\/]*)\.gif.*/,'$1');
-                terrain.push(num);
-            }
-        }
-
-        // sichtbare Koordinaten auslesen
-        coordList = new Array();
-        for (var j=0; j < tableNode.childNodes.length; j++) {
-            var trNode = tableNode.childNodes[j];
-            var currNode = trNode.firstChild;
-            for (var i=0; i < trNode.childNodes.length; i++) {
-                var currNode = trNode.childNodes[i];
-                // nodeType == 3 -> text node
-                if (currNode.firstChild && currNode.firstChild.nodeType == "3"
-                        && currNode.innerHTML != "&nbsp;&nbsp;"
-                        && currNode.innerHTML != "&nbsp;") {
-                    var text = currNode.firstChild.nodeValue;
-                    coords = splitPosition(text);
-                    coordList.push(coords);
+    // lese die Kartenfelder
+    jQuery.each(jQuery(".Feld"), function (index, value) {
+        var koords = value.getAttribute("data-koordinate").split("/");
+        var x = parseInt(koords[0], 10);
+        var y = parseInt(koords[1], 10);
+        if (value.getAttribute("data-feldgrafik")) {
+            var terrain = value.getAttribute("data-feldgrafik")
+                                                        .split(".")[0];
+            var feldname = value.getAttribute("data-feldart");
+            var feldElem = addTerrain("N", x, y, terrain, feldname);
+            if (value.getAttribute("data-dorflevel")) {
+                var level = value.getAttribute("data-dorflevel");
+                var name = value.getAttribute("data-dorfname");
+                var besitzer = value.getAttribute("data-dorfbesitzer");
+                var dorfElem = addDorf(feldElem, level, name, besitzer);
+                if (value.getAttribute("data-dorfallianz")) {
+                    addAlly(dorfElem, value.getAttribute("data-dorfallianz"));
                 }
             }
         }
-        var terrainPos = 0;
-        for (var i=0; i < coordList.length; i++) {
-            if (coordList[i] !== null) {
-                var x = parseInt(coordList[i][3], 10);
-                var y = parseInt(coordList[i][4], 10);
-                var level = coordList[i][2];
-                if (level == undefined) { level = "N"; }
-                addTerrain(level, x, y, terrain[terrainPos]);
-                terrainPos++;
-            }
-        }
+    });
 
-        addDataSection(felderElem);
-    }
+    addDataSection(felderElem);
 }                                                       //      }}}2
 
 } catch (e) {
