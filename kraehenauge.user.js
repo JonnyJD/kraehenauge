@@ -1070,7 +1070,6 @@ if (gamePage == "rbarmee") {
         // Koordinaten des Mittelpunkts
         var tdNode = divEntries[i].parentNode.nextSibling;
         text = tdNode.childNodes[1].firstChild.nodeValue;
-        console.log(text);
         if (text.indexOf("unbekannt") != -1) {
             printWarning("Du weissst nicht wo du bist.");
         } else {
@@ -1692,7 +1691,6 @@ if( gamePage == "rbarmee" ) {
     newDiv.appendChild(textNode);
     kartenBereich.appendChild(newDiv);
 
-    console.log(currentPos);
     if (currentPos.indexOf("unbekannt") == -1) {
         // Importkarte
         iframe = document.createElement('iframe');
