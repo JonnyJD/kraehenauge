@@ -925,26 +925,21 @@ if (gamePage == "rbarmee") {
         // Koordinaten des Mittelpunkts
         var tdNode = divEntries[i].parentNode.nextSibling;
         text = tdNode.childNodes[1].firstChild.nodeValue;
-        fields = splitPosition(text);
-        var floor = fields[2];
-        var x = parseInt(fields[3], 10); var y = parseInt(fields[4], 10);
-        if (floor == undefined) { var floor = "N"; }
-        var terrain = divEntries[i].style.backgroundImage.replace(/.*\/([^\/]*)\.gif.*/, '$1');
-        var name = tdNode.firstChild.nodeValue.replace(/(.*) :/, '$1').trim();
-        addTerrain(floor, x, y, terrain, name);
-
-
-        // Kartenausschnitt finden
-        // gekennzeichnet durch "<td width=20>&nbpsp;></td><td valign=top>"
-        // valign=top ist leider Standard, Suche nach width=20
-        var tdEntries = document.getElementsByTagName("td");
-        var i=0;
-        while (i < tdEntries.length && tdEntries[i].width != 20) { i++; }
-        if (i == tdEntries.length) {
-            printWarning("Kartenausschnitt nicht gefunden.");
+        if (text.indexOf("unbekannt") != -1) {
+            printWarning("Du weissst nicht wo du bist.");
         } else {
-            i++; // Wir suchen die darauffolgende Zelle
-            // lese die Kartenfelder
+            fields = splitPosition(text);
+            var floor = fields[2];
+            var x = parseInt(fields[3], 10); var y = parseInt(fields[4], 10);
+            if (floor == undefined) { var floor = "N"; }
+            var terrain = divEntries[i].style.backgroundImage
+                                    .replace(/.*\/([^\/]*)\.gif.*/, '$1');
+            var name = tdNode.firstChild.nodeValue
+                                    .replace(/(.*) :/, '$1').trim();
+            // Feld auf dem man steht
+            addTerrain(floor, x, y, terrain, name);
+
+            // lese die Kartenfelder in der Minikarte
             jQuery.each(jQuery(".Feld"), function (index, value) {
                 var koords = value.getAttribute("data-koordinate").split("/");
                 var x = parseInt(koords[0], 10);
@@ -1095,7 +1090,7 @@ function addArmee()
         armeeElem.setAttribute("h_id", this.id);
     }
     var posElem = xmlDataDoc.createElement("position");
-    if (this.pos !== null) {
+    if (this.pos !== null && this.pos.indexOf("unbekannt") == -1) {
         fields = splitPosition(this.pos);
         if (typeof fields[2] == "undefined") {
             level = "N";
@@ -1106,7 +1101,8 @@ function addArmee()
         // spaeter noch Tempel moeglich
         posElem.appendChild(xmlDataDoc.createTextNode("taverne"));
     }
-    if (this.pos === null || fields[1] != "Q") {
+    if (this.pos === null ||
+            (this.pos.indexOf("unbekannt") == -1 && fields[1] != "Q")) {
         if (this.pos != null) {
             posElem.setAttribute("level", level);
             posElem.setAttribute("x", fields[3]);
