@@ -1142,8 +1142,24 @@ function addArmee()
 try {
 
 if (gamePage == "kartenraum") {
+    //
     // doerfer
-    // TODO (and don't add them from map above (double the data..)
+    //
+    jQuery.each(jQuery("tr"), function(index, row) {
+        if (row.childNodes.length < 3
+                || !row.childNodes[2].style.background
+                || row.childNodes[2].style.background.indexOf("/karte/") == -1)
+        {
+            return; // kein Dorf
+        }
+        var koords = row.childNodes[0].firstChild.data.split(",");
+        var x = koords[0].trim();       var y = koords[1].trim();
+        var last_seen = row.childNodes[5].getAttribute("data-order");
+        var feldElem = jQuery(rbElem).find('feld[x="'+x+'"][y="'+y+'"]');
+        var dorfElem = feldElem.find('dorf');
+        // add last_seen to element already in XML
+        dorfElem.attr("last_seen", last_seen);
+    });
 
 
     //
