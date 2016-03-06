@@ -1333,9 +1333,7 @@ if (gamePage == "kartenraum") {
         if (value.style.backgroundImage.indexOf("rb/held") != -1) {
             var row = value.parentNode.parentNode;
             var id = row.getAttribute("data-armeeid");
-            console.log("id: " + id);
             var name = row.childNodes[1].firstChild.data;
-            console.log("name: " + name);
             var img = getImage(value);
             if (!img) return;
             var armee = new armeeObjekt(id, img, name);
