@@ -1050,7 +1050,6 @@ if (gamePage == "rbfturm1"
             koords = loc[0].split("/");
             floor = "N";
         }
-        var koords = value.getAttribute("data-koordinate").split("/");
         var x = parseInt(koords[0], 10);
         var y = parseInt(koords[1], 10);
         if (value.getAttribute("data-feldgrafik")) {
