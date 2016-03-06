@@ -1086,7 +1086,14 @@ if (gamePage == "rbarmee") {
 
             // lese die Kartenfelder in der Minikarte
             jQuery.each(jQuery(".Feld"), function (index, value) {
-                var koords = value.getAttribute("data-koordinate").split("/");
+                var loc = value.getAttribute("data-koordinate").split(" ");
+                var koords;
+                if (loc.length > 1) {
+                    koords = loc[1].split("/");
+                    floor = loc[0];
+                } else {
+                    koords = loc[0].split("/");
+                }
                 var x = parseInt(koords[0], 10);
                 var y = parseInt(koords[1], 10);
                 if (value.getAttribute("data-feldgrafik")) {
@@ -1112,6 +1119,16 @@ if (gamePage == "rbfturm1"
 
     // lese die Kartenfelder
     jQuery.each(jQuery(".Feld"), function (index, value) {
+        var loc = value.getAttribute("data-koordinate").split(" ");
+        var koords;
+        var floor;
+        if (loc.length > 1) {
+            koords = loc[1].split("/");
+            floor = loc[0];
+        } else {
+            koords = loc[0].split("/");
+            floor = "N";
+        }
         var koords = value.getAttribute("data-koordinate").split("/");
         var x = parseInt(koords[0], 10);
         var y = parseInt(koords[1], 10);
@@ -1119,7 +1136,7 @@ if (gamePage == "rbfturm1"
             var terrain = value.getAttribute("data-feldgrafik")
                                                         .split(".")[0];
             var feldname = value.getAttribute("data-feldart");
-            var feldElem = addTerrain("N", x, y, terrain, feldname);
+            var feldElem = addTerrain(floor, x, y, terrain, feldname);
             if (value.getAttribute("data-dorflevel")) {
                 var level = value.getAttribute("data-dorflevel");
                 var name = value.getAttribute("data-dorfname");
