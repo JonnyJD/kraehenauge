@@ -1448,7 +1448,7 @@ if( gamePage == "rbarmee"
             if (gamePage == "rbarmee") {
                 // Position aus der Landschaftsaktualisierung
                 var pos = currentPos; // von aktueller Armee
-                var outerTD = divEntries[i].parentNode.parentNode;
+                var outerTD = divEntries[i].parentNode;
                 var name = outerTD.previousSibling.firstChild.firstChild.data;
                 if(name != "Bei:") {
                     /* "Bei:" -> Kapitaen des Schiffs auf dem man ist
