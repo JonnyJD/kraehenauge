@@ -1302,6 +1302,7 @@ if( gamePage == "rbarmee"
     var armeenElem = xmlDataDoc.createElement("armeen");
 
     // eigene Armeen in Armeesicht (input-submit/background-image)    {{{3
+    // bzw. neu auch inputs in Tuermen
     var inputs = document.getElementsByTagName("input");
     function ownArmiesInArmyView()
     {
@@ -1318,16 +1319,41 @@ if( gamePage == "rbarmee"
                 }
             }
             var outerTD = form.parentNode;
-            var name = outerTD.previousSibling.childNodes[0].firstChild.data;
+            var name_elem = outerTD.previousSibling.childNodes[0];
+            var name;
+            if (name_elem.firstChild) {
+                // in Armeesicht name in bold tag
+                name = name_elem.firstChild.data;
+            } else {
+                // in Turmsicht auch input, aber name ohne bold tag
+                name = name_elem.data;
+            }
             if (name != "Held:") {
                 // gesichtetete Armee
                 var armee = new armeeObjekt(id, match[1], name);
-                armee.pos = currentPos; // von aktueller Armee
-                armee.size = outerTD.previousSibling.childNodes[2]
-                    .data.split(" ")[1];
-                armee.strength = outerTD.previousSibling.childNodes[4]
-                    .data.split(" ")[1];
-                armee.owner = outerTD.nextSibling.childNodes[1].firstChild.data;
+                if (typeof currentPos != "undefined") {
+                    // Armeesicht
+                    armee.pos = currentPos;
+                    armee.size = outerTD.previousSibling.childNodes[2]
+                        .data.split(" ")[1];
+                    armee.strength = outerTD.previousSibling.childNodes[4]
+                        .data.split(" ")[1];
+                    armee.owner = outerTD.nextSibling.childNodes[1].firstChild.data;
+                } else {
+                    // Tabelle in Turmsicht
+                    armee.pos = outerTD.previousSibling.previousSibling
+                        .firstChild.data;
+                    armee.ap = outerTD.previousSibling.childNodes[2]
+                        .data.split(" ")[0];
+                    armee.bp = outerTD.previousSibling.childNodes[3]
+                        .firstChild.data.split(" ")[0];
+                    armee.size = outerTD.previousSibling.childNodes[7]
+                        .data.split(" ")[1];
+                    armee.strength = outerTD.previousSibling.childNodes[7]
+                        .data.split(" ")[4];
+                    armee.owner = outerTD.nextSibling.nextSibling.childNodes[0]
+                        .firstChild.data;
+                }
                 // hier hoeher gehen wegen FORM tag
                 armee.schiff = getShip(inputs[i].parentNode);
 
@@ -1480,13 +1506,18 @@ if( gamePage == "rbarmee"
                 }
             } else {
                 // in einer Turmsicht
-                var outerTD = divEntries[i].parentNode.parentNode;
-                var id = outerTD.nextSibling.childNodes[0].value;
+                var outerTD = divEntries[i].parentNode;
+                var id = outerTD.parentNode.getAttribute("data-armeeid");
                 var name = outerTD.previousSibling.firstChild.data;
                 var armee = new armeeObjekt(id, img, name);
                 armee.pos = outerTD.previousSibling.previousSibling
                     .firstChild.data;
-                armee.owner = outerTD.nextSibling.childNodes[2].firstChild.data;
+                armee.size = outerTD.previousSibling.childNodes[2]
+                    .data.split(" ")[1];
+                armee.strength = outerTD.previousSibling.childNodes[2]
+                    .data.split(" ")[4];
+                armee.owner = outerTD.nextSibling.nextSibling.childNodes[0]
+                    .firstChild.data;
                 armee.schiff = getShip(imgEntries[i]);
 
                 armee.add();
