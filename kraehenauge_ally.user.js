@@ -344,6 +344,8 @@ else if (pageTitle.search('Taverne im Dorf (.*), Söldner-Helden anheuern') == 0
     gamePage = 'rbtavernesold'; // kein offizieller Name
 else if (pageTitle.indexOf('Allianz ') == 0)
     gamePage = 'rbally2';
+else if (pageTitle.indexOf('Kartenraum') == 0)
+    gamePage = 'kartenraum';
 //                      }}}2
     return gamePage
 }
@@ -770,6 +772,8 @@ if(gamePage == "rbfturm1" || gamePage == "rbfturm2"
     }
 } else if (gamePage == "rbftop10") {
     sichtElem.setAttribute("typ","top10");
+} else if (gamePage == "kartenraum") {
+    sichtElem.setAttribute("typ","karte");
 } else {
     sichtElem.setAttribute("typ","keine");
 }
@@ -982,7 +986,8 @@ if (gamePage == "rbfturm1"
         || gamePage == "rbfturm2"
         || gamePage == "rbfturma"
         || gamePage == "rbspaehen1"
-        || gamePage == "rbfturms") {
+        || gamePage == "rbfturms"
+        || gamePage == "kartenraum") {
 
     // lese die Kartenfelder
     jQuery.each(jQuery(".Feld"), function (index, value) {
@@ -1027,6 +1032,182 @@ if (gamePage == "rbfturm1"
     printError("Fehler in der Landschaftserfassung: ", e);
 }
 // }}}1
+
+function armeeObjekt(id, img, name) {                   // {{{2
+    this.id = id;
+    this.img = img;
+    this.name = name;
+    this.add = addArmee;
+}
+function addArmee()
+{
+    var armeeElem = xmlDataDoc.createElement("armee");
+    if (this.id !== null) {
+        armeeElem.setAttribute("h_id", this.id);
+    }
+    var posElem = xmlDataDoc.createElement("position");
+    if (this.pos !== null && this.pos.indexOf("unbekannt") == -1) {
+        fields = splitPosition(this.pos);
+        if (typeof fields[2] == "undefined") {
+            level = "N";
+        } else {
+            level = fields[2];
+        }
+    } else {
+        // spaeter noch Tempel moeglich
+        posElem.appendChild(xmlDataDoc.createTextNode("taverne"));
+    }
+    if (this.pos === null ||
+            (this.pos.indexOf("unbekannt") == -1 && fields[1] != "Q")) {
+        if (this.pos != null) {
+            posElem.setAttribute("level", level);
+            posElem.setAttribute("x", fields[3]);
+            posElem.setAttribute("y", fields[4]);
+        }
+        armeeElem.appendChild(posElem);
+        var bildElem = xmlDataDoc.createElement("bild");
+        bildElem.appendChild(xmlDataDoc.createTextNode(this.img));
+        armeeElem.appendChild(bildElem);
+        var nameElem = xmlDataDoc.createElement("held");
+        nameElem.appendChild(xmlDataDoc.createTextNode(this.name));
+        armeeElem.appendChild(nameElem);
+        if (typeof this.last_seen != "undefined" && this.last_seen !== null) {
+            armeeElem.setAttribute("last_seen", this.last_seen);
+        }
+        if (this.owner) {
+            var ritterElem = xmlDataDoc.createElement("ritter");
+            if (this.owner == "[self]") {
+                ritterElem.setAttribute("r_id", gameId.substr(7));
+            } else {
+                ritterElem.appendChild(xmlDataDoc.createTextNode(this.owner));
+            }
+            armeeElem.appendChild(ritterElem);
+        }
+        if (this.size != "undefined" || typeof this.ruf != "undefined") {
+            var sizeElem = xmlDataDoc.createElement("size");
+            if (typeof this.size !== "undefined") {
+                sizeElem.setAttribute("now", this.size);
+            }
+            if (typeof this.ruf != "undefined") {
+                sizeElem.setAttribute("max", this.ruf);
+            }
+            armeeElem.appendChild(sizeElem);
+        }
+        if (typeof this.strength != "undefined" && this.strength !== null) {
+            var strengthElem = xmlDataDoc.createElement("strength");
+            strengthElem.setAttribute("now", this.strength);
+            armeeElem.appendChild(strengthElem);
+        }
+        if (typeof this.bp != "undefined" || typeof this.maxBP != "undefined") {
+            var bpElem = xmlDataDoc.createElement("bp");
+            if (typeof this.bp != "undefined") {
+                bpElem.setAttribute("now", this.bp);
+            }
+            if (typeof this.maxBP != "undefined") {
+                bpElem.setAttribute("max", this.maxBP);
+            }
+            armeeElem.appendChild(bpElem);
+        }
+        if (typeof this.ap != "undefined" || typeof maxAP != "undefined") {
+            var apElem = xmlDataDoc.createElement("ap");
+            if (typeof this.ap != "undefined") {
+                apElem.setAttribute("now", this.ap);
+            }
+            if (typeof this.maxAP != "undefined") {
+                apElem.setAttribute("max", this.maxAP);
+            }
+            armeeElem.appendChild(apElem);
+        }
+        if (typeof this.schiff != "undefined" && this.schiff !== null) {
+            var schiffElem = xmlDataDoc.createElement("schiff");
+            schiffElem.setAttribute("typ", this.schiff.typ);
+            armeeElem.appendChild(schiffElem);
+        }
+        if (typeof this.dauer != "undefined" || typeof this.maxDauer != "undefined") {
+            var dauerElem = xmlDataDoc.createElement("dauer");
+            if (typeof this.dauer != "undefined") {
+                dauerElem.setAttribute("now", this.dauer);
+            }
+            if (typeof this.maxDauer != "undefined") {
+                dauerElem.setAttribute("max", this.maxDauer);
+            }
+            armeeElem.appendChild(dauerElem);
+        }
+        armeenElem.appendChild(armeeElem);
+        dataGathered = true;
+    }
+}                                                           // }}}2
+
+// Aktualisierungserfassung     {{{1
+try {
+
+if (gamePage == "kartenraum") {
+    // doerfer
+    // TODO (and don't add them from map above (double the data..)
+
+
+    //
+    // armeen
+    //
+
+    var armeepattern = new RegExp("http://www.ritterburgwelt.de/rb/held/"
+            + "(h[^/.]+|[0-9]+|e_[^/.]+|transport[^/.]*)","");
+    function getImage(elem)     // {{{2
+    {
+        var match = armeepattern.exec(elem.style.backgroundImage);
+        if (!match) {
+            console.log("kein armeeimage in " + elem.style.backgroundImage);
+            return false;
+        } else {
+            return match[1];
+        }
+    }                           // }}}2
+
+    var armeenElem = xmlDataDoc.createElement("armeen");
+
+    // eigene
+    jQuery.each(jQuery("input.rbi32"), function(index, value) {
+        var row = value.parentNode.parentNode.parentNode.parentNode;
+        var id = row.getAttribute("data-armeeid");
+        var name = row.childNodes[1].firstChild.data;
+        var img = getImage(value);
+        if (!img) return;
+        var armee = new armeeObjekt(id, img, name);
+        armee.pos = row.childNodes[0].firstChild.data;
+        armee.ap = row.childNodes[1].childNodes[2].data.split(" ")[0];
+        armee.bp = row.childNodes[1].childNodes[3]
+            .firstChild.data.split(" ")[0];
+        armee.size = row.childNodes[1].childNodes[7].data.split(" ")[1];
+        armee.strength = row.childNodes[1].childNodes[7].data.split(" ")[4];
+        armee.owner = row.childNodes[4].childNodes[0].firstChild.data;
+        armee.last_seen = row.childNodes[5].getAttribute("data-order");
+        armee.add();
+    });
+    // fremde Armeen und Monster
+    jQuery.each(jQuery("div.rbi32, .rbif"), function(index, value) {
+        if (value.style.backgroundImage.indexOf("rb/held") != -1) {
+            var row = value.parentNode.parentNode;
+            var id = row.getAttribute("data-armeeid");
+            var name = row.childNodes[1].firstChild.data;
+            var img = getImage(value);
+            if (!img) return;
+            var armee = new armeeObjekt(id, img, name);
+            armee.pos = row.childNodes[0].firstChild.data;
+            armee.size = row.childNodes[1].childNodes[2].data.split(" ")[1];
+            armee.strength = row.childNodes[1].childNodes[2].data.split(" ")[4];
+            armee.owner = row.childNodes[4].childNodes[0].firstChild.data;
+            armee.last_seen = row.childNodes[5].getAttribute("data-order");
+            armee.add();
+        }
+    });
+
+    addDataSection(armeenElem);
+}
+
+} catch (e) {
+    printError("Fehler beim Lesen der Aktualisierungdaten: ", e);
+}
+//                                      }}}1
 
 // Armeesortierung und Aktualisierung   {{{1
 try {
@@ -1109,108 +1290,6 @@ function getShip(imgEntry)            // {{{2
         return null;
     }
 }                                       // }}}2
-
-function armeeObjekt(id, img, name) {                   // {{{2
-    this.id = id;
-    this.img = img;
-    this.name = name;
-    this.add = addArmee;
-}
-function addArmee()
-{
-    var armeeElem = xmlDataDoc.createElement("armee");
-    if (this.id !== null) {
-        armeeElem.setAttribute("h_id", this.id);
-    }
-    var posElem = xmlDataDoc.createElement("position");
-    if (this.pos !== null && this.pos.indexOf("unbekannt") == -1) {
-        fields = splitPosition(this.pos);
-        if (typeof fields[2] == "undefined") {
-            level = "N";
-        } else {
-            level = fields[2];
-        }
-    } else {
-        // spaeter noch Tempel moeglich
-        posElem.appendChild(xmlDataDoc.createTextNode("taverne"));
-    }
-    if (this.pos === null ||
-            (this.pos.indexOf("unbekannt") == -1 && fields[1] != "Q")) {
-        if (this.pos != null) {
-            posElem.setAttribute("level", level);
-            posElem.setAttribute("x", fields[3]);
-            posElem.setAttribute("y", fields[4]);
-        }
-        armeeElem.appendChild(posElem);
-        var bildElem = xmlDataDoc.createElement("bild");
-        bildElem.appendChild(xmlDataDoc.createTextNode(this.img));
-        armeeElem.appendChild(bildElem);
-        var nameElem = xmlDataDoc.createElement("held");
-        nameElem.appendChild(xmlDataDoc.createTextNode(this.name));
-        armeeElem.appendChild(nameElem);
-        if (this.owner) {
-            var ritterElem = xmlDataDoc.createElement("ritter");
-            if (this.owner == "[self]") {
-                ritterElem.setAttribute("r_id", gameId.substr(7));
-            } else {
-                ritterElem.appendChild(xmlDataDoc.createTextNode(this.owner));
-            }
-            armeeElem.appendChild(ritterElem);
-        }
-        if (this.size != "undefined" || typeof this.ruf != "undefined") {
-            var sizeElem = xmlDataDoc.createElement("size");
-            if (typeof this.size !== "undefined") {
-                sizeElem.setAttribute("now", this.size);
-            }
-            if (typeof this.ruf != "undefined") {
-                sizeElem.setAttribute("max", this.ruf);
-            }
-            armeeElem.appendChild(sizeElem);
-        }
-        if (typeof this.strength != "undefined" && this.strength !== null) {
-            var strengthElem = xmlDataDoc.createElement("strength");
-            strengthElem.setAttribute("now", this.strength);
-            armeeElem.appendChild(strengthElem);
-        }
-        if (typeof this.bp != "undefined" || typeof this.maxBP != "undefined") {
-            var bpElem = xmlDataDoc.createElement("bp");
-            if (typeof this.bp != "undefined") {
-                bpElem.setAttribute("now", this.bp);
-            }
-            if (typeof this.maxBP != "undefined") {
-                bpElem.setAttribute("max", this.maxBP);
-            }
-            armeeElem.appendChild(bpElem);
-        }
-        if (typeof this.ap != "undefined" || typeof maxAP != "undefined") {
-            var apElem = xmlDataDoc.createElement("ap");
-            if (typeof this.ap != "undefined") {
-                apElem.setAttribute("now", this.ap);
-            }
-            if (typeof this.maxAP != "undefined") {
-                apElem.setAttribute("max", this.maxAP);
-            }
-            armeeElem.appendChild(apElem);
-        }
-        if (this.schiff !== null) {
-            var schiffElem = xmlDataDoc.createElement("schiff");
-            schiffElem.setAttribute("typ", this.schiff.typ);
-            armeeElem.appendChild(schiffElem);
-        }
-        if (typeof this.dauer != "undefined" || typeof this.maxDauer != "undefined") {
-            var dauerElem = xmlDataDoc.createElement("dauer");
-            if (typeof this.dauer != "undefined") {
-                dauerElem.setAttribute("now", this.dauer);
-            }
-            if (typeof this.maxDauer != "undefined") {
-                dauerElem.setAttribute("max", this.maxDauer);
-            }
-            armeeElem.appendChild(dauerElem);
-        }
-        armeenElem.appendChild(armeeElem);
-        dataGathered = true;
-    }
-}                                                           // }}}2
 
 if( gamePage == "rbarmee" 
     || gamePage == "rbfturm1"
@@ -1803,6 +1882,7 @@ if (dataGathered && (gamePage == "rbarmee"
         || gamePage == "rbfturm2"
         || gamePage == "rbfturma"
         || gamePage == "rbfturms"
+        || gamePage == "kartenraum"
         || gamePage == "rbspaehen1"
         || gamePage == "rbreiche"
         || gamePage == "rbnachr1"
