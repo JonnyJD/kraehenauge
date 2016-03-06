@@ -877,7 +877,7 @@ if (gameId == 'rbspiel1728') {
 // Landschaftserfassung         {{{1
 try {
 var felderElem = xmlDataDoc.createElement("felder");
-function addTerrain(floor, x, y, terrain, name)         // {{{2
+function addTerrain(floor, x, y, terrain, name, detail) // {{{2
 {
     var feldElem = xmlDataDoc.createElement("feld");
     feldElem.setAttribute("level", floor);
@@ -890,19 +890,25 @@ function addTerrain(floor, x, y, terrain, name)         // {{{2
         nameElem.appendChild(xmlDataDoc.createTextNode(name));
         feldElem.appendChild(nameElem);
     }
+    if (typeof detail != "undefined") {
+        feldElem.setAttribute("detail", detail);
+    }
     felderElem.appendChild(feldElem);
     dataGathered = true;
     return feldElem;
 }                                                       // }}}2
-function addDorf(feldElem, level, name, besitzer)       // {{{2
+function addDorf(feldElem, level, name, besitzer, detail)       // {{{2
 {
     var dorfElem = xmlDataDoc.createElement("dorf");
     dorfElem.setAttribute("level", level);
     dorfElem.setAttribute("name", name);
     dorfElem.setAttribute("besitzer", besitzer);
+    if (typeof detail != "undefined") {
+        dorfElem.setAttribute("detail", detail);
+    }
     feldElem.appendChild(dorfElem);
     return dorfElem;
-}                                                       //      }}}2
+}                                                               //      }}}2
 function addAlly(dorfElem, name)        // {{{2
 {
     var allyElem = xmlDataDoc.createElement("allianz");
@@ -930,14 +936,7 @@ if (gamePage == "rbarmee") {
         } else {
             fields = splitPosition(text);
             var floor = fields[2];
-            var x = parseInt(fields[3], 10); var y = parseInt(fields[4], 10);
             if (floor == undefined) { var floor = "N"; }
-            var terrain = divEntries[i].style.backgroundImage
-                                    .replace(/.*\/([^\/]*)\.gif.*/, '$1');
-            var name = tdNode.firstChild.nodeValue
-                                    .replace(/(.*) :/, '$1').trim();
-            // Feld auf dem man steht
-            addTerrain(floor, x, y, terrain, name);
 
             // lese die Kartenfelder in der Minikarte
             jQuery.each(jQuery(".Feld"), function (index, value) {
@@ -954,8 +953,21 @@ if (gamePage == "rbarmee") {
                 if (value.getAttribute("data-feldgrafik")) {
                     var terrain = value.getAttribute("data-feldgrafik")
                                                                 .split(".")[0];
-                    var name = value.getAttribute("data-feldart");
-                    addTerrain(floor, x, y, terrain, name);
+                    var feldname = value.getAttribute("data-feldart");
+                    var felddetail = value.getAttribute("data-felddetail");
+                    var feldElem = addTerrain(floor, x, y, terrain,
+                                              feldname, felddetail);
+                    if (value.getAttribute("data-dorflevel")) {
+                        var level = value.getAttribute("data-dorflevel");
+                        var name = value.getAttribute("data-dorfname");
+                        var besitzer = value.getAttribute("data-dorfbesitzer");
+                        var dorfdetail = value.getAttribute("data-dorfdetail");
+                        var dorfElem = addDorf(feldElem, level, name,
+                                               besitzer, dorfdetail);
+                        if (value.getAttribute("data-dorfallianz")) {
+                            addAlly(dorfElem, value.getAttribute("data-dorfallianz"));
+                        }
+                    }
                 }
             });
 
@@ -991,12 +1003,16 @@ if (gamePage == "rbfturm1"
             var terrain = value.getAttribute("data-feldgrafik")
                                                         .split(".")[0];
             var feldname = value.getAttribute("data-feldart");
-            var feldElem = addTerrain(floor, x, y, terrain, feldname);
+            var felddetail = value.getAttribute("data-felddetail");
+            var feldElem = addTerrain(floor, x, y, terrain,
+                                      feldname, felddetail);
             if (value.getAttribute("data-dorflevel")) {
                 var level = value.getAttribute("data-dorflevel");
                 var name = value.getAttribute("data-dorfname");
                 var besitzer = value.getAttribute("data-dorfbesitzer");
-                var dorfElem = addDorf(feldElem, level, name, besitzer);
+                var dorfdetail = value.getAttribute("data-dorfdetail");
+                var dorfElem = addDorf(feldElem, level, name,
+                                       besitzer, dorfdetail);
                 if (value.getAttribute("data-dorfallianz")) {
                     addAlly(dorfElem, value.getAttribute("data-dorfallianz"));
                 }
