@@ -879,7 +879,7 @@ if (gamePage == "rbarmee") {
 
     if (wholePage.indexOf("fliehen") == -1) {
         copyText = visibleText(wholePage);
-        if (copyText.search("U[0-9]+, ") == -1) {
+        if (copyText.search(" : U[0-9]+, ") == -1) {
             if (sendToHandler("send/text/armee", "dorftext", copyText, "DBAntwort")) {
                 sentMessage("Dorfdaten gesendet", "DBAntwort");
             }
