@@ -845,21 +845,6 @@ function visibleText(htmlPage)                                  // {{{2
 
 createOutputArea("DBAntwort");
 
-if (gamePage == "rbarmee") {
-
-    if (wholePage.indexOf("fliehen") == -1) {
-        copyText = visibleText(wholePage);
-        if (copyText.search(" : U[0-9]+, ") == -1) {
-            if (sendToHandler("send/text/armee", "dorftext", copyText, "DBAntwort")) {
-                sentMessage("Dorfdaten gesendet", "DBAntwort");
-            }
-        } else {
-            text = "Keine Dorfdaten aus einer Hoehle gesendet";
-            infoMessage(text, "DBAntwort");
-        }
-    }
-}
-
 if (gamePage == "rbfhandelb") {
     copyText = visibleText(wholePage);
     if (sendToHandler("send/text/turm", "text", copyText, "DBAntwort")) {
@@ -939,8 +924,13 @@ if (gamePage == "rbarmee") {
             printWarning("Du weissst nicht wo du bist.");
         } else {
             fields = splitPosition(text);
+            var xpos = fields[3];
+            var ypos = fields[4];
             var floor = fields[2];
             if (floor == undefined) { var floor = "N"; }
+            sichtElem.setAttribute("x", xpos);
+            sichtElem.setAttribute("y", ypos);
+            sichtElem.setAttribute("level", floor);
 
             // lese die Kartenfelder in der Minikarte
             jQuery.each(jQuery(".Feld"), function (index, value) {
@@ -961,7 +951,10 @@ if (gamePage == "rbarmee") {
                     var felddetail = value.getAttribute("data-felddetail");
                     var feldElem = addTerrain(floor, x, y, terrain,
                                               feldname, felddetail);
-                    if (value.getAttribute("data-dorflevel")) {
+                    // only send dorf data for currently visited field
+                    // other data has unknown status/timestamp
+                    if (value.getAttribute("data-dorflevel")
+                            && x == xpos && y == ypos) {
                         var level = value.getAttribute("data-dorflevel");
                         var name = value.getAttribute("data-dorfname");
                         var besitzer = value.getAttribute("data-dorfbesitzer");
