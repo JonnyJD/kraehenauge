@@ -11,7 +11,7 @@
 // @include        http://kraehen.org/rbstart.php.html
 // @grant          none
 // @author         JonnyJD
-// @version        1.6
+// @version        1.6.1
 // ==/UserScript==      }}}1
 // Anmerkung: Opera versteht das @include nicht und laed immer!
 
@@ -19,7 +19,7 @@
 if (document.title.indexOf("RB \xA9 - ") == 0) {
 
 var clientName = 'Kr\xE4henauge: ALLYTMP-Edition';
-var clientVersion = '1.6 [trunk r' + '$Rev$ '.split(" ")[1] + ']';
+var clientVersion = '1.6.1 [trunk r' + '$Rev$ '.split(" ")[1] + ']';
 var version = clientName + " " + clientVersion;
 var DEBUG = false;
 // Opera kann Formulare auch so in Tabs oeffnen
