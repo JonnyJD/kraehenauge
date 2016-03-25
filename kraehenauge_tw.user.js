@@ -1014,6 +1014,18 @@ if (gamePage == "rbarmee") {
                             addAlly(dorfElem, value.getAttribute("data-dorfallianz"));
                         }
                     }
+                    if (value.getAttribute("data-aptage")
+                            && x == xpos && y == ypos) {
+                        var level = value.getAttribute("data-aptage");
+                        var name = "Aussenposten";
+                        var besitzer = value.getAttribute("data-apbesitzer");
+                        var dorfElem = addDorf(feldElem, level, name,
+                                               besitzer);
+                        dorfElem.setAttribute("type", "ap");
+                        if (value.getAttribute("data-apallianz")) {
+                            addAlly(dorfElem, value.getAttribute("data-apallianz"));
+                        }
+                    }
                 }
             });
 
@@ -1061,6 +1073,16 @@ if (gamePage == "rbfturm1"
                                        besitzer, dorfdetail);
                 if (value.getAttribute("data-dorfallianz")) {
                     addAlly(dorfElem, value.getAttribute("data-dorfallianz"));
+                }
+            }
+            if (value.getAttribute("data-aptage")) {
+                var level = value.getAttribute("data-aptage");
+                var name = "Aussenposten";
+                var besitzer = value.getAttribute("data-apbesitzer");
+                var dorfElem = addDorf(feldElem, level, name, besitzer);
+                dorfElem.setAttribute("type", "ap");
+                if (value.getAttribute("data-apallianz")) {
+                    addAlly(dorfElem, value.getAttribute("data-apallianz"));
                 }
             }
         }
